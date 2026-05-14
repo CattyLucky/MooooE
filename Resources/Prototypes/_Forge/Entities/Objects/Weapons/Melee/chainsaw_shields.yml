@@ -301,8 +301,8 @@
     attackRate: 2
     damage:
       types:
-        Slash: 20
-        Structural: 25
+        Slash: 24
+        Structural: 35
     soundHit:
       collection: MetalThud
     soundNoDamage:
@@ -337,8 +337,8 @@
         volume: -6
     activatedDamage:
       types:
-        Slash: 32
-        Structural: 55
+        Slash: 40
+        Structural: 75
   - type: LandAtCursor
   - type: EmbeddableProjectile
     removalTime: 2.5
@@ -354,19 +354,19 @@
   - type: ToggleableEmbedEffect
     activeDamage:
       types:
-        Slash: 12
-        Structural: 40
-    activeBleedAmount: 3
+        Slash: 16
+        Structural: 60
+    activeBleedAmount: 4
     updateInterval: 1
   - type: ToggleableThrowDamage
     inactiveDamage:
       types:
-        Blunt: 18
-        Structural: 25
+        Blunt: 24
+        Structural: 40
     activeDamage:
       types:
-        Slash: 42
-        Structural: 80
+        Slash: 56
+        Structural: 120
   - type: ReturnOnThrow
     returnAction: ActionReturnReinforcedChainsawShield
     returnSound:
@@ -414,10 +414,10 @@
   - type: Blocking
     passiveBlockModifier:
       coefficients:
-        Blunt: 0.5
-        Slash: 0.5
-        Piercing: 0.5
-        Heat: 0.5
+        Blunt: 0.4
+        Slash: 0.4
+        Piercing: 0.4
+        Heat: 0.4
       flatReductions:
         Heat: 3
         Piercing: 3
