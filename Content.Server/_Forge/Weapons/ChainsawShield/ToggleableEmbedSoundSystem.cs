@@ -1,0 +1,25 @@
+using Content.Shared._Forge.Weapons;
+using Content.Shared.Item.ItemToggle.Components;
+using Content.Shared.Projectiles;
+using Robust.Shared.Audio.Systems;
+
+namespace Content.Server._Forge.Weapons;
+
+public sealed class ToggleableEmbedSoundSystem : EntitySystem
+{
+    [Dependency] private readonly SharedAudioSystem _audio = default!;
+
+    public override void Initialize()
+    {
+        SubscribeLocalEvent<ToggleableEmbedSoundComponent, EmbedEvent>(OnEmbed);
+    }
+
+    private void OnEmbed(EntityUid uid, ToggleableEmbedSoundComponent component, ref EmbedEvent args)
+    {
+        var sound = TryComp<ItemToggleComponent>(uid, out var toggle) && toggle.Activated
+            ? component.ActiveSound
+            : component.InactiveSound;
+
+        _audio.PlayPvs(sound, uid);
+    }
+}
