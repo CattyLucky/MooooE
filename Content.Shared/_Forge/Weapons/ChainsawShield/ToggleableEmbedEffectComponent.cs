@@ -17,5 +17,5 @@ public sealed partial class ToggleableEmbedEffectComponent : Component
     [DataField]
     public bool IgnoreResistances;
 
-    public float Accumulator;
+    public TimeSpan NextUpdate;
 }

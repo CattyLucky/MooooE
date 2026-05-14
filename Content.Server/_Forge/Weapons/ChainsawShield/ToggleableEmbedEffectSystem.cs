@@ -5,6 +5,7 @@ using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.Projectiles;
+using Robust.Shared.Timing;
 
 namespace Content.Server._Forge.Weapons;
 
@@ -12,6 +13,7 @@ public sealed class ToggleableEmbedEffectSystem : EntitySystem
 {
     [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
     [Dependency] private readonly DamageableSystem _damageable = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -20,28 +22,28 @@ public sealed class ToggleableEmbedEffectSystem : EntitySystem
 
     private void OnEmbed(EntityUid uid, ToggleableEmbedEffectComponent component, ref EmbedEvent args)
     {
-        component.Accumulator = 0f;
+        component.NextUpdate = _timing.CurTime + GetUpdateInterval(component);
     }
 
     public override void Update(float frameTime)
     {
+        var curTime = _timing.CurTime;
         var query = EntityQueryEnumerator<ToggleableEmbedEffectComponent, EmbeddableProjectileComponent>();
         while (query.MoveNext(out var uid, out var component, out var embeddable))
         {
+            if (curTime < component.NextUpdate)
+                continue;
+
+            var interval = GetUpdateInterval(component);
+            component.NextUpdate = curTime + interval;
+
             if (embeddable.EmbeddedIntoUid is not { } target ||
                 TerminatingOrDeleted(target) ||
                 !IsActive(uid))
             {
-                component.Accumulator = 0f;
                 continue;
             }
 
-            component.Accumulator += frameTime;
-            var interval = MathF.Max(component.UpdateInterval, 0.1f);
-            if (component.Accumulator < interval)
-                continue;
-
-            component.Accumulator -= interval;
             ApplyEffect(uid, target, component);
         }
     }
@@ -63,5 +65,10 @@ public sealed class ToggleableEmbedEffectSystem : EntitySystem
     private bool IsActive(EntityUid uid)
     {
         return TryComp<ItemToggleComponent>(uid, out var toggle) && toggle.Activated;
+    }
+
+    private static TimeSpan GetUpdateInterval(ToggleableEmbedEffectComponent component)
+    {
+        return TimeSpan.FromSeconds(MathF.Max(component.UpdateInterval, 0.1f));
     }
 }

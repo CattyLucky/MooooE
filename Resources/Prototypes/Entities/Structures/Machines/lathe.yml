@@ -274,6 +274,7 @@
     - Translators
     # Forge-change
     - BSparts
+    - ForgePublicWeapons
   - type: EmagLatheRecipes
     emagDynamicPacks:
     - DynamicAmmoRecipePack
@@ -505,6 +506,7 @@
     - SecurityExplosives
     - DynamicAmmoRecipePack
     - SecurityWeapons
+    - ForgePublicWeapons # Forge-change
     - SecurityDisablers
     - SMCybernetics
     # Mono - Mechs
