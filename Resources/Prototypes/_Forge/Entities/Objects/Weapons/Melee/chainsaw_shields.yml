@@ -414,10 +414,10 @@
   - type: Blocking
     passiveBlockModifier:
       coefficients:
-        Blunt: 0.4
-        Slash: 0.4
-        Piercing: 0.4
-        Heat: 0.4
+        Blunt: 0.5
+        Slash: 0.5
+        Piercing: 0.5
+        Heat: 0.5
       flatReductions:
         Heat: 3
         Piercing: 3
