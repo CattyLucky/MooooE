@@ -141,7 +141,6 @@
   - type: ToggleableEmbedEffect
     activeDamage:
       types:
-        Slash: 12
         Structural: 40
     activeBleedAmount: 3
     updateInterval: 1
@@ -354,7 +353,6 @@
   - type: ToggleableEmbedEffect
     activeDamage:
       types:
-        Slash: 16
         Structural: 60
     activeBleedAmount: 4
     updateInterval: 1
