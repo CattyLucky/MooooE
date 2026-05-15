@@ -3638,8 +3638,6 @@ entities:
       pos: 2.5,-24.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
       deviceLists:
       - 2
   - uid: 524
@@ -3649,8 +3647,6 @@ entities:
       pos: -1.5,-23.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
       deviceLists:
       - 2
   - uid: 525
@@ -3660,8 +3656,6 @@ entities:
       pos: 0.5,-27.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
       deviceLists:
       - 2
 - proto: FirelockEdge
@@ -3681,8 +3675,6 @@ entities:
       pos: -0.5,-18.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
       deviceLists:
       - 2
   - uid: 528
@@ -3692,8 +3684,6 @@ entities:
       pos: 1.5,-18.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
       deviceLists:
       - 2
 - proto: FloorDrain
@@ -4527,8 +4517,6 @@ entities:
       pos: -0.5,-14.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
       deviceLists:
       - 2
     - type: AtmosPipeColor
@@ -4560,8 +4548,6 @@ entities:
       pos: 1.5,-14.5
       parent: 1
     - type: DeviceNetwork
-      configurators:
-      - invalid
       deviceLists:
       - 2
     - type: AtmosPipeLayers
