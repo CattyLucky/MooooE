@@ -19,5 +19,11 @@ public sealed class ThrowingAmmoDamageBoostSystem : EntitySystem
             return;
 
         args.Multiplier *= component.DamageMultiplier;
+
+        if (!args.Consume)
+            return;
+
+        component.DamageMultiplier = 0f;
+        RemCompDeferred<ThrowingAmmoDamageBoostComponent>(uid);
     }
 }

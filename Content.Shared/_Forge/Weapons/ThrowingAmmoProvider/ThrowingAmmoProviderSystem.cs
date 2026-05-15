@@ -1,6 +1,9 @@
 using Content.Shared.Containers.ItemSlots;
+using Content.Shared.CombatMode.Pacification;
+using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction;
 using Content.Shared.Item;
+using Content.Shared.Popups;
 using Content.Shared.Throwing;
 using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Events;
@@ -23,6 +26,7 @@ public sealed class ThrowingAmmoProviderSystem : EntitySystem
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedItemSystem _itemSystem = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly INetManager _netManager = default!;
 
     public override void Initialize()
@@ -99,6 +103,9 @@ public sealed class ThrowingAmmoProviderSystem : EntitySystem
             return;
 
         if (!CanUseAsAmmo(args.Used, comp))
+            return;
+
+        if (TryBlockPacifiedLoading(args))
             return;
 
         for (var i = 0; i < comp.Capacity; i++)
@@ -319,6 +326,25 @@ public sealed class ThrowingAmmoProviderSystem : EntitySystem
         // DamageOtherOnHit is server-only in this fork, so the client cannot validate this whitelist.
         // Let the client predict insertion; the server slot whitelist remains authoritative.
         return _netManager.IsClient || _whitelist.IsValid(comp.Whitelist, uid);
+    }
+
+    private bool TryBlockPacifiedLoading(InteractUsingEvent args)
+    {
+        if (!HasComp<PacifiedComponent>(args.User))
+            return false;
+
+        var ev = new AttemptPacifiedThrowEvent(args.Used, args.User);
+        RaiseLocalEvent(args.Used, ref ev);
+        if (!ev.Cancelled)
+            return false;
+
+        args.Handled = true;
+
+        var cannotUseMessage = ev.CancelReasonMessageId ?? "pacified-cannot-throw";
+        var itemName = Identity.Entity(args.Used, EntityManager);
+        _popup.PopupEntity(Loc.GetString(cannotUseMessage, ("projectile", itemName)), args.Used, args.User);
+
+        return true;
     }
 
     private bool TryInsertAmmo(EntityUid uid, ItemSlot slot, EntityUid user)

@@ -88,19 +88,27 @@ public sealed class ReturnOnThrowSystem : EntitySystem
         if (component.ReturnOwner != null && component.ReturnOwner != owner)
             ClearReturn(uid, component);
 
+        if (!_actions.AddAction(owner, ref component.ReturnActionEntity, out _, component.ReturnAction, uid))
+        {
+            ClearReturn(uid, component);
+            return;
+        }
+
         component.ReturnOwner = owner;
         component.ReturnReady = enabled;
-        Dirty(uid, component);
-
-        if (!_actions.AddAction(owner, ref component.ReturnActionEntity, out _, component.ReturnAction, uid))
-            return;
-
         _actions.SetEnabled(component.ReturnActionEntity, enabled);
         AddPvsOverride(uid, owner);
+        Dirty(uid, component);
     }
 
     private void SetReturnReady(EntityUid uid, ReturnOnThrowComponent component)
     {
+        if (component.ReturnActionEntity == null)
+        {
+            ClearReturn(uid, component);
+            return;
+        }
+
         component.ReturnReady = true;
         _actions.SetEnabled(component.ReturnActionEntity, true);
         Dirty(uid, component);

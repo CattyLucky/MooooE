@@ -35,7 +35,7 @@ namespace Content.Server.Damage.Systems
 
         private void OnDoHit(EntityUid uid, DamageOtherOnHitComponent component, ThrowDoHitEvent args)
         {
-            var damage = GetThrowDamage(uid, component.Damage);
+            var damage = GetThrowDamage(uid, component.Damage, consumeModifiers: true);
             DoThrowDamage(uid, args.Target, args.Component.Thrower, damage, component.IgnoreResistances);
         }
 
@@ -52,9 +52,9 @@ namespace Content.Server.Damage.Systems
             CancelPacifiedThrow(ref args);
         }
 
-        public DamageSpecifier GetThrowDamage(EntityUid uid, DamageSpecifier damage)
+        public DamageSpecifier GetThrowDamage(EntityUid uid, DamageSpecifier damage, bool consumeModifiers = false)
         {
-            var ev = new GetThrowDamageModifierEvent(1f);
+            var ev = new GetThrowDamageModifierEvent(1f, consumeModifiers);
             RaiseLocalEvent(uid, ref ev);
 
             return damage * _damageable.UniversalThrownDamageModifier * ev.Multiplier;
@@ -104,11 +104,13 @@ namespace Content.Server.Damage.Systems
     [ByRefEvent]
     public struct GetThrowDamageModifierEvent
     {
-        public GetThrowDamageModifierEvent(float multiplier)
+        public GetThrowDamageModifierEvent(float multiplier, bool consume = false)
         {
             Multiplier = multiplier;
+            Consume = consume;
         }
 
         public float Multiplier;
+        public bool Consume;
     }
 }

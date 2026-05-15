@@ -21,7 +21,7 @@ public sealed class ToggleableThrowDamageSystem : EntitySystem
 
     private void OnThrowDoHit(EntityUid uid, ToggleableThrowDamageComponent component, ThrowDoHitEvent args)
     {
-        var damage = _damageOtherOnHit.GetThrowDamage(uid, GetDamage(uid, component));
+        var damage = _damageOtherOnHit.GetThrowDamage(uid, GetDamage(uid, component), consumeModifiers: true);
         _damageOtherOnHit.DoThrowDamage(uid, args.Target, args.Component.Thrower, damage, component.IgnoreResistances);
     }
 
