@@ -4,7 +4,7 @@
   entityIcon: ChainsawShield
   discipline: Arsenal
   tier: 2
-  cost: 25000
+  cost: 50000
   recipeUnlocks:
   - ChainsawShield
   - ReinforcedChainsawShield

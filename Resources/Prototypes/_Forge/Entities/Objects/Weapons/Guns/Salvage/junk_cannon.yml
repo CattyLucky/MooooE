@@ -52,7 +52,7 @@
   - type: ThrowingAmmoProvider
     containerId: throwing_ammo
     capacity: 12
-    damageMultiplier: 1.0
+    damageMultiplier: 1.2
     minimumThrowFlyTime: 0.15
     slotTemplate:
       insertOnInteract: false
