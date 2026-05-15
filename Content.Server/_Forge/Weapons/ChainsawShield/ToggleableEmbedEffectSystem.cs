@@ -22,14 +22,15 @@ public sealed class ToggleableEmbedEffectSystem : EntitySystem
 
     private void OnEmbed(EntityUid uid, ToggleableEmbedEffectComponent component, ref EmbedEvent args)
     {
+        EnsureComp<ActiveToggleableEmbedEffectComponent>(uid);
         component.NextUpdate = _timing.CurTime + GetUpdateInterval(component);
     }
 
     public override void Update(float frameTime)
     {
         var curTime = _timing.CurTime;
-        var query = EntityQueryEnumerator<ToggleableEmbedEffectComponent, EmbeddableProjectileComponent>();
-        while (query.MoveNext(out var uid, out var component, out var embeddable))
+        var query = EntityQueryEnumerator<ActiveToggleableEmbedEffectComponent, ToggleableEmbedEffectComponent, EmbeddableProjectileComponent>();
+        while (query.MoveNext(out var uid, out _, out var component, out var embeddable))
         {
             if (curTime < component.NextUpdate)
                 continue;
@@ -38,11 +39,14 @@ public sealed class ToggleableEmbedEffectSystem : EntitySystem
             component.NextUpdate = curTime + interval;
 
             if (embeddable.EmbeddedIntoUid is not { } target ||
-                TerminatingOrDeleted(target) ||
-                !IsActive(uid))
+                TerminatingOrDeleted(target))
             {
+                RemCompDeferred<ActiveToggleableEmbedEffectComponent>(uid);
                 continue;
             }
+
+            if (!IsActive(uid))
+                continue;
 
             ApplyEffect(uid, target, component);
         }
@@ -71,4 +75,9 @@ public sealed class ToggleableEmbedEffectSystem : EntitySystem
     {
         return TimeSpan.FromSeconds(MathF.Max(component.UpdateInterval, 0.1f));
     }
+}
+
+[RegisterComponent]
+public sealed partial class ActiveToggleableEmbedEffectComponent : Component
+{
 }

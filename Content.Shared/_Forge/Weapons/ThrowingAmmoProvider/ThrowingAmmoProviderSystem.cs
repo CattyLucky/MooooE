@@ -107,7 +107,7 @@ public sealed class ThrowingAmmoProviderSystem : EntitySystem
             if (!_itemSlots.TryGetSlot(uid, slotId, out var slot) || slot.Item != null)
                 continue;
 
-            if (TryInsertAmmo(uid, slotId, slot, args.Used, args.User))
+            if (TryInsertAmmo(uid, slot, args.User))
             {
                 args.Handled = true;
                 return;
@@ -122,6 +122,11 @@ public sealed class ThrowingAmmoProviderSystem : EntitySystem
 
     private void OnGunShot(EntityUid uid, ThrowingAmmoProviderComponent comp, ref GunShotEvent args)
     {
+        // Server gun code already plays the shot sound after throwing the item.
+        // This keeps local prediction responsive without duplicating the sound server-side.
+        if (!_netManager.IsClient)
+            return;
+
         if (TryComp<GunComponent>(uid, out var gun))
             _audio.PlayPredicted(gun.SoundGunshotModified ?? gun.SoundGunshot, uid, args.User);
     }
@@ -316,16 +321,16 @@ public sealed class ThrowingAmmoProviderSystem : EntitySystem
         return _netManager.IsClient || _whitelist.IsValid(comp.Whitelist, uid);
     }
 
-    private bool TryInsertAmmo(EntityUid uid, string slotId, ItemSlot slot, EntityUid item, EntityUid user)
+    private bool TryInsertAmmo(EntityUid uid, ItemSlot slot, EntityUid user)
     {
         if (!_netManager.IsClient)
-            return _itemSlots.TryInsert(uid, slotId, item, user, excludeUserAudio: true);
+            return _itemSlots.TryInsertFromHand(uid, slot, user, excludeUserAudio: true);
 
         var whitelist = slot.Whitelist;
         slot.Whitelist = null;
         try
         {
-            return _itemSlots.TryInsert(uid, slotId, item, user, excludeUserAudio: true);
+            return _itemSlots.TryInsertFromHand(uid, slot, user, excludeUserAudio: true);
         }
         finally
         {

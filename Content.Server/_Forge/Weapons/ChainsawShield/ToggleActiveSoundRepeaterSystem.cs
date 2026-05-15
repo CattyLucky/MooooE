@@ -17,27 +17,46 @@ public sealed class ToggleActiveSoundRepeaterSystem : EntitySystem
 
     public override void Update(float frameTime)
     {
-        var query = EntityQueryEnumerator<ToggleActiveSoundRepeaterComponent, ItemToggleComponent>();
-        while (query.MoveNext(out var uid, out var repeater, out var toggle))
+        var query = EntityQueryEnumerator<ActiveToggleSoundRepeaterComponent, ToggleActiveSoundRepeaterComponent, ItemToggleComponent>();
+        while (query.MoveNext(out var uid, out _, out var repeater, out var toggle))
         {
             if (!toggle.Activated || _timing.CurTime < repeater.NextSound)
                 continue;
 
             _audio.PlayPvs(repeater.Sound, uid);
-            ScheduleNext(repeater, repeater.Interval);
+            ScheduleNext(repeater, GetInterval(repeater));
         }
     }
 
     private void OnToggled(EntityUid uid, ToggleActiveSoundRepeaterComponent component, ref ItemToggledEvent args)
     {
         if (!args.Activated)
+        {
+            RemCompDeferred<ActiveToggleSoundRepeaterComponent>(uid);
             return;
+        }
 
-        ScheduleNext(component, component.InitialDelay);
+        EnsureComp<ActiveToggleSoundRepeaterComponent>(uid);
+        ScheduleNext(component, GetInitialDelay(component));
     }
 
-    private void ScheduleNext(ToggleActiveSoundRepeaterComponent component, float delay)
+    private void ScheduleNext(ToggleActiveSoundRepeaterComponent component, TimeSpan delay)
     {
-        component.NextSound = _timing.CurTime + TimeSpan.FromSeconds(delay);
+        component.NextSound = _timing.CurTime + delay;
     }
+
+    private static TimeSpan GetInitialDelay(ToggleActiveSoundRepeaterComponent component)
+    {
+        return TimeSpan.FromSeconds(MathF.Max(component.InitialDelay, 0f));
+    }
+
+    private static TimeSpan GetInterval(ToggleActiveSoundRepeaterComponent component)
+    {
+        return TimeSpan.FromSeconds(MathF.Max(component.Interval, 0.1f));
+    }
+}
+
+[RegisterComponent]
+public sealed partial class ActiveToggleSoundRepeaterComponent : Component
+{
 }
