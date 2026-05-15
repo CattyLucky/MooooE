@@ -13,7 +13,7 @@ using Content.Shared.Throwing;
 using Content.Shared.Wires;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Player;
-using Robust.Shared.Utility;
+using Robust.Shared.Utility; // Forge-Change
 
 namespace Content.Server.Damage.Systems
 {
@@ -52,6 +52,7 @@ namespace Content.Server.Damage.Systems
             CancelPacifiedThrow(ref args);
         }
 
+        // Forge-Change-Start: shared throw-damage pipeline with optional one-shot modifier consumption.
         public DamageSpecifier GetThrowDamage(EntityUid uid, DamageSpecifier damage, bool consumeModifiers = false)
         {
             var ev = new GetThrowDamageModifierEvent(1f, consumeModifiers);
@@ -99,8 +100,10 @@ namespace Content.Server.Damage.Systems
         {
             args.Cancel("pacified-cannot-throw");
         }
+        // Forge-Change-End
     }
 
+    // Forge-Change: throw modifier event with consume flag for ricochet-safe multiplier usage.
     [ByRefEvent]
     public struct GetThrowDamageModifierEvent
     {
