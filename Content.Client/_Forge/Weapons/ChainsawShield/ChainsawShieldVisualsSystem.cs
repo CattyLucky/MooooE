@@ -1,11 +1,11 @@
 using System.Linq;
 using Content.Client.Items.Systems;
-using Content.Shared._Forge.Weapons;
+using Content.Shared._Forge.Weapons.ChainsawShield;
 using Content.Shared.Hands;
 using Content.Shared.Toggleable;
 using Robust.Client.GameObjects;
 
-namespace Content.Client._Forge.Weapons;
+namespace Content.Client._Forge.Weapons.ChainsawShield;
 
 public sealed class ChainsawShieldVisualsSystem : EntitySystem
 {

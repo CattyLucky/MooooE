@@ -1,9 +1,8 @@
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Whitelist;
-using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 
-namespace Content.Shared.Weapons.Ranged.Components;
+namespace Content.Shared._Forge.Weapons.ThrowingAmmoProvider;
 
 [RegisterComponent, NetworkedComponent]
 [AutoGenerateComponentState(true)]
@@ -24,12 +23,6 @@ public sealed partial class ThrowingAmmoProviderComponent : Component
     [DataField]
     public EntityWhitelist? Whitelist;
 
-    [DataField]
-    public SoundSpecifier? SoundInsert = new SoundPathSpecifier("/Audio/Weapons/Guns/MagIn/shotgun_insert.ogg");
-
-    [DataField]
-    public SoundSpecifier? SoundRack = new SoundPathSpecifier("/Audio/Weapons/Guns/Cock/shotgun_rack.ogg");
-
     [DataField, AutoNetworkedField]
     public int AmmoCount;
 
@@ -41,9 +34,6 @@ public sealed partial class ThrowingAmmoProviderComponent : Component
 [AutoGenerateComponentState]
 public sealed partial class CannonBoostedComponent : Component
 {
-    [DataField, AutoNetworkedField]
-    public float DamageMultiplier;
-
     [DataField, AutoNetworkedField]
     public float MinimumFlyTime;
 }
@@ -60,13 +50,8 @@ public sealed partial class HiddenUntilThrownComponent : Component
 {
 }
 
-public enum HlamotronVisualLayers
+public enum JunkCannonVisualLayers
 {
     Empty,
-    Loaded
-}
-
-public enum JunkCannonInhandVisuals
-{
     Loaded
 }

@@ -1,30 +1,16 @@
-using Content.Server.Administration.Logs;
-using Content.Server.Weapons.Ranged.Systems;
-using Content.Shared._Forge.Weapons;
-using Content.Shared.Camera;
+using Content.Shared._Forge.Weapons.ChainsawShield;
+using Content.Server.Damage.Systems;
 using Content.Shared.CombatMode.Pacification;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Events;
-using Content.Shared.Damage.Systems;
-using Content.Shared.Database;
-using Content.Shared.Effects;
 using Content.Shared.Item.ItemToggle.Components;
-using Content.Shared.Mobs.Components;
 using Content.Shared.Throwing;
-using Content.Shared.Weapons.Ranged.Components;
-using Robust.Shared.Physics.Components;
-using Robust.Shared.Player;
 
-namespace Content.Server._Forge.Weapons;
+namespace Content.Server._Forge.Weapons.ChainsawShield;
 
 public sealed class ToggleableThrowDamageSystem : EntitySystem
 {
-    [Dependency] private readonly IAdminLogManager _adminLogger = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly DamageExamineSystem _damageExamine = default!;
-    [Dependency] private readonly GunSystem _guns = default!;
-    [Dependency] private readonly SharedCameraRecoilSystem _cameraRecoil = default!;
-    [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
+    [Dependency] private readonly DamageOtherOnHitSystem _damageOtherOnHit = default!;
 
     public override void Initialize()
     {
@@ -35,37 +21,19 @@ public sealed class ToggleableThrowDamageSystem : EntitySystem
 
     private void OnThrowDoHit(EntityUid uid, ToggleableThrowDamageComponent component, ThrowDoHitEvent args)
     {
-        if (TerminatingOrDeleted(args.Target))
-            return;
-
-        var damage = GetDamage(uid, component) * _damageable.UniversalThrownDamageModifier * GetCannonMultiplier(uid);
-        var changed = _damageable.TryChangeDamage(
-            args.Target,
-            damage,
-            component.IgnoreResistances,
-            origin: args.Component.Thrower);
-
-        if (changed != null && HasComp<MobStateComponent>(args.Target))
-            _adminLogger.Add(LogType.ThrowHit,
-                $"{ToPrettyString(args.Target):target} received {changed.GetTotal():damage} damage from collision");
-
-        if (changed is { Empty: false })
-            _color.RaiseEffect(Color.Red, new List<EntityUid> { args.Target }, Filter.Pvs(args.Target, entityManager: EntityManager));
-
-        _guns.PlayImpactSound(args.Target, changed, null, false, null, null);
-        if (TryComp<PhysicsComponent>(uid, out var body) && body.LinearVelocity.LengthSquared() > 0f)
-            _cameraRecoil.KickCamera(args.Target, body.LinearVelocity.Normalized());
+        var damage = _damageOtherOnHit.GetThrowDamage(uid, GetDamage(uid, component));
+        _damageOtherOnHit.DoThrowDamage(uid, args.Target, args.Component.Thrower, damage, component.IgnoreResistances);
     }
 
     private void OnDamageExamine(EntityUid uid, ToggleableThrowDamageComponent component, ref DamageExamineEvent args)
     {
-        var damage = GetDamage(uid, component) * _damageable.UniversalThrownDamageModifier * GetCannonMultiplier(uid);
-        _damageExamine.AddDamageExamine(args.Message, _damageable.ApplyUniversalAllModifiers(damage), Loc.GetString("damage-throw"));
+        var damage = _damageOtherOnHit.GetThrowDamage(uid, GetDamage(uid, component));
+        _damageOtherOnHit.AddThrowDamageExamine(args.Message, damage);
     }
 
     private void OnAttemptPacifiedThrow(Entity<ToggleableThrowDamageComponent> ent, ref AttemptPacifiedThrowEvent args)
     {
-        args.Cancel("pacified-cannot-throw");
+        DamageOtherOnHitSystem.CancelPacifiedThrow(ref args);
     }
 
     private DamageSpecifier GetDamage(EntityUid uid, ToggleableThrowDamageComponent component)
@@ -73,12 +41,5 @@ public sealed class ToggleableThrowDamageSystem : EntitySystem
         return TryComp<ItemToggleComponent>(uid, out var toggle) && toggle.Activated
             ? component.ActiveDamage
             : component.InactiveDamage;
-    }
-
-    private float GetCannonMultiplier(EntityUid uid)
-    {
-        return TryComp<ThrowingAmmoDamageBoostComponent>(uid, out var boost)
-            ? boost.DamageMultiplier
-            : 1f;
     }
 }

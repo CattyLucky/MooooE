@@ -9,20 +9,20 @@
     layers:
     - state: base
       visible: true
-      map: [ "enum.HlamotronVisualLayers.Empty" ]
+      map: [ "enum.JunkCannonVisualLayers.Empty" ]
     - state: icon
       visible: false
-      map: [ "enum.HlamotronVisualLayers.Loaded" ]
+      map: [ "enum.JunkCannonVisualLayers.Loaded" ]
   - type: Item
     size: Huge
     sprite: Forge/Objects/Weapons/Guns/Salvage/junkjet.rsi
   - type: GenericVisualizer
     visuals:
       enum.AmmoVisuals.HasAmmo:
-        enum.HlamotronVisualLayers.Empty:
+        enum.JunkCannonVisualLayers.Empty:
           True: { visible: false }
           False: { visible: true }
-        enum.HlamotronVisualLayers.Loaded:
+        enum.JunkCannonVisualLayers.Loaded:
           True: { visible: true }
           False: { visible: false }
   - type: GunRequiresWield
@@ -54,10 +54,6 @@
     capacity: 12
     damageMultiplier: 2
     minimumThrowFlyTime: 0.15
-    soundInsert:
-      path: /Audio/Weapons/Guns/MagIn/shotgun_insert.ogg
-    soundRack:
-      path: /Audio/Weapons/Guns/MagOut/smg_magout.ogg
     slotTemplate:
       insertOnInteract: false
       swap: false
@@ -80,33 +76,3 @@
       path: /Audio/Weapons/Guns/Gunshots/shotgun.ogg
     soundEmpty:
       path: /Audio/Weapons/Guns/Empty/empty.ogg
-
-- type: entity
-  name: debug junk cannon
-  parent: JunkCannon
-  id: DebugJunkCannon
-  description: A debug version of the junk cannon with a much larger magazine and boosted throw damage.
-  components:
-  - type: ThrowingAmmoProvider
-    containerId: throwing_ammo
-    capacity: 33
-    damageMultiplier: 5.0
-    minimumThrowFlyTime: 0.15
-    soundInsert:
-      path: /Audio/Weapons/Guns/MagIn/shotgun_insert.ogg
-    soundRack:
-      path: /Audio/Weapons/Guns/Empty/empty.ogg
-    slotTemplate:
-      insertOnInteract: false
-      swap: false
-      insertSound:
-        path: /Audio/Weapons/Guns/MagIn/shotgun_insert.ogg
-      ejectSound:
-        path: /Audio/Weapons/Guns/Empty/empty.ogg
-    whitelist:
-      components:
-      - DamageOtherOnHit
-      - ToggleableThrowDamage
-  - type: ItemSlots
-  - type: Gun
-    fireRate: 22

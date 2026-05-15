@@ -1,13 +1,13 @@
 using Content.Server.Body.Components;
 using Content.Server.Body.Systems;
-using Content.Shared._Forge.Weapons;
+using Content.Shared._Forge.Weapons.ChainsawShield;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.Projectiles;
 using Robust.Shared.Timing;
 
-namespace Content.Server._Forge.Weapons;
+namespace Content.Server._Forge.Weapons.ChainsawShield;
 
 public sealed class ToggleableEmbedEffectSystem : EntitySystem
 {
@@ -75,9 +75,4 @@ public sealed class ToggleableEmbedEffectSystem : EntitySystem
     {
         return TimeSpan.FromSeconds(MathF.Max(component.UpdateInterval, 0.1f));
     }
-}
-
-[RegisterComponent]
-public sealed partial class ActiveToggleableEmbedEffectComponent : Component
-{
 }

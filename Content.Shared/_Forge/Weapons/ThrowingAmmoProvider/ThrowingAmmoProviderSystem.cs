@@ -4,6 +4,7 @@ using Content.Shared.Item;
 using Content.Shared.Throwing;
 using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Events;
+using Content.Shared.Weapons.Ranged.Systems;
 using Content.Shared.Whitelist;
 using Content.Shared.Wieldable;
 using Content.Shared.Wieldable.Components;
@@ -12,7 +13,7 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Network;
 
-namespace Content.Shared.Weapons.Ranged.Systems;
+namespace Content.Shared._Forge.Weapons.ThrowingAmmoProvider;
 
 public sealed class ThrowingAmmoProviderSystem : EntitySystem
 {
@@ -246,7 +247,6 @@ public sealed class ThrowingAmmoProviderSystem : EntitySystem
     private void ApplyCannonBoost(EntityUid uid, ThrowingAmmoProviderComponent comp)
     {
         var boosted = EnsureComp<CannonBoostedComponent>(uid);
-        boosted.DamageMultiplier = comp.DamageMultiplier;
         boosted.MinimumFlyTime = comp.MinimumThrowFlyTime;
         Dirty(uid, boosted);
 

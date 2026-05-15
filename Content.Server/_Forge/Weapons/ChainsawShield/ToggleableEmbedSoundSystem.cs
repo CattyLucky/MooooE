@@ -1,9 +1,9 @@
-using Content.Shared._Forge.Weapons;
+using Content.Shared._Forge.Weapons.ChainsawShield;
 using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.Projectiles;
 using Robust.Shared.Audio.Systems;
 
-namespace Content.Server._Forge.Weapons;
+namespace Content.Server._Forge.Weapons.ChainsawShield;
 
 public sealed class ToggleableEmbedSoundSystem : EntitySystem
 {

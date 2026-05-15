@@ -1,11 +1,11 @@
 using Content.Client.Weapons.Ranged.Components;
 using Content.Client.Weapons.Ranged.ItemStatus;
 using Content.Client.Weapons.Ranged.Systems;
-using Content.Shared.Weapons.Ranged.Components;
+using Content.Shared._Forge.Weapons.ThrowingAmmoProvider;
 using Robust.Client.GameObjects;
 using Robust.Client.UserInterface;
 
-namespace Content.Client._Forge.Weapons;
+namespace Content.Client._Forge.Weapons.ThrowingAmmoProvider;
 
 public sealed class ThrowingAmmoCounterSystem : EntitySystem
 {

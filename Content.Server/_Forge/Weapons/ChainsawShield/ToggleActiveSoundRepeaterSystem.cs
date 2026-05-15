@@ -1,9 +1,9 @@
-using Content.Shared._Forge.Weapons;
+using Content.Shared._Forge.Weapons.ChainsawShield;
 using Content.Shared.Item.ItemToggle.Components;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Timing;
 
-namespace Content.Server._Forge.Weapons;
+namespace Content.Server._Forge.Weapons.ChainsawShield;
 
 public sealed class ToggleActiveSoundRepeaterSystem : EntitySystem
 {
@@ -54,9 +54,4 @@ public sealed class ToggleActiveSoundRepeaterSystem : EntitySystem
     {
         return TimeSpan.FromSeconds(MathF.Max(component.Interval, 0.1f));
     }
-}
-
-[RegisterComponent]
-public sealed partial class ActiveToggleSoundRepeaterComponent : Component
-{
 }

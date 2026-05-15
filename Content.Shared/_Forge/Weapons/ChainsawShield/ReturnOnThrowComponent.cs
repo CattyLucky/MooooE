@@ -1,13 +1,15 @@
 using Content.Shared.Actions;
 using Robust.Shared.Audio;
+using Robust.Shared.GameStates;
 
-namespace Content.Shared._Forge.Weapons;
+namespace Content.Shared._Forge.Weapons.ChainsawShield;
 
-[RegisterComponent]
+[RegisterComponent, NetworkedComponent]
+[AutoGenerateComponentState]
 public sealed partial class ReturnOnThrowComponent : Component
 {
-    [DataField]
-    public string ReturnAction = "ActionReturnOnThrow";
+    [DataField(required: true)]
+    public string ReturnAction = default!;
 
     [DataField]
     public bool ForcePickup;
@@ -17,15 +19,11 @@ public sealed partial class ReturnOnThrowComponent : Component
 
     public EntityUid? ReturnActionEntity;
 
+    [AutoNetworkedField]
     public EntityUid? ReturnOwner;
 
+    [AutoNetworkedField]
     public bool ReturnReady;
-}
-
-[RegisterComponent]
-public sealed partial class ReturnOnThrowActionComponent : Component
-{
-    public EntityUid? Target;
 }
 
 public sealed partial class ReturnOnThrowActionEvent : InstantActionEvent;

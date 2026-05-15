@@ -1,5 +1,5 @@
-using Content.Shared._Forge.Weapons;
 using Content.Shared.Actions;
+using Content.Shared._Forge.Weapons.ChainsawShield;
 using Content.Shared.Hands;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Projectiles;
@@ -10,7 +10,7 @@ using Robust.Shared.Containers;
 using Robust.Shared.GameStates;
 using Robust.Shared.Player;
 
-namespace Content.Server._Forge.Weapons;
+namespace Content.Server._Forge.Weapons.ChainsawShield;
 
 public sealed class ReturnOnThrowSystem : EntitySystem
 {
@@ -31,8 +31,6 @@ public sealed class ReturnOnThrowSystem : EntitySystem
         SubscribeLocalEvent<ReturnOnThrowComponent, GotEquippedHandEvent>(OnGotEquippedHand);
         SubscribeLocalEvent<ReturnOnThrowComponent, EntGotInsertedIntoContainerMessage>(OnGotInsertedIntoContainer);
         SubscribeLocalEvent<ReturnOnThrowComponent, ComponentShutdown>(OnShutdown);
-
-        SubscribeLocalEvent<ReturnOnThrowActionComponent, ReturnOnThrowActionEvent>(OnReturnActionFromAction);
     }
 
     private void OnThrown(EntityUid uid, ReturnOnThrowComponent component, ref ThrownEvent args)
@@ -51,7 +49,7 @@ public sealed class ReturnOnThrowSystem : EntitySystem
         if (component.ReturnOwner == null)
             return;
 
-        SetReturnReady(component);
+        SetReturnReady(uid, component);
     }
 
     private void OnEmbedded(EntityUid uid, ReturnOnThrowComponent component, ref EmbedEvent args)
@@ -59,7 +57,7 @@ public sealed class ReturnOnThrowSystem : EntitySystem
         if (component.ReturnOwner == null)
             return;
 
-        SetReturnReady(component);
+        SetReturnReady(uid, component);
     }
 
     private void OnGotEquippedHand(EntityUid uid, ReturnOnThrowComponent component, ref GotEquippedHandEvent args)
@@ -85,23 +83,6 @@ public sealed class ReturnOnThrowSystem : EntitySystem
         args.Handled = TryReturn(uid, args.Performer, component);
     }
 
-    private void OnReturnActionFromAction(EntityUid uid, ReturnOnThrowActionComponent component, ref ReturnOnThrowActionEvent args)
-    {
-        if (args.Handled || component.Target == null)
-            return;
-
-        if (!TryComp<ReturnOnThrowComponent>(component.Target, out var returnComponent))
-        {
-            _actions.RemoveAction(uid);
-            return;
-        }
-
-        if (returnComponent.ReturnOwner != args.Performer || !returnComponent.ReturnReady)
-            return;
-
-        args.Handled = TryReturn(component.Target.Value, args.Performer, returnComponent);
-    }
-
     private void GrantReturnAction(EntityUid uid, ReturnOnThrowComponent component, EntityUid owner, bool enabled)
     {
         if (component.ReturnOwner != null && component.ReturnOwner != owner)
@@ -109,21 +90,20 @@ public sealed class ReturnOnThrowSystem : EntitySystem
 
         component.ReturnOwner = owner;
         component.ReturnReady = enabled;
+        Dirty(uid, component);
 
         if (!_actions.AddAction(owner, ref component.ReturnActionEntity, out _, component.ReturnAction, uid))
             return;
-
-        var actionComponent = EnsureComp<ReturnOnThrowActionComponent>(component.ReturnActionEntity.Value);
-        actionComponent.Target = uid;
 
         _actions.SetEnabled(component.ReturnActionEntity, enabled);
         AddPvsOverride(uid, owner);
     }
 
-    private void SetReturnReady(ReturnOnThrowComponent component)
+    private void SetReturnReady(EntityUid uid, ReturnOnThrowComponent component)
     {
         component.ReturnReady = true;
         _actions.SetEnabled(component.ReturnActionEntity, true);
+        Dirty(uid, component);
     }
 
     private bool TryReturn(EntityUid uid, EntityUid owner, ReturnOnThrowComponent component)
@@ -165,12 +145,7 @@ public sealed class ReturnOnThrowSystem : EntitySystem
         _actions.RemoveAction(component.ReturnActionEntity);
         component.ReturnOwner = null;
         component.ReturnReady = false;
-
-        if (component.ReturnActionEntity != null &&
-            TryComp<ReturnOnThrowActionComponent>(component.ReturnActionEntity, out var actionComponent))
-        {
-            actionComponent.Target = null;
-        }
+        Dirty(uid, component);
     }
 
     private void AddPvsOverride(EntityUid uid, EntityUid owner)

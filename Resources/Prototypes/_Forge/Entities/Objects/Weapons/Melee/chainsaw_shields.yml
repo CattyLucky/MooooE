@@ -436,7 +436,6 @@
       sprite: Forge/Objects/Weapons/Melee/chainsaw-shield.rsi
       state: shield-icon
     event: !type:ReturnOnThrowActionEvent
-  - type: ReturnOnThrowAction
 
 - type: entity
   id: ActionReturnReinforcedChainsawShield
@@ -450,4 +449,3 @@
       sprite: Forge/Objects/Weapons/Melee/reinforced-chainsaw-shield.rsi
       state: shield-icon
     event: !type:ReturnOnThrowActionEvent
-  - type: ReturnOnThrowAction
