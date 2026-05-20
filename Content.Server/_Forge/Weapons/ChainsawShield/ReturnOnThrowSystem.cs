@@ -9,21 +9,27 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.GameStates;
 using Robust.Shared.Player;
+using Robust.Shared.Timing;
 
 namespace Content.Server._Forge.Weapons.ChainsawShield;
 
-public sealed class ReturnOnThrowSystem : EntitySystem
+public sealed partial class ReturnOnThrowSystem : EntitySystem
 {
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedContainerSystem _containers = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
-    [Dependency] private readonly ISharedPlayerManager _player = default!;
-    [Dependency] private readonly ProjectileSystem _projectiles = default!;
-    [Dependency] private readonly SharedPvsOverrideSystem _pvs = default!;
+    private const int MaxReturnActions = 12;
+
+    [Dependency] private SharedActionsSystem _actions = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private SharedContainerSystem _containers = default!;
+    [Dependency] private SharedHandsSystem _hands = default!;
+    [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private ISharedPlayerManager _player = default!;
+    [Dependency] private ProjectileSystem _projectiles = default!;
+    [Dependency] private SharedPvsOverrideSystem _pvs = default!;
 
     public override void Initialize()
     {
+        base.Initialize();
+
         SubscribeLocalEvent<ReturnOnThrowComponent, ThrownEvent>(OnThrown);
         SubscribeLocalEvent<ReturnOnThrowComponent, StopThrowEvent>(OnStopThrow);
         SubscribeLocalEvent<ReturnOnThrowComponent, EmbedEvent>(OnEmbedded);
@@ -44,7 +50,7 @@ public sealed class ReturnOnThrowSystem : EntitySystem
         GrantReturnAction(uid, component, args.User.Value, enabled: false);
     }
 
-    private void OnStopThrow(EntityUid uid, ReturnOnThrowComponent component, StopThrowEvent args)
+    private void OnStopThrow(EntityUid uid, ReturnOnThrowComponent component, ref StopThrowEvent args)
     {
         if (component.ReturnOwner == null)
             return;
@@ -80,13 +86,27 @@ public sealed class ReturnOnThrowSystem : EntitySystem
         if (args.Handled || component.ReturnOwner != args.Performer || !component.ReturnReady)
             return;
 
-        args.Handled = TryReturn(uid, args.Performer, component);
+        if (_timing.CurTime < component.NextReturnAttempt)
+        {
+            args.Handled = true;
+            return;
+        }
+
+        component.NextReturnAttempt = _timing.CurTime + component.ReturnCooldown;
+        args.Handled = true;
+        TryReturn(uid, args.Performer, component);
     }
 
     private void GrantReturnAction(EntityUid uid, ReturnOnThrowComponent component, EntityUid owner, bool enabled)
     {
         if (component.ReturnOwner != null && component.ReturnOwner != owner)
             ClearReturn(uid, component);
+
+        if (!HasReturnActionSlot(component, owner))
+        {
+            ClearReturn(uid, component);
+            return;
+        }
 
         if (!_actions.AddAction(owner, ref component.ReturnActionEntity, out _, component.ReturnAction, uid))
         {
@@ -101,16 +121,50 @@ public sealed class ReturnOnThrowSystem : EntitySystem
         Dirty(uid, component);
     }
 
+    private bool HasReturnActionSlot(ReturnOnThrowComponent component, EntityUid owner)
+    {
+        if (component.ReturnOwner == owner &&
+            component.ReturnActionEntity is { } existingAction &&
+            !TerminatingOrDeleted(existingAction))
+        {
+            return true;
+        }
+
+        return HasReturnActionCapacity(owner);
+    }
+
+    private bool HasReturnActionCapacity(EntityUid owner)
+    {
+        var count = 0;
+        var query = EntityQueryEnumerator<ReturnOnThrowComponent>();
+        while (query.MoveNext(out _, out var component))
+        {
+            if (component.ReturnOwner != owner ||
+                component.ReturnActionEntity is not { } action ||
+                TerminatingOrDeleted(action))
+            {
+                continue;
+            }
+
+            count++;
+            if (count >= MaxReturnActions)
+                return false;
+        }
+
+        return true;
+    }
+
     private void SetReturnReady(EntityUid uid, ReturnOnThrowComponent component)
     {
-        if (component.ReturnActionEntity == null)
+        if (component.ReturnActionEntity is not { } action ||
+            TerminatingOrDeleted(action))
         {
             ClearReturn(uid, component);
             return;
         }
 
         component.ReturnReady = true;
-        _actions.SetEnabled(component.ReturnActionEntity, true);
+        _actions.SetEnabled(action, true);
         Dirty(uid, component);
     }
 
@@ -150,6 +204,7 @@ public sealed class ReturnOnThrowSystem : EntitySystem
         if (component.ReturnOwner != null)
             RemovePvsOverride(uid, component.ReturnOwner.Value);
 
+        // RemoveAction detaches the contained action entity so it can be reused on the next throw.
         _actions.RemoveAction(component.ReturnActionEntity);
         component.ReturnOwner = null;
         component.ReturnReady = false;

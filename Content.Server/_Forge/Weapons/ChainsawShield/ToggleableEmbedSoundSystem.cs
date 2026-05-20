@@ -5,12 +5,14 @@ using Robust.Shared.Audio.Systems;
 
 namespace Content.Server._Forge.Weapons.ChainsawShield;
 
-public sealed class ToggleableEmbedSoundSystem : EntitySystem
+public sealed partial class ToggleableEmbedSoundSystem : EntitySystem
 {
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
 
     public override void Initialize()
     {
+        base.Initialize();
+
         SubscribeLocalEvent<ToggleableEmbedSoundComponent, EmbedEvent>(OnEmbed);
     }
 

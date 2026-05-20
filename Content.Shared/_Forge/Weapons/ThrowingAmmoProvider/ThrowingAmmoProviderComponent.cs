@@ -23,7 +23,7 @@ public sealed partial class ThrowingAmmoProviderComponent : Component
     [DataField]
     public EntityWhitelist? Whitelist;
 
-    [DataField, AutoNetworkedField]
+    [AutoNetworkedField]
     public int AmmoCount;
 
     [DataField]

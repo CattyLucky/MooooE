@@ -1,78 +1,148 @@
-using Content.Server.Body.Components;
-using Content.Server.Body.Systems;
 using Content.Shared._Forge.Weapons.ChainsawShield;
-using Content.Shared.Damage;
-using Content.Shared.Damage.Systems;
 using Content.Shared.Item.ItemToggle.Components;
+using Content.Shared.Movement.Systems;
 using Content.Shared.Projectiles;
-using Robust.Shared.Timing;
+using Content.Shared.StatusEffect;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server._Forge.Weapons.ChainsawShield;
 
-public sealed class ToggleableEmbedEffectSystem : EntitySystem
+public sealed partial class ToggleableEmbedEffectSystem : EntitySystem
 {
-    [Dependency] private readonly BloodstreamSystem _bloodstream = default!;
-    [Dependency] private readonly DamageableSystem _damageable = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private MovementSpeedModifierSystem _movement = default!;
+    [Dependency] private StatusEffectsSystem _statusEffects = default!;
+
+    private static readonly ProtoId<StatusEffectPrototype> ChainsawShieldSlowedKey = "ChainsawShieldSlowed";
+
+    // StatusEffectsSystem requires a duration; cleanup is still driven by detach/toggle/shutdown.
+    private static readonly TimeSpan SlowStatusLifetime = TimeSpan.FromHours(6);
 
     public override void Initialize()
     {
+        base.Initialize();
+
         SubscribeLocalEvent<ToggleableEmbedEffectComponent, EmbedEvent>(OnEmbed);
+        SubscribeLocalEvent<ToggleableEmbedEffectComponent, ItemToggledEvent>(OnToggled);
+        SubscribeLocalEvent<ToggleableEmbedEffectComponent, EntParentChangedMessage>(OnParentChanged);
+        SubscribeLocalEvent<ToggleableEmbedEffectComponent, ComponentShutdown>(OnShutdown);
     }
 
     private void OnEmbed(EntityUid uid, ToggleableEmbedEffectComponent component, ref EmbedEvent args)
     {
-        EnsureComp<ActiveToggleableEmbedEffectComponent>(uid);
-        component.NextUpdate = _timing.CurTime + GetUpdateInterval(component);
+        if (IsActive(uid))
+            ApplySlow(args.Embedded, component);
     }
 
-    public override void Update(float frameTime)
+    private void OnToggled(EntityUid uid, ToggleableEmbedEffectComponent component, ref ItemToggledEvent args)
     {
-        var curTime = _timing.CurTime;
-        var query = EntityQueryEnumerator<ActiveToggleableEmbedEffectComponent, ToggleableEmbedEffectComponent, EmbeddableProjectileComponent>();
-        while (query.MoveNext(out var uid, out _, out var component, out var embeddable))
+        if (!TryComp<EmbeddableProjectileComponent>(uid, out var embeddable) ||
+            embeddable.EmbeddedIntoUid is not { } target)
+            return;
+
+        if (args.Activated)
+            ApplySlow(target, component);
+        else
+            RemoveSlow(component);
+    }
+
+    private void OnParentChanged(EntityUid uid, ToggleableEmbedEffectComponent component, ref EntParentChangedMessage args)
+    {
+        if (component.SlowedTarget is { } target && args.Transform.ParentUid != target)
+            RemoveSlow(component);
+    }
+
+    private void OnShutdown(EntityUid uid, ToggleableEmbedEffectComponent component, ComponentShutdown args)
+    {
+        RemoveSlow(component);
+    }
+
+    private void ApplySlow(EntityUid target, ToggleableEmbedEffectComponent component)
+    {
+        if (TerminatingOrDeleted(target))
+            return;
+
+        if (component.SlowedTarget is { } oldTarget && oldTarget != target)
+            RemoveSlow(component);
+
+        component.SlowedTarget = target;
+
+        if (!TryRefreshTargetSlow(target))
         {
-            if (curTime < component.NextUpdate)
-                continue;
-
-            var interval = GetUpdateInterval(component);
-            component.NextUpdate = curTime + interval;
-
-            if (embeddable.EmbeddedIntoUid is not { } target ||
-                TerminatingOrDeleted(target))
-            {
-                RemCompDeferred<ActiveToggleableEmbedEffectComponent>(uid);
-                continue;
-            }
-
-            if (!IsActive(uid))
-                continue;
-
-            ApplyEffect(uid, target, component);
+            component.SlowedTarget = null;
+            return;
         }
     }
 
-    private void ApplyEffect(EntityUid uid, EntityUid target, ToggleableEmbedEffectComponent component)
+    private void RemoveSlow(ToggleableEmbedEffectComponent component)
     {
-        if (!component.ActiveDamage.Empty)
-            _damageable.TryChangeDamage(target, component.ActiveDamage, component.IgnoreResistances, origin: uid);
+        if (component.SlowedTarget is not { } target)
+            return;
 
-        if (component.ActiveBleedAmount <= 0f ||
-            !TryComp<BloodstreamComponent>(target, out var bloodstream))
+        component.SlowedTarget = null;
+
+        if (TerminatingOrDeleted(target))
+            return;
+
+        if (TryGetStrongestSlow(target, out var walk, out var sprint))
         {
+            TryRefreshTargetSlow(target, walk, sprint);
             return;
         }
 
-        _bloodstream.TryModifyBleedAmount(target, component.ActiveBleedAmount, bloodstream);
+        _statusEffects.TryRemoveStatusEffect(target, ChainsawShieldSlowedKey);
+    }
+
+    private bool TryRefreshTargetSlow(EntityUid target)
+    {
+        if (TryGetStrongestSlow(target, out var walk, out var sprint))
+            return TryRefreshTargetSlow(target, walk, sprint);
+
+        return false;
+    }
+
+    private bool TryRefreshTargetSlow(EntityUid target, float walk, float sprint)
+    {
+        if (!_statusEffects.TryAddStatusEffect<ChainsawShieldSlowedComponent>(
+                target,
+                ChainsawShieldSlowedKey,
+                SlowStatusLifetime,
+                true))
+        {
+            return false;
+        }
+
+        if (!TryComp<ChainsawShieldSlowedComponent>(target, out var slowed))
+            return false;
+
+        slowed.WalkSpeedModifier = walk;
+        slowed.SprintSpeedModifier = sprint;
+        Dirty(target, slowed);
+        _movement.RefreshMovementSpeedModifiers(target);
+        return true;
+    }
+
+    private bool TryGetStrongestSlow(EntityUid target, out float walk, out float sprint)
+    {
+        walk = 1f;
+        sprint = 1f;
+        var found = false;
+
+        var query = EntityQueryEnumerator<ToggleableEmbedEffectComponent>();
+        while (query.MoveNext(out var uid, out var component))
+        {
+            if (component.SlowedTarget != target || !IsActive(uid))
+                continue;
+
+            walk = MathF.Min(walk, component.WalkSpeedModifier);
+            sprint = MathF.Min(sprint, component.SprintSpeedModifier);
+            found = true;
+        }
+
+        return found;
     }
 
     private bool IsActive(EntityUid uid)
     {
         return TryComp<ItemToggleComponent>(uid, out var toggle) && toggle.Activated;
-    }
-
-    private static TimeSpan GetUpdateInterval(ToggleableEmbedEffectComponent component)
-    {
-        return TimeSpan.FromSeconds(MathF.Max(component.UpdateInterval, 0.1f));
     }
 }

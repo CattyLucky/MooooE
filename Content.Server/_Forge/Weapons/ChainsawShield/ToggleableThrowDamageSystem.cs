@@ -8,18 +8,20 @@ using Content.Shared.Throwing;
 
 namespace Content.Server._Forge.Weapons.ChainsawShield;
 
-public sealed class ToggleableThrowDamageSystem : EntitySystem
+public sealed partial class ToggleableThrowDamageSystem : EntitySystem
 {
-    [Dependency] private readonly DamageOtherOnHitSystem _damageOtherOnHit = default!;
+    [Dependency] private DamageOtherOnHitSystem _damageOtherOnHit = default!;
 
     public override void Initialize()
     {
+        base.Initialize();
+
         SubscribeLocalEvent<ToggleableThrowDamageComponent, ThrowDoHitEvent>(OnThrowDoHit);
         SubscribeLocalEvent<ToggleableThrowDamageComponent, DamageExamineEvent>(OnDamageExamine);
         SubscribeLocalEvent<ToggleableThrowDamageComponent, AttemptPacifiedThrowEvent>(OnAttemptPacifiedThrow);
     }
 
-    private void OnThrowDoHit(EntityUid uid, ToggleableThrowDamageComponent component, ThrowDoHitEvent args)
+    private void OnThrowDoHit(EntityUid uid, ToggleableThrowDamageComponent component, ref ThrowDoHitEvent args)
     {
         var damage = _damageOtherOnHit.GetThrowDamage(uid, GetDamage(uid, component), consumeModifiers: true);
         _damageOtherOnHit.DoThrowDamage(uid, args.Target, args.Component.Thrower, damage, component.IgnoreResistances);

@@ -139,12 +139,8 @@
       params:
         volume: -3
   - type: ToggleableEmbedEffect
-    activeDamage:
-      types:
-        Slash: 0.5
-        Structural: 1
-    activeBleedAmount: 3
-    updateInterval: 2
+    walkSpeedModifier: 0.5
+    sprintSpeedModifier: 0.5
   - type: ToggleableThrowDamage
     inactiveDamage:
       types:
@@ -352,12 +348,8 @@
       params:
         volume: -3
   - type: ToggleableEmbedEffect
-    activeDamage:
-      types:
-        Slash: 1
-        Structural: 2
-    activeBleedAmount: 4
-    updateInterval: 2
+    walkSpeedModifier: 0.45
+    sprintSpeedModifier: 0.45
   - type: ToggleableThrowDamage
     inactiveDamage:
       types:
@@ -430,7 +422,7 @@
   description: Return the thrown chainsaw shield to a free hand.
   components:
   - type: InstantAction
-    useDelay: 0.5
+    useDelay: 1
     itemIconStyle: BigAction
     icon:
       sprite: Forge/Objects/Weapons/Melee/chainsaw-shield.rsi
@@ -443,7 +435,7 @@
   description: Return the thrown reinforced chainsaw shield to a free hand.
   components:
   - type: InstantAction
-    useDelay: 0.5
+    useDelay: 1
     itemIconStyle: BigAction
     icon:
       sprite: Forge/Objects/Weapons/Melee/reinforced-chainsaw-shield.rsi

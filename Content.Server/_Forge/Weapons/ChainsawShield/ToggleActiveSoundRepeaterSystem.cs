@@ -5,18 +5,22 @@ using Robust.Shared.Timing;
 
 namespace Content.Server._Forge.Weapons.ChainsawShield;
 
-public sealed class ToggleActiveSoundRepeaterSystem : EntitySystem
+public sealed partial class ToggleActiveSoundRepeaterSystem : EntitySystem
 {
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private IGameTiming _timing = default!;
 
     public override void Initialize()
     {
+        base.Initialize();
+
         SubscribeLocalEvent<ToggleActiveSoundRepeaterComponent, ItemToggledEvent>(OnToggled);
     }
 
     public override void Update(float frameTime)
     {
+        base.Update(frameTime);
+
         var query = EntityQueryEnumerator<ActiveToggleSoundRepeaterComponent, ToggleActiveSoundRepeaterComponent, ItemToggleComponent>();
         while (query.MoveNext(out var uid, out _, out var repeater, out var toggle))
         {

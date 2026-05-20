@@ -18,16 +18,16 @@ using Robust.Shared.Network;
 
 namespace Content.Shared._Forge.Weapons.ThrowingAmmoProvider;
 
-public sealed class ThrowingAmmoProviderSystem : EntitySystem
+public sealed partial class ThrowingAmmoProviderSystem : EntitySystem
 {
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
-    [Dependency] private readonly SharedContainerSystem _containers = default!;
-    [Dependency] private readonly EntityWhitelistSystem _whitelist = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedItemSystem _itemSystem = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
-    [Dependency] private readonly INetManager _netManager = default!;
+    [Dependency] private ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private SharedContainerSystem _containers = default!;
+    [Dependency] private EntityWhitelistSystem _whitelist = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private SharedAppearanceSystem _appearance = default!;
+    [Dependency] private SharedItemSystem _itemSystem = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
+    [Dependency] private INetManager _netManager = default!;
 
     public override void Initialize()
     {
@@ -84,7 +84,9 @@ public sealed class ThrowingAmmoProviderSystem : EntitySystem
 
     private void OnTakeAmmo(EntityUid uid, ThrowingAmmoProviderComponent comp, TakeAmmoEvent args)
     {
-        for (var shot = 0; shot < args.Shots; shot++)
+        var shotsTaken = 0;
+        var attemptsLeft = Math.Max(args.Shots + comp.Capacity, args.Shots);
+        while (shotsTaken < args.Shots && attemptsLeft-- > 0)
         {
             var result = TryTakeLastAmmo(uid, comp, out var ent);
             if (result == TakeAmmoResult.Stop)
@@ -93,7 +95,8 @@ public sealed class ThrowingAmmoProviderSystem : EntitySystem
             if (result == TakeAmmoResult.Retry)
                 continue;
 
-            AddTakenAmmo(ent, comp, args);
+            AddTakenAmmo(ent, comp, args, args.WillBeFired);
+            shotsTaken++;
         }
     }
 
@@ -159,7 +162,7 @@ public sealed class ThrowingAmmoProviderSystem : EntitySystem
 
     // -- CannonBoosted --
 
-    private void OnThrown(EntityUid uid, CannonBoostedComponent comp, ThrownEvent args)
+    private void OnThrown(EntityUid uid, CannonBoostedComponent comp, ref ThrownEvent args)
     {
         RemCompDeferred<HiddenUntilThrownComponent>(uid);
 
@@ -180,14 +183,14 @@ public sealed class ThrowingAmmoProviderSystem : EntitySystem
         Dirty(uid, thrown);
     }
 
-    private void OnThrowDoHit(EntityUid uid, CannonBoostedComponent comp, ThrowDoHitEvent args)
+    private void OnThrowDoHit(EntityUid uid, CannonBoostedComponent comp, ref ThrowDoHitEvent args)
     {
         RemCompDeferred<HiddenUntilThrownComponent>(uid);
         RemCompDeferred<ThrowingAmmoDamageBoostComponent>(uid);
         RemCompDeferred<CannonBoostedComponent>(uid);
     }
 
-    private void OnStopThrow(EntityUid uid, CannonBoostedComponent comp, StopThrowEvent args)
+    private void OnStopThrow(EntityUid uid, CannonBoostedComponent comp, ref StopThrowEvent args)
     {
         RemCompDeferred<HiddenUntilThrownComponent>(uid);
         RemCompDeferred<ThrowingAmmoDamageBoostComponent>(uid);
@@ -242,10 +245,13 @@ public sealed class ThrowingAmmoProviderSystem : EntitySystem
         return true;
     }
 
-    private void AddTakenAmmo(EntityUid ent, ThrowingAmmoProviderComponent comp, TakeAmmoEvent args)
+    private void AddTakenAmmo(EntityUid ent, ThrowingAmmoProviderComponent comp, TakeAmmoEvent args, bool willBeFired)
     {
-        EnsureComp<HiddenUntilThrownComponent>(ent);
-        ApplyCannonBoost(ent, comp);
+        if (willBeFired)
+        {
+            EnsureComp<HiddenUntilThrownComponent>(ent);
+            ApplyCannonBoost(ent, comp);
+        }
 
         var ammo = EnsureComp<AmmoComponent>(ent);
         args.Ammo.Add((ent, ammo));

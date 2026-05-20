@@ -7,12 +7,14 @@ using Robust.Client.UserInterface;
 
 namespace Content.Client._Forge.Weapons.ThrowingAmmoProvider;
 
-public sealed class ThrowingAmmoCounterSystem : EntitySystem
+public sealed partial class ThrowingAmmoCounterSystem : EntitySystem
 {
-    [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private SpriteSystem _sprite = default!;
 
     public override void Initialize()
     {
+        base.Initialize();
+
         SubscribeLocalEvent<ThrowingAmmoProviderComponent, GunSystem.AmmoCounterControlEvent>(OnThrowingAmmoControl);
         SubscribeLocalEvent<ThrowingAmmoProviderComponent, GunSystem.UpdateAmmoCounterEvent>(OnThrowingAmmoUpdate);
         SubscribeLocalEvent<ThrowingAmmoProviderComponent, AfterAutoHandleStateEvent>(OnThrowingAmmoState);

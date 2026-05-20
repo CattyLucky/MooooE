@@ -1,21 +1,13 @@
-using Content.Shared.Damage;
-
 namespace Content.Shared._Forge.Weapons.ChainsawShield;
 
 [RegisterComponent]
 public sealed partial class ToggleableEmbedEffectComponent : Component
 {
-    [DataField(required: true)]
-    public DamageSpecifier ActiveDamage = default!;
+    [DataField]
+    public float WalkSpeedModifier = 0.5f;
 
     [DataField]
-    public float ActiveBleedAmount;
+    public float SprintSpeedModifier = 0.5f;
 
-    [DataField]
-    public float UpdateInterval = 1f;
-
-    [DataField]
-    public bool IgnoreResistances;
-
-    public TimeSpan NextUpdate;
+    public EntityUid? SlowedTarget;
 }

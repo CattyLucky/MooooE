@@ -3,10 +3,12 @@ using Content.Server.Damage.Systems;
 
 namespace Content.Server._Forge.Weapons.ThrowingAmmoProvider;
 
-public sealed class ThrowingAmmoDamageBoostSystem : EntitySystem
+public sealed partial class ThrowingAmmoDamageBoostSystem : EntitySystem
 {
     public override void Initialize()
     {
+        base.Initialize();
+
         SubscribeLocalEvent<ThrowingAmmoDamageBoostComponent, GetThrowDamageModifierEvent>(OnGetThrowDamageModifier);
     }
 

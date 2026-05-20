@@ -17,7 +17,12 @@ public sealed partial class ReturnOnThrowComponent : Component
     [DataField]
     public SoundSpecifier? ReturnSound;
 
+    [DataField]
+    public TimeSpan ReturnCooldown = TimeSpan.FromSeconds(1);
+
     public EntityUid? ReturnActionEntity;
+
+    public TimeSpan NextReturnAttempt;
 
     [AutoNetworkedField]
     public EntityUid? ReturnOwner;
