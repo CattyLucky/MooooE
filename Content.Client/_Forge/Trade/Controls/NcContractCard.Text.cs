@@ -189,6 +189,9 @@ public sealed partial class NcContractCard
 
     private int CalculateRequiredTotal(ContractClientData c)
     {
+        if (ContractExecutionKinds.ToObjectiveType(c.ExecutionKind) == ContractObjectiveType.ArtifactStudy)
+            return Math.Max(1, c.Required);
+
         if (c.Targets is { Count: > 0, })
         {
             var sum = 0;

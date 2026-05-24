@@ -19,6 +19,7 @@ public sealed partial class NcContractSystem : EntitySystem
         RegisterDefinitionHandler(new RetrievalContractDefinitionHandler());
         RegisterDefinitionHandler(new HuntContractDefinitionHandler());
         RegisterDefinitionHandler(new GhostRoleContractDefinitionHandler());
+        RegisterDefinitionHandler(new ArtifactStudyContractDefinitionHandler());
         RegisterAdditionalDefinitionHandlers();
     }
 
@@ -206,6 +207,39 @@ public sealed partial class NcContractSystem : EntitySystem
         ) =>
             candidate.GhostRole != null
                 ? system.CreateGhostRoleContractData(store, candidate.GhostRole)
+                : CreateInvalidContractData(candidate);
+    }
+
+    private sealed class ArtifactStudyContractDefinitionHandler : IContractDefinitionHandler
+    {
+        public NcContractOfferType OfferType => NcContractOfferType.ArtifactStudy;
+        public ContractPoolCandidateKind CandidateKind => ContractPoolCandidateKind.ArtifactStudy;
+
+        public bool TryCreateCandidate(
+            NcContractSystem system,
+            NcContractOfferPoolPrototype pool,
+            NcContractOfferEntry entry,
+            ContractPoolCandidate candidate
+        )
+        {
+            if (!system._prototypes.TryIndex<NcArtifactStudyContractPrototype>(entry.Id, out var artifactStudy) ||
+                !system.TryValidateArtifactStudyContractForPool(pool.ID, artifactStudy))
+                return false;
+
+            candidate.Kind = CandidateKind;
+            candidate.Id = artifactStudy.ID;
+            candidate.Repeatable = artifactStudy.Repeatable;
+            candidate.ArtifactStudy = artifactStudy;
+            return true;
+        }
+
+        public ContractServerData CreateContract(
+            NcContractSystem system,
+            EntityUid store,
+            ContractPoolCandidate candidate
+        ) =>
+            candidate.ArtifactStudy != null
+                ? system.CreateArtifactStudyContractData(store, candidate.ArtifactStudy)
                 : CreateInvalidContractData(candidate);
     }
 }

@@ -8,11 +8,14 @@ public static class ContractExecutionKinds
         {
             ContractExecutionKind.HuntObjective => ContractObjectiveType.Hunt,
             ContractExecutionKind.GhostRoleObjective => ContractObjectiveType.GhostRole,
+            ContractExecutionKind.ArtifactStudyObjective => ContractObjectiveType.ArtifactStudy,
             _ => ContractObjectiveType.Delivery
         };
 
     public static bool UsesWorldRuntime(ContractExecutionKind kind) => kind != ContractExecutionKind.InventoryDelivery;
 
     public static bool UsesStageProgress(ContractExecutionKind kind) =>
-        kind is ContractExecutionKind.HuntObjective or ContractExecutionKind.GhostRoleObjective;
+        kind is ContractExecutionKind.HuntObjective
+            or ContractExecutionKind.GhostRoleObjective
+            or ContractExecutionKind.ArtifactStudyObjective;
 }

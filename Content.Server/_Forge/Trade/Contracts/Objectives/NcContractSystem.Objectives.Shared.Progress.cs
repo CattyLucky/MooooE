@@ -47,6 +47,9 @@ public sealed partial class NcContractSystem : EntitySystem
         public readonly HashSet<EntityUid> RetrievalSpawnedEntitySet = new();
         public readonly Dictionary<(string TargetItem, PrototypeMatchMode MatchMode), int> TurnedInByTarget = new();
         public bool ActiveDeliveryDropoff;
+        public bool ArtifactStudyCompleted;
+        public int ArtifactStudyNodeTotal;
+        public int ArtifactStudyTriggered;
         public bool DeliveryDropoffCompleted;
         public MapCoordinates? DeliveryDropoffCoordinates;
         public EntityUid? DeliveryDropoffEntity;

@@ -118,6 +118,8 @@ nc-store-contract-type-hunt = Hunt
 nc-store-contract-type-hunt-tooltip = A target will appear after acceptance. Eliminate it, take proof, and return for payment.
 nc-store-contract-type-ghost-role = Special Target
 nc-store-contract-type-ghost-role-tooltip = Accepting this opens a special role. If someone takes it, a living target appears.
+nc-store-contract-type-artifact-study = Study
+nc-store-contract-type-artifact-study-tooltip = A contract artifact appears after acceptance. Fully reveal its nodes and bring it to the terminal.
 nc-store-contract-offer-pool-tooltip = Offer group: { $pool }
 
 nc-store-contract-route-source-line = Pickup: { $hint }
@@ -163,6 +165,16 @@ nc-store-contract-hunt-body-action-progress = Targets: { $progress }/{ $required
 nc-store-contract-hunt-body-action-ready = Drag the body to the trader.
 nc-store-contract-hunt-target-lost = The hunt target was lost before all stages were completed. The contract has failed.
 nc-store-contract-hunt-next-target-spawn-failed = Could not spawn the next hunt target stage. The contract has failed.
+
+nc-store-contract-artifact-study-status-available = A contract artifact will appear after acceptance.
+nc-store-contract-artifact-study-status-active = Fully study the contract artifact.
+nc-store-contract-artifact-study-status-progress = Revealed nodes: { $triggered }/{ $total }. Keep studying the artifact.
+nc-store-contract-artifact-study-status-bring = All nodes are revealed. Bring the artifact to the terminal so it can read the data.
+nc-store-contract-artifact-study-status-ready = The artifact is fully studied. The contract can be completed.
+nc-store-contract-artifact-study-action-available = Accept the study order.
+nc-store-contract-artifact-study-action-progress = Reveal every artifact node and bring the artifact to the terminal.
+nc-store-contract-artifact-study-action-ready = Complete the contract at the trader.
+nc-store-contract-artifact-study-target-lost = The contract artifact was lost. The contract has failed.
 
 nc-store-contract-ghost-role-timeout = Nobody took this role in time. The contract has failed.
 nc-store-contract-ghost-role-target-lost = The target was lost before the operation began. The contract has failed.

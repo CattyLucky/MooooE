@@ -118,6 +118,8 @@ nc-store-contract-type-hunt = Контракт на голову
 nc-store-contract-type-hunt-tooltip = После принятия появится цель. Уберите её, заберите доказательство и вернитесь за платой.
 nc-store-contract-type-ghost-role = Особая цель
 nc-store-contract-type-ghost-role-tooltip = После принятия откроется особая роль. Если её займут, появится живая цель.
+nc-store-contract-type-artifact-study = Изучение
+nc-store-contract-type-artifact-study-tooltip = После принятия появится контрактный артефакт. Полностью раскройте его узлы и принесите к терминалу.
 nc-store-contract-offer-pool-tooltip = Группа витрины: { $pool }
 
 nc-store-contract-route-source-line = Загрузка: { $hint }
@@ -163,6 +165,16 @@ nc-store-contract-hunt-body-action-progress = Цели: { $progress }/{ $require
 nc-store-contract-hunt-body-action-ready = Притащите тело к торговцу.
 nc-store-contract-hunt-target-lost = Цель ликвидирована или утрачена до завершения всех этапов. Контракт сорван.
 nc-store-contract-hunt-next-target-spawn-failed = Не удалось определить следующую цель для этапа охоты. Контракт сорван.
+
+nc-store-contract-artifact-study-status-available = После принятия появится контрактный артефакт.
+nc-store-contract-artifact-study-status-active = Изучите контрактный артефакт полностью.
+nc-store-contract-artifact-study-status-progress = Раскрыто узлов: { $triggered }/{ $total }. Продолжайте изучать артефакт.
+nc-store-contract-artifact-study-status-bring = Все узлы раскрыты. Принесите артефакт к терминалу, чтобы он считал данные.
+nc-store-contract-artifact-study-status-ready = Артефакт полностью изучен. Можно сдавать контракт.
+nc-store-contract-artifact-study-action-available = Примите заказ на изучение.
+nc-store-contract-artifact-study-action-progress = Раскройте все узлы артефакта и принесите его к терминалу.
+nc-store-contract-artifact-study-action-ready = Завершите контракт у торговца.
+nc-store-contract-artifact-study-target-lost = Контрактный артефакт утрачен. Контракт сорван.
 
 nc-store-contract-ghost-role-timeout = Никто не взял эту роль вовремя. Контракт сорван.
 nc-store-contract-ghost-role-target-lost = Цель выбыла ещё до начала операции. Контракт сорван.

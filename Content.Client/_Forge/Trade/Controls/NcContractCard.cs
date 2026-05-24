@@ -305,6 +305,9 @@ public sealed partial class NcContractCard : PanelContainer
             statusText = BuildHuntStatusText(_data);
 
         if (string.IsNullOrWhiteSpace(statusText))
+            statusText = BuildArtifactStudyStatusText(_data);
+
+        if (string.IsNullOrWhiteSpace(statusText))
             statusText = BuildRouteStatusText(_data);
 
         if (string.IsNullOrWhiteSpace(statusText))
@@ -329,9 +332,11 @@ public sealed partial class NcContractCard : PanelContainer
 
     private void PopulateStage()
     {
-        var hasStage = _data.ExecutionKind is ContractExecutionKind.HuntObjective
-                or ContractExecutionKind.GhostRoleObjective &&
-            _data.Runtime.StageGoal > 1;
+        var hasStageKind = _data.ExecutionKind is
+                ContractExecutionKind.HuntObjective
+                or ContractExecutionKind.GhostRoleObjective
+                or ContractExecutionKind.ArtifactStudyObjective;
+        var hasStage = hasStageKind && _data.Runtime.StageGoal > 1;
 
         StageLabel.Visible = hasStage;
         if (!hasStage)

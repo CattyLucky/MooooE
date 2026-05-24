@@ -81,6 +81,9 @@ public sealed partial class NcContractSystem : EntitySystem
         state.RetrievalLastAcceptedCargoCoordinates = null;
         state.RetrievalRouteDeliveryCompleted = false;
         state.HuntTargetWasKilled = false;
+        state.ArtifactStudyCompleted = false;
+        state.ArtifactStudyNodeTotal = 0;
+        state.ArtifactStudyTriggered = 0;
         state.GhostRoleSurvivalStart = null;
         state.GhostRoleSurvivalDeadline = null;
         state.GhostRoleSurvivalMind = null;

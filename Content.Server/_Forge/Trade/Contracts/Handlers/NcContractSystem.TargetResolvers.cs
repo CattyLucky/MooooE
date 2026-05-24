@@ -16,6 +16,7 @@ public sealed partial class NcContractSystem : EntitySystem
         RegisterTargetResolver(new RetrievalRouteDeliveryTargetResolver());
         RegisterTargetResolver(new HuntTargetResolver());
         RegisterTargetResolver(new GhostRoleTargetResolver());
+        RegisterTargetResolver(new ArtifactStudyTargetResolver());
         RegisterAdditionalTargetResolvers();
     }
 
@@ -219,5 +220,10 @@ public sealed partial class NcContractSystem : EntitySystem
     private sealed class GhostRoleTargetResolver : ContractTargetResolverBase
     {
         public override ContractExecutionKind Kind => ContractExecutionKind.GhostRoleObjective;
+    }
+
+    private sealed class ArtifactStudyTargetResolver : ContractTargetResolverBase
+    {
+        public override ContractExecutionKind Kind => ContractExecutionKind.ArtifactStudyObjective;
     }
 }

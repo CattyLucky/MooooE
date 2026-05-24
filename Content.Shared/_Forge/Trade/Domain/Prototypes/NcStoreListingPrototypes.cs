@@ -203,7 +203,8 @@ public enum NcContractOfferType : byte
     Supply = 0,
     Retrieval = 1,
     Hunt = 2,
-    GhostRole = 3
+    GhostRole = 3,
+    ArtifactStudy = 4
 }
 
 /// <summary>
@@ -265,7 +266,8 @@ public enum ContractObjectiveType : byte
     Hunt = 1,
 
     // Value 2 is intentionally left open for old/future delivery variants.
-    GhostRole = 3
+    GhostRole = 3,
+    ArtifactStudy = 4
 }
 
 [Serializable, NetSerializable,]

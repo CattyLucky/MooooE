@@ -178,6 +178,13 @@ public sealed partial class NcContractCard
                 return huntHint;
         }
 
+        if (GetObjectiveType(data) == ContractObjectiveType.ArtifactStudy)
+        {
+            var artifactHint = BuildArtifactStudyActionHintText(data);
+            if (!string.IsNullOrWhiteSpace(artifactHint))
+                return artifactHint;
+        }
+
         if (data.FlowStatus == ContractFlowStatus.ReadyToTurnIn && !string.IsNullOrWhiteSpace(data.TurnInItem))
             return Loc.GetString("nc-store-contract-action-can-claim-proof");
 
@@ -232,6 +239,42 @@ public sealed partial class NcContractCard
                 _ => string.Empty
             },
 
+            _ => string.Empty
+        };
+    }
+
+    private static string BuildArtifactStudyStatusText(ContractClientData data)
+    {
+        if (GetObjectiveType(data) != ContractObjectiveType.ArtifactStudy)
+            return string.Empty;
+
+        if (data.FlowStatus == ContractFlowStatus.Failed && !string.IsNullOrWhiteSpace(data.Runtime.FailureReason))
+            return data.Runtime.FailureReason;
+
+        if (!string.IsNullOrWhiteSpace(data.Runtime.StatusHint))
+            return data.Runtime.StatusHint;
+
+        return data.FlowStatus switch
+        {
+            ContractFlowStatus.Available => Loc.GetString("nc-store-contract-artifact-study-status-available"),
+            ContractFlowStatus.ReadyToTurnIn => Loc.GetString("nc-store-contract-artifact-study-status-ready"),
+            ContractFlowStatus.InProgress => Loc.GetString("nc-store-contract-artifact-study-status-active"),
+            _ => string.Empty
+        };
+    }
+
+    private static string BuildArtifactStudyActionHintText(ContractClientData data)
+    {
+        if (data.FlowStatus == ContractFlowStatus.Failed && !string.IsNullOrWhiteSpace(data.Runtime.FailureReason))
+            return data.Runtime.FailureReason;
+
+        return data.FlowStatus switch
+        {
+            ContractFlowStatus.Available => Loc.GetString("nc-store-contract-artifact-study-action-available"),
+            ContractFlowStatus.ReadyToTurnIn => Loc.GetString("nc-store-contract-artifact-study-action-ready"),
+            ContractFlowStatus.InProgress when !string.IsNullOrWhiteSpace(data.Runtime.StatusHint) =>
+                data.Runtime.StatusHint,
+            ContractFlowStatus.InProgress => Loc.GetString("nc-store-contract-artifact-study-action-progress"),
             _ => string.Empty
         };
     }
@@ -323,6 +366,7 @@ public sealed partial class NcContractCard
         {
             ContractObjectiveType.Hunt => Loc.GetString("nc-store-contract-type-hunt"),
             ContractObjectiveType.GhostRole => Loc.GetString("nc-store-contract-type-ghost-role"),
+            ContractObjectiveType.ArtifactStudy => Loc.GetString("nc-store-contract-type-artifact-study"),
             _ => Loc.GetString("nc-store-contract-type-delivery")
         };
 
@@ -331,6 +375,7 @@ public sealed partial class NcContractCard
         {
             ContractObjectiveType.Hunt => Loc.GetString("nc-store-contract-type-hunt-tooltip"),
             ContractObjectiveType.GhostRole => Loc.GetString("nc-store-contract-type-ghost-role-tooltip"),
+            ContractObjectiveType.ArtifactStudy => Loc.GetString("nc-store-contract-type-artifact-study-tooltip"),
             _ => Loc.GetString("nc-store-contract-type-delivery-tooltip")
         };
 }

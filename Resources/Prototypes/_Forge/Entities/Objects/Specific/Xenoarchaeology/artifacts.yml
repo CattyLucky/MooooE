@@ -1,0 +1,22 @@
+- type: entity
+  parent: BaseXenoArtifactItem
+  id: ForgeContractStudyArtifactItem
+  name: contract alien artifact
+  description: A controlled artifact prepared for Forge study contracts.
+  suffix: Forge, Study Contract
+  components:
+  - type: Artifact
+    nodesMin: 2
+    nodesMax: 3
+  - type: ForgeArtifactStudyPreset
+    nodeCount: 5
+    triggers:
+    - TriggerInteraction
+    - TriggerExamine
+    - TriggerItemLanded
+    - TriggerMusic
+    effects:
+    - EffectGoodFeeling
+    - EffectBadFeeling
+    - EffectLightFlicker
+    - EffectJunkSpawn

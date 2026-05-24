@@ -16,6 +16,7 @@ public sealed partial class NcContractSystem : EntitySystem
         RegisterObjectiveHandler(new RetrievalRouteDeliveryObjectiveHandler());
         RegisterObjectiveHandler(new HuntObjectiveHandler());
         RegisterObjectiveHandler(new GhostRoleObjectiveHandler());
+        RegisterObjectiveHandler(new ArtifactStudyObjectiveHandler());
         RegisterAdditionalObjectiveHandlers();
     }
 
@@ -391,5 +392,69 @@ public sealed partial class NcContractSystem : EntitySystem
             ContractServerData contract
         ) =>
             system.HandleGhostRoleTargetResolved(key, comp, contract);
+    }
+
+    private sealed class ArtifactStudyObjectiveHandler : ContractObjectiveHandlerBase
+    {
+        public override ContractExecutionKind Kind => ContractExecutionKind.ArtifactStudyObjective;
+
+        public override ClaimAttemptResult TryClaim(
+            NcContractSystem system,
+            EntityUid store,
+            EntityUid user,
+            string contractId,
+            NcStoreComponent comp,
+            ContractServerData contract
+        ) =>
+            system.TryClaimArtifactStudyContract(store, user, contractId, comp, contract);
+
+        public override bool TryInitializeRuntimeOnTake(
+            NcContractSystem system,
+            EntityUid store,
+            EntityUid user,
+            string contractId,
+            ContractServerData contract
+        ) =>
+            system.TryInitializeArtifactStudyObjective(store, user, contractId, contract);
+
+        public override bool TryUpdateProgress(
+            NcContractSystem system,
+            EntityUid store,
+            string contractId,
+            ContractServerData contract,
+            IReadOnlyList<EntityUid> userItems,
+            IReadOnlyList<EntityUid>? crateItems
+        )
+        {
+            system.RefreshArtifactStudyProgressFromSources(store, contractId, contract, userItems, crateItems);
+            return true;
+        }
+
+        public override void RefreshObjectiveProgress(
+            NcContractSystem system,
+            EntityUid store,
+            string contractId,
+            ContractServerData contract
+        ) =>
+            system.SyncArtifactStudyObjectiveProgress(store, contractId, contract);
+
+        public override void AnalyzeProgressRequirements(
+            ContractServerData contract,
+            ref bool needsUserItems,
+            ref bool needsCrateItems,
+            ref bool needsStoreWorldItems
+        )
+        {
+            needsUserItems = true;
+            needsCrateItems = true;
+        }
+
+        public override void OnTrackedTargetResolved(
+            NcContractSystem system,
+            (EntityUid Store, string ContractId) key,
+            NcStoreComponent comp,
+            ContractServerData contract
+        ) =>
+            system.HandleArtifactStudyTargetResolved(key, comp, contract);
     }
 }

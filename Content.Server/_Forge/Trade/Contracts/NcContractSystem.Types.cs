@@ -54,11 +54,13 @@ public sealed partial class NcContractSystem : EntitySystem
         Supply = 1,
         Retrieval = 2,
         Hunt = 3,
-        GhostRole = 4
+        GhostRole = 4,
+        ArtifactStudy = 5
     }
 
     private sealed class ContractPoolCandidate
     {
+        public NcArtifactStudyContractPrototype? ArtifactStudy;
         public NcGhostRoleContractPrototype? GhostRole;
         public NcHuntContractPrototype? Hunt;
         public string Id = string.Empty;

@@ -11,5 +11,6 @@ public enum ContractExecutionKind : byte
     TrackedDeliveryObjective,
     RetrievalRouteDelivery,
     HuntObjective,
-    GhostRoleObjective
+    GhostRoleObjective,
+    ArtifactStudyObjective
 }

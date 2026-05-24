@@ -46,6 +46,9 @@
   - type: Hunt
     id: ForgeTestHuntCarps
     weight: 2
+  - type: ArtifactStudy
+    id: ForgeTestStudyArtifact
+    weight: 1
 
 - type: ncContractOfferPool
   id: ForgeExpeditionGhostOrders
@@ -166,6 +169,24 @@
   - type: Currency
     currency: Credit
     count: { min: 700, max: 1000 }
+  - type: Pool
+    pool: ForgeExpeditionRewardGear
+    count: 1
+
+- type: ncArtifactStudyContract
+  id: ForgeTestStudyArtifact
+  name: "Тест: изучить артефакт"
+  description: "После принятия появится контрактный артефакт. Раскройте все его узлы и принесите артефакт к терминалу, чтобы сдать заказ."
+  icon: ForgeContractStudyArtifactItem
+  artifact: ForgeContractStudyArtifactItem
+  spawn:
+    point:
+      type: MarkerGroup
+      id: ForgeTradeTestArtifactStudySpawn
+  reward:
+  - type: Currency
+    currency: Credit
+    count: { min: 900, max: 1300 }
   - type: Pool
     pool: ForgeExpeditionRewardGear
     count: 1
