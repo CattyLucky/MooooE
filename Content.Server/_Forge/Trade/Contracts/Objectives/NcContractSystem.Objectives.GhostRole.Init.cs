@@ -1,4 +1,5 @@
 using Content.Server.Ghost.Roles.Components;
+using Content.Server.Ghost.Roles.Raffles;
 using Content.Shared._Forge.Trade;
 using Content.Shared.Roles;
 using Robust.Shared.Map;
@@ -92,6 +93,16 @@ public sealed partial class NcContractSystem : EntitySystem
         ghostRole.RoleName = ResolveContractGhostRoleName(config, contract);
         ghostRole.RoleDescription = ResolveContractGhostRoleDescription(config, contract);
         ghostRole.RoleRules = ResolveContractGhostRoleRules(config);
+        if (config.GhostRoleTakeDelaySeconds > 0)
+        {
+            var delay = (uint) config.GhostRoleTakeDelaySeconds;
+            ghostRole.RaffleConfig = new GhostRoleRaffleConfig(new GhostRoleRaffleSettings
+            {
+                InitialDuration = delay,
+                JoinExtendsDurationBy = 0,
+                MaxDuration = delay
+            });
+        }
 
         var spawnerComp = EnsureComp<NcContractGhostRoleSpawnerComponent>(spawner);
         spawnerComp.TargetPrototype = ghostRoleProtoId;

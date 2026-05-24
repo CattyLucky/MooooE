@@ -1,0 +1,49 @@
+- type: ncBarterListing
+  id: ForgeBarterScrapSpawnerToCredits
+  name: "Лом в кредиты"
+  description: "Обмен обычного спавнера лома на кредиты."
+  icon: SalvageSpawnerScrapCommon
+  cost:
+  - prototype: SalvageSpawnerScrapCommon
+    count: 1
+  receive:
+  - currency: Credit
+    count: 250
+
+- type: ncBarterListing
+  id: ForgeBarterTreasureSpawnerToPka
+  name: "Ценный тайник за ПКА"
+  description: "Обмен ценного спавнера сокровищ на протокинетический ускоритель."
+  icon: WeaponProtoKineticAccelerator
+  cost:
+  - prototype: SalvageSpawnerTreasureValuable
+    count: 1
+  receive:
+  - prototype: WeaponProtoKineticAccelerator
+    count: 1
+
+- type: ncBarterListing
+  id: ForgeBarterCreditsToRandomExpeditionGear
+  name: "Случайное экспедиционное снаряжение"
+  description: "Обмен кредитов на один случайный предмет или спавнер из экспедиционного пула."
+  icon: SalvageSpawnerEquipment
+  cost:
+  - currency: Credit
+    count: 500
+  receivePools:
+  - pool: ForgeExpeditionRewardGear
+    rolls: 1
+    chance: 1
+
+- type: ncBarterCategory
+  id: ForgeExpeditionBarterCategory
+  name: "Бартер экспедиций"
+  listings:
+  - ForgeBarterScrapSpawnerToCredits
+  - ForgeBarterTreasureSpawnerToPka
+  - ForgeBarterCreditsToRandomExpeditionGear
+
+- type: ncBarterPreset
+  id: ForgeExpeditionBarterPreset
+  categories:
+  - ForgeExpeditionBarterCategory

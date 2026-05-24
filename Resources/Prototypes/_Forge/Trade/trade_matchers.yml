@@ -1,0 +1,57 @@
+- type: ncMatcher
+  id: ForgeExpeditionWeaponsList
+  name: "случайное оружие [Экспедиция]"
+  description: "Случайное экспедиционное оружие или инструмент для добычи."
+  sprite:
+    sprite: Objects/Weapons/Melee/crusher.rsi
+    state: icon
+  items:
+  - WeaponProtoKineticAccelerator
+  - WeaponGrapplingGun
+  - WeaponCrusherDagger
+  - WeaponCrusher
+  - WeaponCrusherGlaive
+
+- type: ncMatcher
+  id: ForgeExpeditionScrapSpawnerList
+  name: "случайный спавнер лома [Экспедиция]"
+  description: "Случайный спавнер экспедиционного лома."
+  sprite:
+    sprite: Objects/Materials/Scrap/generic.rsi
+    state: metal-1
+  items:
+  - SalvageSpawnerScrapCommon
+  - SalvageSpawnerScrapValuable
+
+- type: ncMatcher
+  id: ForgeExpeditionTreasureSpawnerList
+  name: "случайный спавнер ценностей [Экспедиция]"
+  description: "Случайный спавнер экспедиционных сокровищ и ценных находок."
+  sprite:
+    sprite: Objects/Materials/materials.rsi
+    state: diamond
+  items:
+  - SalvageSpawnerTreasure
+  - SalvageSpawnerTreasureValuable
+
+- type: ncMatcher
+  id: ForgeExpeditionEquipmentSpawnerList
+  name: "случайный спавнер снаряжения [Экспедиция]"
+  description: "Случайный спавнер экспедиционного снаряжения."
+  sprite:
+    sprite: Objects/Devices/communication.rsi
+    state: walkietalkie
+  items:
+  - SalvageSpawnerEquipment
+  - SalvageSpawnerEquipmentValuable
+
+- type: ncMatcher
+  id: ForgeExpeditionSupportSpawnerList
+  name: "случайный спавнер снабжения [Экспедиция]"
+  description: "Случайный служебный спавнер экспедиции."
+  sprite:
+    sprite: Structures/Storage/Crates/generic.rsi
+    state: icon
+  items:
+  - SalvageMaterialCrateSpawner
+  - SalvageMobSpawner

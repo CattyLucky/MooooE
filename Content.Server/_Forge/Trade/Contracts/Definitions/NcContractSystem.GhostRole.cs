@@ -45,6 +45,7 @@ public sealed partial class NcContractSystem : EntitySystem
             GhostRoleSurvivalBriefing = proto.Survival.Briefing,
             GhostRoleSurvivalObjectiveTitle = proto.Survival.ObjectiveTitle,
             GhostRoleSurvivalObjectiveDescription = proto.Survival.ObjectiveDescription,
+            GhostRoleTakeDelaySeconds = proto.Spawn.TakeDelaySeconds,
             AcceptTimeoutSeconds = proto.Spawn.AcceptTimeoutSeconds,
             SpawnPoint = CloneContractPointSelector(proto.Spawn.Point),
             GivePinpointer = true

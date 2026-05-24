@@ -19,7 +19,13 @@ public sealed partial class NcContractSystem : EntitySystem
         var dirty = false;
 
         if (config.GhostRoleCharacterSex is { } sex)
+        {
             _contractGhostRoleHumanoid.SetSex(mob, sex, false, humanoid);
+            if (SharedHumanoidAppearanceSystem.DefaultSexVoice.TryGetValue(sex, out var voice))
+                _contractGhostRoleHumanoid.SetTTSVoice(mob, voice, humanoid);
+
+            dirty = true;
+        }
 
         if (config.GhostRoleCharacterGender is { } gender)
         {

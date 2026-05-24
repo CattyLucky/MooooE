@@ -9,7 +9,7 @@ internal static class NcContractTuning
     public const int DefaultObjectiveStageGoal = 1;
 
     public const string DefaultContractPinpointerPrototypeId = "PinpointerUniversal";
-    public const string DefaultTrackedDeliveryDropoffSignPrototypeId = "TradeContractDropoffSign";
+    public const string DefaultTrackedDeliveryDropoffSignPrototypeId = "ForgeTradeContractDropoffSign";
 
     public const int MaxActiveContractPinpointers = 7;
     public const float GhostRoleStoreDeliveryRange = 2.5f;

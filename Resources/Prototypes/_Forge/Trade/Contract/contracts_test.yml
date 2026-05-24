@@ -1,0 +1,223 @@
+- type: storeContractsPreset
+  id: ForgeExpeditionTestContractsPreset
+  contractOffers:
+    maxVisible: 7
+    groups:
+    - pool: ForgeExpeditionSupplyOrders
+      minVisible: 1
+      maxVisible: 2
+      fillWeight: 3
+    - pool: ForgeExpeditionFieldOrders
+      minVisible: 2
+      maxVisible: 3
+      fillWeight: 2
+    - pool: ForgeExpeditionGhostOrders
+      minVisible: 1
+      maxVisible: 2
+      fillWeight: 1
+  skipCost: 250
+  skipCurrency: Credit
+
+- type: ncContractOfferPool
+  id: ForgeExpeditionSupplyOrders
+  name: "Снабжение"
+  order: 10
+  color: "#8BC7E5"
+  entries:
+  - type: Supply
+    id: ForgeTestSupplySalvageScrap
+    weight: 2
+  - type: Supply
+    id: ForgeTestSupplyExpeditionWeapon
+    weight: 1
+
+- type: ncContractOfferPool
+  id: ForgeExpeditionFieldOrders
+  name: "Полевая работа"
+  order: 20
+  color: "#C9A45A"
+  entries:
+  - type: Retrieval
+    id: ForgeTestRetrievalLostCrate
+    weight: 2
+  - type: Retrieval
+    id: ForgeTestRetrievalProofMedicalCrate
+    weight: 1
+  - type: Hunt
+    id: ForgeTestHuntCarps
+    weight: 2
+
+- type: ncContractOfferPool
+  id: ForgeExpeditionGhostOrders
+  name: "Особые цели"
+  order: 30
+  color: "#A94D3D"
+  entries:
+  - type: GhostRole
+    id: ForgeTestGhostRoleLostSalvager
+    weight: 1
+  - type: GhostRole
+    id: ForgeTestGhostRoleYavassaBiila
+    weight: 1
+
+- type: ncItemGroup
+  id: ForgeExpeditionWeaponGroup
+  name: "экспедиционное оружие"
+  description: "Любой базовый инструмент или оружие утилизатора."
+  icon: WeaponProtoKineticAccelerator
+  prototypes:
+  - WeaponProtoKineticAccelerator
+  - WeaponGrapplingGun
+  - WeaponCrusher
+  - WeaponCrusherDagger
+  - WeaponCrusherGlaive
+
+- type: ncHuntGroup
+  id: ForgeHuntGroupCarps
+  name: "контрактные карпы"
+  description: "Помеченные карпы для тестовых заказов. Их не стирает защита ЦК как обычную враждебную фауну."
+  icon: ForgeContractCarp
+  prototypes:
+  - ForgeContractCarp
+  - ForgeContractCarpGilded
+
+- type: ncSupplyContract
+  id: ForgeTestSupplySalvageScrap
+  name: "Тест: сдать спавнер лома"
+  description: "Принесите обычный экспедиционный спавнер лома для проверки Supply-контракта."
+  icon: SalvageSpawnerScrapCommon
+  targets:
+  - prototype: SalvageSpawnerScrapCommon
+    count: 1
+  reward:
+  - type: Currency
+    currency: Credit
+    count: { min: 350, max: 500 }
+  - type: Pool
+    pool: ForgeExpeditionRewardEasy
+    count: 1
+
+- type: ncSupplyContract
+  id: ForgeTestSupplyExpeditionWeapon
+  name: "Тест: сдать экспедиционное оружие"
+  description: "Принесите любой инструмент из экспедиционной группы для проверки group-цели."
+  icon: WeaponProtoKineticAccelerator
+  targets:
+  - group: ForgeExpeditionWeaponGroup
+    count: 1
+  reward:
+  - type: Currency
+    currency: Credit
+    count: { min: 500, max: 750 }
+  - type: Pool
+    pool: ForgeExpeditionRewardGear
+    count: 1
+
+- type: ncRetrievalContract
+  id: ForgeTestRetrievalLostCrate
+  name: "Тест: вернуть экспедиционный ящик"
+  description: "Найдите меченый ящик и верните его в торговый автомат. Если маркер не поставлен на карте, груз появится у автомата."
+  icon: ForgeTradeCargoExpeditionCrate
+  cargo:
+  - prototype: ForgeTradeCargoExpeditionCrate
+    count: 1
+  route: ForgeTradeRouteCargoToTrader
+  reward:
+  - type: Currency
+    currency: Credit
+    count: { min: 450, max: 650 }
+  - type: Pool
+    pool: ForgeExpeditionRewardEasy
+    count: 1
+
+- type: ncRetrievalContract
+  id: ForgeTestRetrievalProofMedicalCrate
+  name: "Тест: доставка с накладной"
+  description: "Доставьте медицинский ящик на синюю точку приемки и принесите накладную обратно."
+  icon: ForgeTradeCargoMedicalCrate
+  cargo:
+  - prototype: ForgeTradeCargoMedicalCrate
+    count: 1
+  route: ForgeTradeRouteCargoToDropoffProof
+  reward:
+  - type: Currency
+    currency: Credit
+    count: { min: 650, max: 900 }
+  - type: Pool
+    pool: ForgeExpeditionRewardGear
+    count: 1
+
+- type: ncHuntContract
+  id: ForgeTestHuntCarps
+  name: "Тест: зачистить карпов"
+  description: "Зачистите тестовую точку от контрактных карпов и принесите трофейную метку."
+  icon: ForgeContractCarp
+  targets:
+  - group: ForgeHuntGroupCarps
+    count: 2
+  completion:
+    mode: TrophyTurnIn
+    trophy: ForgeTradeContractProofCarpTrophy
+  spawn:
+    point:
+      type: MarkerGroup
+      id: ForgeTradeTestHuntSpawn
+  reward:
+  - type: Currency
+    currency: Credit
+    count: { min: 700, max: 1000 }
+  - type: Pool
+    pool: ForgeExpeditionRewardGear
+    count: 1
+
+- type: ncGhostRoleContract
+  id: ForgeTestGhostRoleLostSalvager
+  name: "Тест: вернуть утилизатора"
+  description: "Особая цель появляется как ghost-role. Доставьте ее обратно живой и в наручниках."
+  role: ForgeGhostRoleLostSalvager
+  spawn:
+    point:
+      type: MarkerGroup
+      id: ForgeTradeTestGhostSpawn
+    acceptTimeoutSeconds: 300
+    takeDelaySeconds: 30
+  completion:
+    mode: AliveCuffedTurnIn
+  survival:
+    durationSeconds: 1800
+    briefing: "Продержитесь 30 минут и не дайте доставить себя к торговому автомату."
+    objectiveTitle: "Выжить"
+    objectiveDescription: "Не быть сданным по контракту до конца таймера."
+  reward:
+  - type: Currency
+    currency: Credit
+    count: { min: 900, max: 1300 }
+  - type: Pool
+    pool: ForgeExpeditionRewardGear
+    count: 1
+
+- type: ncGhostRoleContract
+  id: ForgeTestGhostRoleYavassaBiila
+  name: "Тест: Явасса-Биила"
+  description: "Явасса-Биила снова сорвала чужую сделку и ушла в шумное похождение с двумя щитами-пилами. Заказчик платит только за живую цель в наручниках."
+  role: ForgeGhostRoleYavassaBiila
+  spawn:
+    point:
+      type: MarkerGroup
+      id: ForgeTradeTestGhostSpawn
+    acceptTimeoutSeconds: 300
+    takeDelaySeconds: 30
+  completion:
+    mode: AliveCuffedTurnIn
+  survival:
+    durationSeconds: 1800
+    briefing: "Продержитесь 30 минут. Вас хотят взять живой: прячьтесь, торгуйтесь, провоцируйте охотников и не дайте довести себя до торгового автомата."
+    objectiveTitle: "Выжить"
+    objectiveDescription: "Остаться на свободе и не быть сданной живой по контракту."
+  reward:
+  - type: Currency
+    currency: Credit
+    count: { min: 1200, max: 1700 }
+  - type: Pool
+    pool: ForgeExpeditionRewardGear
+    count: 1

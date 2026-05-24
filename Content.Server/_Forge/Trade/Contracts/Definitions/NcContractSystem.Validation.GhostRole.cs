@@ -173,6 +173,12 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
         }
 
+        if (spawn.TakeDelaySeconds < 0)
+        {
+            Sawmill.Warning($"[Contracts] GhostRole contract '{contractId}' spawn.takeDelaySeconds must be >= 0.");
+            return false;
+        }
+
         return spawn.Point.Type switch
         {
             ContractPointSelectorType.MarkerId => RequireGhostRoleSpawnPointId(contractId, spawn.Point),

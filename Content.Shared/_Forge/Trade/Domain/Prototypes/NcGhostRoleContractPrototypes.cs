@@ -107,6 +107,9 @@ public sealed partial class NcGhostRoleSpawnData
 
     [DataField("acceptTimeoutSeconds")]
     public int AcceptTimeoutSeconds { get; set; } = 300;
+
+    [DataField("takeDelaySeconds")]
+    public int TakeDelaySeconds { get; set; }
 }
 
 [DataDefinition]

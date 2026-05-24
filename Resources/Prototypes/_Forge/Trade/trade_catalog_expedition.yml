@@ -1,0 +1,66 @@
+- type: storeCategoryStructured
+  id: ForgeExpeditionBuyWeapons
+  name: "Экспедиционное оружие"
+  entries:
+  - proto: ForgeExpeditionWeaponsList
+    match: Matcher
+    price: 1100
+    count: 10
+
+- type: storeCategoryStructured
+  id: ForgeExpeditionBuySpawners
+  name: "Спавнеры экспедиций"
+  entries:
+  - proto: ForgeExpeditionScrapSpawnerList
+    match: Matcher
+    price: 650
+  - proto: ForgeExpeditionTreasureSpawnerList
+    match: Matcher
+    price: 1150
+    count: 8
+  - proto: ForgeExpeditionEquipmentSpawnerList
+    match: Matcher
+    price: 1200
+    count: 8
+  - proto: ForgeExpeditionSupportSpawnerList
+    match: Matcher
+    price: 1100
+
+- type: storePresetStructured
+  id: ForgeExpeditionBuy
+  currency: Credit
+  categories:
+  - ForgeExpeditionBuyWeapons
+  - ForgeExpeditionBuySpawners
+
+- type: storeCategoryStructured
+  id: ForgeExpeditionSellWeapons
+  name: "Экспедиционное оружие"
+  entries:
+  - proto: ForgeExpeditionWeaponsList
+    match: Matcher
+    price: 550
+
+- type: storeCategoryStructured
+  id: ForgeExpeditionSellSpawners
+  name: "Спавнеры экспедиций"
+  entries:
+  - proto: ForgeExpeditionScrapSpawnerList
+    match: Matcher
+    price: 325
+  - proto: ForgeExpeditionTreasureSpawnerList
+    match: Matcher
+    price: 575
+  - proto: ForgeExpeditionEquipmentSpawnerList
+    match: Matcher
+    price: 600
+  - proto: ForgeExpeditionSupportSpawnerList
+    match: Matcher
+    price: 550
+
+- type: storePresetStructured
+  id: ForgeExpeditionSell
+  currency: Credit
+  categories:
+  - ForgeExpeditionSellWeapons
+  - ForgeExpeditionSellSpawners

@@ -1,0 +1,51 @@
+- type: ncSupplyRewardPool
+  id: ForgeExpeditionRewardEasy
+  entries:
+  - type: Currency
+    currency: Credit
+    count: { min: 150, max: 300 }
+    weight: 3
+  - type: Item
+    prototype: SheetSteel1
+    count: { min: 5, max: 10 }
+    weight: 2
+  - type: Item
+    prototype: Brutepack
+    count: { min: 1, max: 2 }
+    weight: 2
+  - type: Item
+    prototype: Ointment
+    count: { min: 1, max: 2 }
+    weight: 2
+  - type: Item
+    prototype: SalvageSpawnerScrapCommon
+    count: 1
+    weight: 2
+
+- type: ncSupplyRewardPool
+  id: ForgeExpeditionRewardGear
+  entries:
+  - type: Item
+    prototype: WeaponProtoKineticAccelerator
+    count: 1
+    weight: 2
+  - type: Item
+    prototype: WeaponGrapplingGun
+    count: 1
+    weight: 1
+  - type: Item
+    prototype: WeaponCrusherDagger
+    count: 1
+    weight: 1
+  - type: Item
+    prototype: SalvageSpawnerEquipment
+    count: 1
+    weight: 2
+  - type: Item
+    prototype: SalvageSpawnerTreasure
+    count: 1
+    weight: 2
+  - type: Currency
+    currency: Credit
+    count: { min: 250, max: 500 }
+    weight: 2

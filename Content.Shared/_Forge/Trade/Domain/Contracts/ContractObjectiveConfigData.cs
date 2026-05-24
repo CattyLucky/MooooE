@@ -18,6 +18,7 @@ public sealed class ContractObjectiveConfigData
     public Color? GhostRoleCharacterSkinColor;
     public NcGhostRoleCompletionMode GhostRoleCompletionMode = NcGhostRoleCompletionMode.DeadBodyTurnIn;
     public int GhostRoleSurvivalDurationSeconds;
+    public int GhostRoleTakeDelaySeconds;
 
     public bool GivePinpointer = true;
     public int GuardCount;

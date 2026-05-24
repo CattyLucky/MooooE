@@ -1,0 +1,95 @@
+- type: entity
+  id: ForgeTradeContractDropoffSign
+  name: "экспедиционная веха приемки"
+  description: "Временная точка приемки контрактного груза."
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+    anchored: true
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Sprite
+    sprite: Objects/Decoration/mines.rsi
+    state: sign_right
+  - type: PointLight
+    enabled: true
+    radius: 2
+    energy: 0.8
+    color: "#6FA8DC"
+
+- type: entity
+  parent: CrateGenericSteel
+  id: ForgeTradeCargoExpeditionCrate
+  name: "меченый экспедиционный ящик"
+  description: "Пломбированный ящик экспедиционной службы. Для контракта важен сам груз, а не содержимое."
+  categories: [ HideSpawnMenu ]
+
+- type: entity
+  parent: CrateMedical
+  id: ForgeTradeCargoMedicalCrate
+  name: "меченый медицинский ящик"
+  description: "Медицинский ящик с контрактной пломбой."
+  categories: [ HideSpawnMenu ]
+
+- type: ncRetrievalSourcePreset
+  id: ForgeTradeTestCargoSource
+  spawnCargo: true
+  point:
+    type: MarkerGroup
+    id: ForgeTradeTestCargoSource
+  fallbackToStore: true
+
+- type: ncRetrievalDestinationPreset
+  id: ForgeTradeDestinationStoreUi
+  target:
+    type: StoreUi
+
+- type: ncRetrievalDestinationPreset
+  id: ForgeTradeTestDropoffDestination
+  target:
+    type: MarkerGroup
+    id: ForgeTradeTestDropoff
+  radius: 2.0
+
+- type: ncRetrievalGuidancePreset
+  id: ForgeTradeGuidanceCargoToTrader
+  sourceHint: "тестовая точка груза или сам автомат"
+  destinationHint: "верните груз в торговый автомат"
+  pinpointer:
+    enabled: true
+    target: CargoThenDestinationThenStore
+    prototype: PinpointerUniversal
+    maxActive: 7
+
+- type: ncRetrievalGuidancePreset
+  id: ForgeTradeGuidanceCargoToDropoff
+  sourceHint: "тестовая точка груза или сам автомат"
+  destinationHint: "синяя тестовая точка приемки"
+  pinpointer:
+    enabled: true
+    target: CargoThenDestinationThenStore
+    prototype: PinpointerUniversal
+    maxActive: 7
+
+- type: ncRetrievalRoutePreset
+  id: ForgeTradeRouteCargoToTrader
+  source: ForgeTradeTestCargoSource
+  destination: ForgeTradeDestinationStoreUi
+  claim:
+    mode: StoreCargo
+  guidance: ForgeTradeGuidanceCargoToTrader
+  delivery:
+    consumeCargo: true
+    lockDeliveredCargo: false
+
+- type: ncRetrievalRoutePreset
+  id: ForgeTradeRouteCargoToDropoffProof
+  source: ForgeTradeTestCargoSource
+  destination: ForgeTradeTestDropoffDestination
+  claim:
+    mode: DestinationProof
+    proof: ForgeTradeDeliveryReceiptProof
+  guidance: ForgeTradeGuidanceCargoToDropoff
+  delivery:
+    consumeCargo: true
+    lockDeliveredCargo: false
