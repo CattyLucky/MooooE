@@ -1,6 +1,5 @@
 namespace Content.Server._Forge.Trade;
 
-
 /// <summary>
 ///     Currency handler abstraction.
 ///     A currency id is an opaque string used by listings and presets.

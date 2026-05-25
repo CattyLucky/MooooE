@@ -1,6 +1,5 @@
 namespace Content.Server._Forge.Trade;
 
-
 public sealed class NcInventorySnapshot
 {
     public readonly Dictionary<string, int> ProtoCounts = new(StringComparer.Ordinal);
@@ -17,9 +16,13 @@ public sealed class NcInventorySnapshot
         Clear();
 
         foreach (var (key, value) in other.ProtoCounts)
+        {
             ProtoCounts[key] = value;
+        }
 
         foreach (var (key, value) in other.StackTypeCounts)
+        {
             StackTypeCounts[key] = value;
+        }
     }
 }

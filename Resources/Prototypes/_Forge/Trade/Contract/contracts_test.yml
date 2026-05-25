@@ -47,7 +47,13 @@
     id: ForgeTestHuntCarps
     weight: 2
   - type: ArtifactStudy
-    id: ForgeTestStudyArtifact
+    id: ForgeTestStudyArtifactEasy
+    weight: 2
+  - type: ArtifactStudy
+    id: ForgeTestStudyArtifactMedium
+    weight: 1
+  - type: ArtifactStudy
+    id: ForgeTestStudyArtifactHard
     weight: 1
 
 - type: ncContractOfferPool
@@ -174,15 +180,31 @@
     count: 1
 
 - type: ncArtifactStudyContract
-  id: ForgeTestStudyArtifact
-  name: "Тест: изучить артефакт"
-  description: "После принятия появится контрактный артефакт. Раскройте все его узлы и принесите артефакт к терминалу, чтобы сдать заказ."
-  icon: ForgeContractStudyArtifactItem
-  artifact: ForgeContractStudyArtifactItem
+  id: ForgeTestStudyArtifactEasy
+  name: "Тест: изучить простой артефакт"
+  description: "После принятия рядом с торговым автоматом появится простой контрактный артефакт. Раскройте все его узлы и принесите артефакт к терминалу."
+  icon: ForgeContractStudyArtifactEasy
+  artifact: ForgeContractStudyArtifactEasy
   spawn:
     point:
-      type: MarkerGroup
-      id: ForgeTradeTestArtifactStudySpawn
+      type: Store
+  reward:
+  - type: Currency
+    currency: Credit
+    count: { min: 650, max: 900 }
+  - type: Pool
+    pool: ForgeExpeditionRewardEasy
+    count: 1
+
+- type: ncArtifactStudyContract
+  id: ForgeTestStudyArtifactMedium
+  name: "Тест: изучить средний артефакт"
+  description: "После принятия рядом с торговым автоматом появится средний контрактный артефакт. Раскройте все его узлы и принесите артефакт к терминалу."
+  icon: ForgeContractStudyArtifactMedium
+  artifact: ForgeContractStudyArtifactMedium
+  spawn:
+    point:
+      type: Store
   reward:
   - type: Currency
     currency: Credit
@@ -190,6 +212,23 @@
   - type: Pool
     pool: ForgeExpeditionRewardGear
     count: 1
+
+- type: ncArtifactStudyContract
+  id: ForgeTestStudyArtifactHard
+  name: "Тест: изучить сложный артефакт"
+  description: "После принятия рядом с торговым автоматом появится сложный контрактный артефакт. Раскройте все его узлы и принесите артефакт к терминалу."
+  icon: ForgeContractStudyArtifactHard
+  artifact: ForgeContractStudyArtifactHard
+  spawn:
+    point:
+      type: Store
+  reward:
+  - type: Currency
+    currency: Credit
+    count: { min: 1500, max: 2200 }
+  - type: Pool
+    pool: ForgeExpeditionRewardGear
+    count: 2
 
 - type: ncGhostRoleContract
   id: ForgeTestGhostRoleLostSalvager

@@ -1,6 +1,5 @@
 namespace Content.Server._Forge.Trade;
 
-
 public sealed partial class NcContractSystem
 {
     private readonly IContractPinpointerRegistry _pinpointerService = new ContractPinpointerService();
@@ -36,7 +35,9 @@ public sealed partial class NcContractSystem
                 state.PinpointerEntities.Remove(pinpointer);
         }
 
-        public bool TryGetOwner(IContractObjectiveRuntimeStore runtime, EntityUid pinpointer, out EntityUid owner) =>
-            runtime.PinpointerOwners.TryGetValue(pinpointer, out owner);
+        public bool TryGetOwner(IContractObjectiveRuntimeStore runtime, EntityUid pinpointer, out EntityUid owner)
+        {
+            return runtime.PinpointerOwners.TryGetValue(pinpointer, out owner);
+        }
     }
 }

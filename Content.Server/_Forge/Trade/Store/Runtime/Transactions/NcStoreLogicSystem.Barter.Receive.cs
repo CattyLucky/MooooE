@@ -3,9 +3,7 @@ using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -13,7 +11,7 @@ public sealed partial class NcStoreLogicSystem
 
     private bool TryBuildBarterReceivePlan(NcStoreListingDef listing, int times, out BarterReceivePlan plan)
     {
-        plan = new();
+        plan = new BarterReceivePlan();
 
         if (times <= 0)
             return false;
@@ -50,8 +48,10 @@ public sealed partial class NcStoreLogicSystem
         }
 
         for (var i = 0; i < listing.BarterReceivePools.Count; i++)
+        {
             if (!TryAddBarterReceivePoolToPlan(plan, listing.BarterReceivePools[i], times))
                 return false;
+        }
 
         // If a barter has only random receive pools and every chance roll misses, the transaction is
         // treated as not available for this click. This avoids charging the player for an empty result.
@@ -90,19 +90,23 @@ public sealed partial class NcStoreLogicSystem
             var dropCounts = new Dictionary<string, int>(StringComparer.Ordinal);
             var rolls = RollRange(entry.Rolls, 1);
             for (var roll = 0; roll < rolls; roll++)
+            {
                 if (!TryRollBarterRewardToPlan(plan, deck, dropCounts, 0))
                     break;
+            }
         }
 
         return true;
     }
 
-    private bool TryCreateValidBarterRewardDeck(string poolId, out List<ContractRewardDef> deck) =>
-        TryCreateValidBarterRewardDeck(
+    private bool TryCreateValidBarterRewardDeck(string poolId, out List<ContractRewardDef> deck)
+    {
+        return TryCreateValidBarterRewardDeck(
             poolId,
             out deck,
-            new(StringComparer.Ordinal),
+            new HashSet<string>(StringComparer.Ordinal),
             0);
+    }
 
     private bool TryCreateValidBarterRewardDeck(
         string poolId,
@@ -111,7 +115,7 @@ public sealed partial class NcStoreLogicSystem
         int depth
     )
     {
-        deck = new();
+        deck = new List<ContractRewardDef>();
         if (string.IsNullOrWhiteSpace(poolId) || depth > MaxBarterReceivePoolDepth)
             return false;
 
@@ -143,8 +147,9 @@ public sealed partial class NcStoreLogicSystem
         return result;
     }
 
-    private static ContractRewardDef ToContractRewardDef(NcSupplyRewardPoolEntry entry) =>
-        new()
+    private static ContractRewardDef ToContractRewardDef(NcSupplyRewardPoolEntry entry)
+    {
+        return new ContractRewardDef
         {
             Type = entry.Type,
             RewardId = entry.Type switch
@@ -152,12 +157,13 @@ public sealed partial class NcStoreLogicSystem
                 StoreRewardType.Item => entry.Prototype,
                 StoreRewardType.Currency => entry.Currency,
                 StoreRewardType.Pool => entry.Pool,
-                _ => string.Empty
+                _ => string.Empty,
             },
             Count = entry.Count,
             Weight = entry.Weight,
-            MaxRepeats = entry.MaxRepeats
+            MaxRepeats = entry.MaxRepeats,
         };
+    }
 
     private bool TryRollBarterRewardToPlan(
         BarterReceivePlan plan,
@@ -209,8 +215,10 @@ public sealed partial class NcStoreLogicSystem
                 return false;
 
             for (var i = 0; i < amount; i++)
+            {
                 if (!TryRollBarterRewardToPlan(plan, nestedDeck, dropCounts, depth + 1))
                     break;
+            }
 
             return true;
         }
@@ -234,17 +242,17 @@ public sealed partial class NcStoreLogicSystem
             if (existing.Prototype != prototype || existing.Currency != currency)
                 continue;
 
-            var total = (long) existing.Count + amount;
-            existing.Count = total > int.MaxValue ? int.MaxValue : (int) total;
+            var total = (long)existing.Count + amount;
+            existing.Count = total > int.MaxValue ? int.MaxValue : (int)total;
             return;
         }
 
         plan.Entries.Add(
-            new()
+            new BarterReceivePlanEntry
             {
                 Prototype = prototype,
                 Currency = currency,
-                Count = amount
+                Count = amount,
             });
     }
 
@@ -296,7 +304,7 @@ public sealed partial class NcStoreLogicSystem
             StoreRewardType.Item => _protos.HasIndex<EntityPrototype>(rewardId),
             StoreRewardType.Currency => _protos.HasIndex<StackPrototype>(rewardId),
             StoreRewardType.Pool => TryCreateValidBarterRewardDeck(rewardId, out _, visited, depth + 1),
-            _ => false
+            _ => false,
         };
     }
 
@@ -345,7 +353,10 @@ public sealed partial class NcStoreLogicSystem
     }
 
 
-    private static string GetRewardId(ContractRewardDef reward) => reward.RewardId;
+    private static string GetRewardId(ContractRewardDef reward)
+    {
+        return reward.RewardId;
+    }
 
     private sealed class BarterReceivePlan
     {

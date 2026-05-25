@@ -2,9 +2,7 @@ using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 /// <summary>
 ///     Stack-based currency implementation.
@@ -54,8 +52,8 @@ public sealed partial class StackCurrencyHandler : ICurrencyHandler
         // StackType ids are stack prototype ids. Payout also needs a valid spawn prototype,
         // otherwise sell/claim validation could accept currency that cannot actually be issued.
         return _protos.TryIndex<StackPrototype>(currencyId, out var proto) &&
-            !string.IsNullOrWhiteSpace(proto.Spawn) &&
-            _protos.HasIndex<EntityPrototype>(proto.Spawn);
+               !string.IsNullOrWhiteSpace(proto.Spawn) &&
+               _protos.HasIndex<EntityPrototype>(proto.Spawn);
     }
 
     public bool TryGetBalance(in NcInventorySnapshot snapshot, string currencyId, out int balance)
@@ -79,6 +77,6 @@ public sealed partial class StackCurrencyHandler : ICurrencyHandler
             return false;
 
         return _ents.EntityExists(user) &&
-            _ents.TryGetComponent(user, out TransformComponent? _);
+               _ents.TryGetComponent(user, out TransformComponent? _);
     }
 }

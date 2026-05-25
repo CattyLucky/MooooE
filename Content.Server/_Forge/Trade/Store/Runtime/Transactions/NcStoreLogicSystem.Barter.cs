@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -55,8 +53,8 @@ public sealed partial class NcStoreLogicSystem
             return false;
 
         if (!store.ListingIndex.TryGetValue(
-            NcStoreComponent.MakeListingKey(StoreMode.Barter, listingId),
-            out var listing))
+                NcStoreComponent.MakeListingKey(StoreMode.Barter, listingId),
+                out var listing))
             return false;
 
         if (listing.BarterCost.Count == 0 ||
@@ -83,9 +81,9 @@ public sealed partial class NcStoreLogicSystem
             return false;
 
         if (!TryExecuteBarterReceivePlan(
-            user,
-            receivePlan,
-            () => TryExecuteBarterCostPlanPreCommit(user, costPlan)))
+                user,
+                receivePlan,
+                () => TryExecuteBarterCostPlanPreCommit(user, costPlan)))
             return false;
 
         if (listing.RemainingCount > 0)

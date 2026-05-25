@@ -2,9 +2,7 @@ using Content.Shared.Stacks;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -101,9 +99,11 @@ public sealed partial class NcStoreLogicSystem
             string productEntity,
             int remainingToSpawn,
             int maxPerStack
-        ) =>
-            remainingToSpawn <= 0 ||
-            TrySpawnRemainingPurchasedStacks(user, productEntity, remainingToSpawn, maxPerStack);
+        )
+        {
+            return remainingToSpawn <= 0 ||
+                   TrySpawnRemainingPurchasedStacks(user, productEntity, remainingToSpawn, maxPerStack);
+        }
 
         private void HandleFailedPurchaseBatch(EntityUid user)
         {
@@ -142,8 +142,10 @@ public sealed partial class NcStoreLogicSystem
         private void TrackStackRestore(EntityUid ent, int previousCount)
         {
             for (var i = 0; i < _stackRestoreScratch.Count; i++)
+            {
                 if (_stackRestoreScratch[i].Ent == ent)
                     return;
+            }
 
             _stackRestoreScratch.Add((ent, previousCount));
         }
@@ -222,7 +224,9 @@ public sealed partial class NcStoreLogicSystem
             }
 
             for (var i = 0; i < _spawnedScratch.Count; i++)
+            {
                 _sys.QueuePickupToHandsOrCrateNextTick(user, _spawnedScratch[i]);
+            }
 
             ResetPurchaseBatchState();
         }

@@ -1,9 +1,7 @@
 using Content.Shared._Forge.Trade;
 using Content.Shared.Stacks;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -23,10 +21,10 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
 
         if (!TryGiveContractRewardsWithPreCommit(
-            ctx.User,
-            ctx.Contract.Rewards,
-            () => TryExecuteClaimTakePlanPreCommit(ctx),
-            out fail))
+                ctx.User,
+                ctx.Contract.Rewards,
+                () => TryExecuteClaimTakePlanPreCommit(ctx),
+                out fail))
             return false;
 
         MarkClaimTargetsCompleted(ctx.Contract);
@@ -90,8 +88,10 @@ public sealed partial class NcContractSystem : EntitySystem
         fail = ClaimAttemptResult.Fail(ClaimFailureReason.None);
 
         foreach (var entry in takePlan)
+        {
             if (!TryValidateClaimTakeEntry(entry, out fail))
                 return false;
+        }
 
         return true;
     }
@@ -130,8 +130,10 @@ public sealed partial class NcContractSystem : EntitySystem
         return false;
     }
 
-    private static ClaimAttemptResult CreateClaimExecutionFailure(string message) =>
-        ClaimAttemptResult.Fail(ClaimFailureReason.ExecutionFailed, message);
+    private static ClaimAttemptResult CreateClaimExecutionFailure(string message)
+    {
+        return ClaimAttemptResult.Fail(ClaimFailureReason.ExecutionFailed, message);
+    }
 
     private bool TryExecuteClaimTakeEntries(
         List<ClaimTakeEntry> takePlan,
@@ -142,8 +144,10 @@ public sealed partial class NcContractSystem : EntitySystem
         fail = ClaimAttemptResult.Fail(ClaimFailureReason.None);
 
         foreach (var entry in takePlan)
+        {
             if (!TryExecuteClaimTakeEntry(entry, journal, out fail))
                 return false;
+        }
 
         return true;
     }
@@ -246,17 +250,17 @@ public sealed partial class NcContractSystem : EntitySystem
         var preCommitFail = ClaimAttemptResult.Ok();
 
         if (Rewards.TryExecuteRewardListWithPreCommit(
-            user,
-            rewards,
-            "Claim",
-            () =>
-            {
-                preCommitFail = preCommit();
-                return preCommitFail.Success
-                    ? null
-                    : $"{preCommitFail.Reason}: {preCommitFail.Details}";
-            },
-            out var reason))
+                user,
+                rewards,
+                "Claim",
+                () =>
+                {
+                    preCommitFail = preCommit();
+                    return preCommitFail.Success
+                        ? null
+                        : $"{preCommitFail.Reason}: {preCommitFail.Details}";
+                },
+                out var reason))
             return true;
 
         if (!preCommitFail.Success)

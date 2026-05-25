@@ -2,16 +2,17 @@ using Content.Shared.Stacks;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
     private const int DefaultMaxStackFallback = 1000;
     private readonly List<EntityUid> _stackFillItemsScratch = new();
 
-    public bool TrySpawnProduct(string protoId, EntityUid user) => TrySpawnProductInternal(protoId, user, true);
+    public bool TrySpawnProduct(string protoId, EntityUid user)
+    {
+        return TrySpawnProductInternal(protoId, user, true);
+    }
 
     private bool TrySpawnProductInternal(string protoId, EntityUid user, bool invalidateCache)
     {
@@ -136,8 +137,10 @@ public sealed partial class NcStoreLogicSystem
     {
         var count = 0;
         for (var i = 0; i < units; i++)
+        {
             if (TrySpawnProductInternal(protoId, user, false))
                 count++;
+        }
 
         if (count > 0)
             _inventory.InvalidateInventoryCache(user);

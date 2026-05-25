@@ -2,9 +2,7 @@ using Content.Shared._Forge.Trade;
 using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreSystemStructuredLoader
 {
@@ -36,13 +34,19 @@ public sealed partial class StoreSystemStructuredLoader
         var ok = true;
 
         for (var i = 0; i < listingProto.Cost.Count; i++)
+        {
             ok &= ValidateBarterCost(listingProto.ID, $"cost[{i}]", listingProto.Cost[i]);
+        }
 
         for (var i = 0; i < listingProto.Receive.Count; i++)
+        {
             ok &= ValidateBarterReceive(listingProto.ID, $"receive[{i}]", listingProto.Receive[i]);
+        }
 
         for (var i = 0; i < listingProto.ReceivePools.Count; i++)
+        {
             ok &= ValidateBarterReceivePool(listingProto.ID, $"receivePools[{i}]", listingProto.ReceivePools[i]);
+        }
 
         if (listingProto.Count == 0 || listingProto.Count < -1)
         {
@@ -157,9 +161,11 @@ public sealed partial class StoreSystemStructuredLoader
         }
 
         var ok = true;
-        var visited = new HashSet<string>(StringComparer.Ordinal) { entry.Pool, };
+        var visited = new HashSet<string>(StringComparer.Ordinal) { entry.Pool };
         for (var i = 0; i < pool.Entries.Count; i++)
+        {
             ok &= ValidateBarterReceivePoolReward(entryId, $"{path}.pool[{i}]", pool.Entries[i], visited);
+        }
 
         if (ok)
             return true;
@@ -262,7 +268,9 @@ public sealed partial class StoreSystemStructuredLoader
 
             var ok = true;
             for (var i = 0; i < nestedPool.Entries.Count; i++)
+            {
                 ok &= ValidateBarterReceivePoolReward(entryId, $"{path}.pool[{i}]", nestedPool.Entries[i], visited);
+            }
 
             visited.Remove(reward.Pool);
             return ok;

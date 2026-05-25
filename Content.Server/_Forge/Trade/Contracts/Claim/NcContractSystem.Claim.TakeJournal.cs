@@ -1,9 +1,7 @@
 using Content.Shared._Forge.Trade;
 using Content.Shared.Stacks;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem
 {
@@ -32,7 +30,9 @@ public sealed partial class NcContractSystem
             return;
 
         for (var i = journal.TurnInRestores.Count - 1; i >= 0; i--)
+        {
             RestoreClaimTurnInEntry(journal.TurnInState, journal.TurnInRestores[i]);
+        }
     }
 
     private static void RestoreClaimTurnInEntry(ObjectiveRuntimeState state, TurnInRestore restore)
@@ -46,7 +46,9 @@ public sealed partial class NcContractSystem
     private void RestoreClaimRetrievalCargo(ClaimTakeJournal journal)
     {
         for (var i = journal.RetrievalCargoRestores.Count - 1; i >= 0; i--)
+        {
             RestoreClaimRetrievalCargoEntry(journal.RetrievalCargoRestores[i]);
+        }
     }
 
     private void RestoreClaimRetrievalCargoEntry((EntityUid Cargo, (EntityUid Store, string ContractId) Key) restore)
@@ -58,7 +60,9 @@ public sealed partial class NcContractSystem
     private void RestoreClaimStacks(ClaimTakeJournal journal)
     {
         for (var i = journal.StackRestores.Count - 1; i >= 0; i--)
+        {
             RestoreClaimStackEntry(journal.StackRestores[i]);
+        }
     }
 
     private void RestoreClaimStackEntry((EntityUid Ent, int PreviousCount) restore)
@@ -81,8 +85,10 @@ public sealed partial class NcContractSystem
         public void TrackStack(EntityUid ent, int previousCount)
         {
             for (var i = 0; i < StackRestores.Count; i++)
+            {
                 if (StackRestores[i].Ent == ent)
                     return;
+            }
 
             StackRestores.Add((ent, previousCount));
         }
@@ -90,8 +96,10 @@ public sealed partial class NcContractSystem
         public void TrackRetrievalCargo(EntityUid cargo, (EntityUid Store, string ContractId) key)
         {
             for (var i = 0; i < RetrievalCargoRestores.Count; i++)
+            {
                 if (RetrievalCargoRestores[i].Cargo == cargo)
                     return;
+            }
 
             RetrievalCargoRestores.Add((cargo, key));
         }
@@ -104,11 +112,13 @@ public sealed partial class NcContractSystem
             TurnInState ??= state;
 
             for (var i = 0; i < TurnInRestores.Count; i++)
+            {
                 if (TurnInRestores[i].Key == key)
                     return;
+            }
 
             var hadValue = state.TurnedInByTarget.TryGetValue(key, out var previousValue);
-            TurnInRestores.Add(new(key, hadValue, previousValue));
+            TurnInRestores.Add(new TurnInRestore(key, hadValue, previousValue));
         }
 
         public void Clear()

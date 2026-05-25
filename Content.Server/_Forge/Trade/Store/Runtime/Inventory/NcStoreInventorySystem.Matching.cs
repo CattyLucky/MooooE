@@ -5,9 +5,7 @@ using Content.Shared.Inventory;
 using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreInventorySystem
 {
@@ -75,16 +73,21 @@ public sealed partial class NcStoreInventorySystem
         return _ents.HasComponent<ClothingComponent>(item);
     }
 
-    private bool IsDirectChildOf(EntityUid root, EntityUid item) =>
-        _ents.TryGetComponent(item, out TransformComponent? xform) && xform.ParentUid == root;
+    private bool IsDirectChildOf(EntityUid root, EntityUid item)
+    {
+        return _ents.TryGetComponent(item, out TransformComponent? xform) && xform.ParentUid == root;
+    }
 
     private bool IsHeldInHands(EntityUid user, EntityUid item)
     {
         if (!_ents.TryGetComponent(user, out HandsComponent? hands))
             return false;
         foreach (var hand in hands.Hands.Values)
+        {
             if (hand.HeldEntity == item)
                 return true;
+        }
+
         return false;
     }
 

@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreStructuredSystem
 {
@@ -116,7 +114,9 @@ public sealed partial class StoreStructuredSystem
         _openStoresScratch.AddRange(_openStoreUids);
 
         foreach (var uid in _openStoresScratch)
+        {
             ValidateOpenStore(uid);
+        }
     }
 
     private bool TryGetOpenStoreUser(EntityUid uid, out NcStoreComponent store, out EntityUid user)
@@ -141,8 +141,10 @@ public sealed partial class StoreStructuredSystem
         return now >= scratch.NextDynamicAllowed;
     }
 
-    private void SetNextDynamicUpdateTime(DynamicScratch scratch, TimeSpan now) =>
+    private void SetNextDynamicUpdateTime(DynamicScratch scratch, TimeSpan now)
+    {
         scratch.NextDynamicAllowed = now + TimeSpan.FromSeconds(MinDynamicInterval);
+    }
 
     private void ValidateOpenStore(EntityUid uid)
     {
@@ -170,9 +172,11 @@ public sealed partial class StoreStructuredSystem
         CloseStoreForNoAccess(uid, store, userUid);
     }
 
-    private bool IsStoreUserInRange(TransformComponent storeXform, EntityUid userUid) =>
-        TryComp(userUid, out TransformComponent? userXform) &&
-        _xform.InRange(storeXform.Coordinates, userXform.Coordinates, AutoCloseDistance);
+    private bool IsStoreUserInRange(TransformComponent storeXform, EntityUid userUid)
+    {
+        return TryComp(userUid, out TransformComponent? userXform) &&
+               _xform.InRange(storeXform.Coordinates, userXform.Coordinates, AutoCloseDistance);
+    }
 
     private void CloseStoreForDetachedUser(EntityUid uid, NcStoreComponent store, EntityUid userUid)
     {

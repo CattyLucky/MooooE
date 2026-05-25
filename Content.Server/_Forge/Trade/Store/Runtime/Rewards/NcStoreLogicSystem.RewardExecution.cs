@@ -1,9 +1,7 @@
 using Content.Shared._Forge.Trade;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -52,7 +50,7 @@ public sealed partial class NcStoreLogicSystem
         out string reason
     )
     {
-        plan = new();
+        plan = new NcRewardExecutionPlan();
         reason = string.Empty;
 
         if (rewards == null || rewards.Count == 0)
@@ -83,7 +81,7 @@ public sealed partial class NcStoreLogicSystem
         out string reason
     )
     {
-        plan = new();
+        plan = new NcRewardExecutionPlan();
         reason = string.Empty;
 
         if (receivePlan.Entries.Count == 0)
@@ -143,18 +141,18 @@ public sealed partial class NcStoreLogicSystem
             if (existing.Type != type || !string.Equals(existing.Id, id, StringComparison.Ordinal))
                 continue;
 
-            var total = (long) existing.Amount + amount;
+            var total = (long)existing.Amount + amount;
             if (total > int.MaxValue)
             {
                 reason = $"Reward entry '{id}' amount overflow.";
                 return false;
             }
 
-            plan.Entries[i] = existing with { Amount = (int) total, };
+            plan.Entries[i] = existing with { Amount = (int)total };
             return true;
         }
 
-        plan.Entries.Add(new(type, id, amount));
+        plan.Entries.Add(new NcRewardExecutionEntry(type, id, amount));
         return true;
     }
 

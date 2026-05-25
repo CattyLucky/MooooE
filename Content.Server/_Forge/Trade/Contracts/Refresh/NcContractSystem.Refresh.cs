@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -11,7 +9,7 @@ public sealed partial class NcContractSystem : EntitySystem
         if (!TryResolveContractPreset(uid, comp, out var preset))
             return;
 
-        if (preset.ContractOffers is { Groups.Count: > 0, } offers)
+        if (preset.ContractOffers is { Groups.Count: > 0 } offers)
             RefillContractsForStoreOffers(uid, comp, offers, ignoredContractId);
         else
         {
@@ -55,8 +53,8 @@ public sealed partial class NcContractSystem : EntitySystem
         if (right <= 0)
             return left;
 
-        var sum = (long) left + right;
-        return sum >= int.MaxValue ? int.MaxValue : (int) sum;
+        var sum = (long)left + right;
+        return sum >= int.MaxValue ? int.MaxValue : (int)sum;
     }
 
     private bool TryPickAndRemoveWeighted(

@@ -1,9 +1,7 @@
 using Content.Shared._Forge.Trade;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreSystemStructuredLoader
 {
@@ -81,14 +79,14 @@ public sealed partial class StoreSystemStructuredLoader
             Description = listingProto.Description,
             MatchMode = PrototypeMatchMode.Exact,
             Mode = StoreMode.Barter,
-            Categories = new() { categoryName, },
-            Conditions = new(),
+            Categories = new List<string> { categoryName },
+            Conditions = new List<ListingConditionPrototype>(),
             RemainingCount = listingProto.Count,
             UnitsPerPurchase = 1,
             BarterCost = CloneBarterCost(listingProto.Cost),
             BarterReceive = CloneBarterReceive(listingProto.Receive),
             BarterReceivePools = CloneBarterReceivePools(listingProto.ReceivePools),
-            Cost = new()
+            Cost = new Dictionary<string, int>(),
         };
 
         comp.Listings.Add(listing);

@@ -2,9 +2,7 @@ using Content.Shared._Forge.Trade;
 using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreInventorySystem
 {
@@ -85,7 +83,7 @@ public sealed partial class NcStoreInventorySystem
             var matcher = GetCompiledMatcher(protoId, true);
             if (matcher == null)
             {
-                return new(
+                return new ProductTakeRequest(
                     protoId,
                     null,
                     matchMode,
@@ -93,7 +91,7 @@ public sealed partial class NcStoreInventorySystem
                     false);
             }
 
-            return new(
+            return new ProductTakeRequest(
                 protoId,
                 null,
                 matchMode,
@@ -105,7 +103,7 @@ public sealed partial class NcStoreInventorySystem
         {
             if (!TryResolveTradeTagId(protoId, out var tagId))
             {
-                return new(
+                return new ProductTakeRequest(
                     protoId,
                     null,
                     matchMode,
@@ -113,7 +111,7 @@ public sealed partial class NcStoreInventorySystem
                     false);
             }
 
-            return new(
+            return new ProductTakeRequest(
                 tagId,
                 null,
                 matchMode,
@@ -121,7 +119,7 @@ public sealed partial class NcStoreInventorySystem
                 true);
         }
 
-        return new(
+        return new ProductTakeRequest(
             protoId,
             GetProductStackType(protoId),
             matchMode,
@@ -162,8 +160,10 @@ public sealed partial class NcStoreInventorySystem
         var compactNeeded = false;
 
         for (var i = 0; i < cachedItems.Count && left > 0; i++)
+        {
             if (!TryConsumeTakeUnitsFromEntity(root, cachedItems, i, request, ref left, ref compactNeeded))
                 continue;
+        }
 
         if (compactNeeded)
             CompactCachedItemsIfNeeded(cachedItems);
@@ -190,8 +190,10 @@ public sealed partial class NcStoreInventorySystem
         return TryConsumePrototypeTake(cachedItems, index, ent, request, ref left, ref compactNeeded);
     }
 
-    private bool ShouldSkipTakeEntity(EntityUid root, EntityUid ent) =>
-        ent == EntityUid.Invalid || !_ents.EntityExists(ent) || IsProtectedFromDirectSale(root, ent);
+    private bool ShouldSkipTakeEntity(EntityUid root, EntityUid ent)
+    {
+        return ent == EntityUid.Invalid || !_ents.EntityExists(ent) || IsProtectedFromDirectSale(root, ent);
+    }
 
     private int CountTakeableUnits(EntityUid ent, ProductTakeRequest request)
     {

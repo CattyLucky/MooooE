@@ -1,6 +1,5 @@
 namespace Content.Server._Forge.Trade;
 
-
 public sealed partial class NcStoreLogicSystem
 {
     private sealed partial class StoreSpawnService

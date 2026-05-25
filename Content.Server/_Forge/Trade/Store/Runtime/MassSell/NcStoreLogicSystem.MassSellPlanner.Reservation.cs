@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -81,7 +79,9 @@ public sealed partial class NcStoreLogicSystem
         var protoIds = _massSellProtoIdsScratch;
         protoIds.Clear();
         foreach (var protoId in perProto.Keys)
+        {
             protoIds.Add(protoId);
+        }
 
         protoIds.Sort(StringComparer.Ordinal);
 
@@ -114,8 +114,10 @@ public sealed partial class NcStoreLogicSystem
         string protoId,
         int want,
         Dictionary<string, int> protoCounts
-    ) =>
-        ReserveMassSellUnits(protoCounts, protoId, want);
+    )
+    {
+        return ReserveMassSellUnits(protoCounts, protoId, want);
+    }
 
     private int ReserveMassSellMatcherUnits(
         string matcherId,
@@ -207,11 +209,11 @@ public sealed partial class NcStoreLogicSystem
         int taken
     )
     {
-        var total = (long) quote.UnitPrice * taken;
+        var total = (long)quote.UnitPrice * taken;
         SafeAddIncome(plan.IncomeByCurrency, quote.CurrencyId, total);
         plan.UnitsByListingId[listing.Id] = taken;
         plan.PriceByListingId[listing.Id] = quote;
-        plan.Steps.Add(new(listing, quote.CurrencyId, quote.UnitPrice, taken));
+        plan.Steps.Add(new MassSellStep(listing, quote.CurrencyId, quote.UnitPrice, taken));
     }
 
     private static void SafeAddIncome(Dictionary<string, int> income, string currencyId, long delta)
@@ -221,7 +223,7 @@ public sealed partial class NcStoreLogicSystem
         if (!income.TryGetValue(currencyId, out var cur))
             cur = 0;
         var sum = cur + delta;
-        income[currencyId] = sum >= int.MaxValue ? int.MaxValue : (int) sum;
+        income[currencyId] = sum >= int.MaxValue ? int.MaxValue : (int)sum;
     }
 
     public readonly record struct MassSellStep(

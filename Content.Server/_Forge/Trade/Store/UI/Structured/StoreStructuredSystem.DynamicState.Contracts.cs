@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreStructuredSystem : EntitySystem
 {
@@ -22,7 +20,9 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             return;
 
         foreach (var contract in comp.Contracts.Values)
+        {
             buf.Contracts.Add(MapContractToClient(store, contract));
+        }
 
         buf.Contracts.Sort(CompareContractsForUi);
         scratch.CacheContracts(signature, buf.Contracts);
@@ -43,7 +43,9 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             var hash = 17;
             AddHash(ref hash, contractsScratch.Count);
             for (var i = 0; i < contractsScratch.Count; i++)
+            {
                 AddHash(ref hash, ComputeContractSignature(store, contractsScratch[i]));
+            }
 
             contractsScratch.Clear();
             return hash;

@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -18,12 +16,12 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
 
         if (!TryEvaluateContractConditions(
-            ContractConditionPhase.Take,
-            store,
-            user,
-            contractId,
-            contract,
-            out var conditionFailure))
+                ContractConditionPhase.Take,
+                store,
+                user,
+                contractId,
+                contract,
+                out var conditionFailure))
         {
             Sawmill.Info(
                 $"[Contracts] Take rejected for '{contractId}' on {ToPrettyString(store)}: {conditionFailure}");

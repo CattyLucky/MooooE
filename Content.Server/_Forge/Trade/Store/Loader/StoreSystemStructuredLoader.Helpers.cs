@@ -1,14 +1,15 @@
 namespace Content.Server._Forge.Trade;
 
-
 public sealed partial class StoreSystemStructuredLoader
 {
     private static int CountNonEmpty(params string[] values)
     {
         var count = 0;
         for (var i = 0; i < values.Length; i++)
+        {
             if (!string.IsNullOrWhiteSpace(values[i]))
                 count++;
+        }
 
         return count;
     }

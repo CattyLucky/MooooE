@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem
 {
@@ -26,11 +24,15 @@ public sealed partial class NcContractSystem
             return;
 
         foreach (var group in groups)
+        {
             while (comp.Contracts.Count < maxVisible &&
-                group.CurrentVisible < group.MinVisible &&
-                group.CurrentVisible < group.MaxVisible)
+                   group.CurrentVisible < group.MinVisible &&
+                   group.CurrentVisible < group.MaxVisible)
+            {
                 if (!TryIssueOfferContract(store, comp, group, selectedIds))
                     break;
+            }
+        }
 
         while (comp.Contracts.Count < maxVisible)
         {
@@ -71,7 +73,7 @@ public sealed partial class NcContractSystem
                 MinVisible = Math.Max(0, groupEntry.MinVisible),
                 MaxVisible = Math.Max(Math.Max(0, groupEntry.MinVisible), groupEntry.MaxVisible),
                 FillWeight = Math.Max(1, groupEntry.FillWeight),
-                CurrentVisible = CountCurrentOfferPoolContracts(comp, pool.ID)
+                CurrentVisible = CountCurrentOfferPoolContracts(comp, pool.ID),
             };
 
             BuildOfferPoolCandidates(pool, comp, ignoredContractId, group.Candidates);
@@ -85,8 +87,10 @@ public sealed partial class NcContractSystem
     {
         var count = 0;
         foreach (var contract in comp.Contracts.Values)
+        {
             if (string.Equals(contract.OfferPoolId, poolId, StringComparison.Ordinal))
                 count++;
+        }
 
         return count;
     }
@@ -125,13 +129,13 @@ public sealed partial class NcContractSystem
         out ContractPoolCandidate candidate
     )
     {
-        candidate = new()
+        candidate = new ContractPoolCandidate
         {
             Weight = entry.Weight,
             OfferPoolId = pool.ID,
             OfferPoolName = pool.Name,
             OfferPoolOrder = pool.Order,
-            OfferPoolColor = pool.Color
+            OfferPoolColor = pool.Color,
         };
 
         if (!TryGetDefinitionHandler(entry.Type, out var handler))
@@ -191,8 +195,10 @@ public sealed partial class NcContractSystem
     )
     {
         foreach (var candidate in group.Candidates)
+        {
             if (!selectedIds.Contains(candidate.Id))
                 return true;
+        }
 
         return false;
     }
@@ -224,8 +230,10 @@ public sealed partial class NcContractSystem
     )
     {
         for (var i = candidates.Count - 1; i >= 0; i--)
+        {
             if (selectedIds.Contains(candidates[i].Id))
                 candidates.RemoveAt(i);
+        }
     }
 
     private sealed class OfferGroupState

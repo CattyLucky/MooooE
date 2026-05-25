@@ -10,9 +10,7 @@ using Robust.Server.GameObjects;
 using Robust.Shared.Audio;
 using Robust.Shared.Timing;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed class NcStoreSystem : EntitySystem
 {
@@ -20,6 +18,7 @@ public sealed class NcStoreSystem : EntitySystem
     private const int MaxTransactionCount = 1000;
     private static readonly TimeSpan InvalidMessageWarningInterval = TimeSpan.FromSeconds(5);
     private static readonly ISawmill Sawmill = Logger.GetSawmill("ncstore");
+
     private static readonly SoundSpecifier TransactionSuccessSound =
         new SoundPathSpecifier("/Audio/Effects/Cargo/ping.ogg");
 
@@ -74,8 +73,10 @@ public sealed class NcStoreSystem : EntitySystem
         return Vector2.Distance(aPos, bPos) <= maxDistance;
     }
 
-    private bool IsInUseRange(EntityUid store, EntityUid user) =>
-        IsInRange(store, user, StoreTradeLimits.StoreUseDistance);
+    private bool IsInUseRange(EntityUid store, EntityUid user)
+    {
+        return IsInRange(store, user, StoreTradeLimits.StoreUseDistance);
+    }
 
 
     private bool TryValidateUse(EntityUid store, NcStoreComponent comp, EntityUid actor, out string failMessage)
@@ -170,7 +171,10 @@ public sealed class NcStoreSystem : EntitySystem
     }
 
 
-    private void PopupFail(EntityUid actor, string message) => _popups.PopupEntity(message, actor, actor);
+    private void PopupFail(EntityUid actor, string message)
+    {
+        _popups.PopupEntity(message, actor, actor);
+    }
 
 
     private bool TryGetLockedUiUser(EntityUid store, NcStoreComponent comp, out EntityUid user)

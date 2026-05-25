@@ -1,9 +1,7 @@
 using Content.Shared._Forge.Trade;
 using Content.Shared.Stacks;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -162,7 +160,7 @@ public sealed partial class NcContractSystem : EntitySystem
         if (_progressTargetIndexPool.Count > 0)
             return _progressTargetIndexPool.Pop();
 
-        return new(4);
+        return new List<int>(4);
     }
 
     private int ReserveProgressFromItems(

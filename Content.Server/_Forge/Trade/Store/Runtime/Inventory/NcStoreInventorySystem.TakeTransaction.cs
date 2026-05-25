@@ -1,8 +1,6 @@
 using Content.Shared.Stacks;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreInventorySystem
 {
@@ -76,8 +74,10 @@ public sealed partial class NcStoreInventorySystem
             return;
 
         for (var i = 0; i < _takeTransactionStackRestoreScratch.Count; i++)
+        {
             if (_takeTransactionStackRestoreScratch[i].Ent == ent)
                 return;
+        }
 
         _takeTransactionStackRestoreScratch.Add((ent, previousCount));
     }

@@ -1,16 +1,16 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
     private static (string TargetItem, PrototypeMatchMode MatchMode) MakeTurnInKey(
         string targetItem,
         PrototypeMatchMode matchMode
-    ) =>
-        (targetItem, matchMode);
+    )
+    {
+        return (targetItem, matchMode);
+    }
 
     private int GetTurnedInCount(
         ObjectiveRuntimeState state,
@@ -28,10 +28,12 @@ public sealed partial class NcContractSystem : EntitySystem
         EntityUid store,
         string contractId,
         ContractTargetServerData target
-    ) =>
-        _objectiveRuntime.ByContract.TryGetValue((store, contractId), out var state)
+    )
+    {
+        return _objectiveRuntime.ByContract.TryGetValue((store, contractId), out var state)
             ? GetTurnedInCount(state, target.TargetItem, target.MatchMode)
             : 0;
+    }
 
     private int GetRemainingTurnInRequirement(
         EntityUid store,
@@ -114,15 +116,15 @@ public sealed partial class NcContractSystem : EntitySystem
             _scratchStoreNearbyItems.Clear();
 
         if (TryUpdateRetrievalSpawnedProgress(
-            ctx.Store,
-            contractId,
-            ctx.Contract,
-            ctx.User,
-            _scratchUserItems,
-            ctx.Crate,
-            crateItems,
-            _scratchStoreNearbyItems,
-            crateItems is { Count: > 0, }))
+                ctx.Store,
+                contractId,
+                ctx.Contract,
+                ctx.User,
+                _scratchUserItems,
+                ctx.Crate,
+                crateItems,
+                _scratchStoreNearbyItems,
+                crateItems is { Count: > 0 }))
         {
             ApplyPartialTurnInProgress(ctx.Store, contractId, ctx.Contract);
             return;
@@ -136,7 +138,7 @@ public sealed partial class NcContractSystem : EntitySystem
             ctx.Crate,
             crateItems,
             _scratchStoreNearbyItems,
-            crateItems is { Count: > 0, });
+            crateItems is { Count: > 0 });
         ApplyPartialTurnInProgress(ctx.Store, contractId, ctx.Contract);
     }
 

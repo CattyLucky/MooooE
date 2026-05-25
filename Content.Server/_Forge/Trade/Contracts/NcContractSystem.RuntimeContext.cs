@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -39,8 +37,10 @@ public sealed partial class NcContractSystem : EntitySystem
         RemoveBlankStrings(config.SpawnSpecific);
     }
 
-    private static int NormalizePositiveOrDefault(int value, int fallback) =>
-        value > 0 ? value : fallback;
+    private static int NormalizePositiveOrDefault(int value, int fallback)
+    {
+        return value > 0 ? value : fallback;
+    }
 
     private static void NormalizeRetrievalSpawnConfig(ContractObjectiveConfigData config)
     {
@@ -85,8 +85,10 @@ public sealed partial class NcContractSystem : EntitySystem
     private static void RemoveBlankStrings(List<string> values)
     {
         for (var i = values.Count - 1; i >= 0; i--)
+        {
             if (string.IsNullOrWhiteSpace(values[i]))
                 values.RemoveAt(i);
+        }
     }
 
     private static ContractPointSelectorPrototype? CloneContractPointSelector(ContractPointSelectorPrototype? selector)
@@ -99,11 +101,13 @@ public sealed partial class NcContractSystem : EntitySystem
         {
             Type = selector.Type,
             Id = selector.Id,
-            Options = new(sourceOptions.Count)
+            Options = new List<WeightedContractPointOptionEntry>(sourceOptions.Count),
         };
 
         for (var i = 0; i < sourceOptions.Count; i++)
+        {
             clone.Options.Add(sourceOptions[i]);
+        }
 
         return clone;
     }
@@ -122,7 +126,7 @@ public sealed partial class NcContractSystem : EntitySystem
             ContractPointSelectorType.MarkerId or ContractPointSelectorType.MarkerGroup =>
                 NormalizeNamedPointSelector(selector, defaultToStore),
             ContractPointSelectorType.Weighted => NormalizeWeightedPointSelector(selector, defaultToStore),
-            _ => GetFallbackPointSelector(defaultToStore)
+            _ => GetFallbackPointSelector(defaultToStore),
         };
     }
 
@@ -156,24 +160,30 @@ public sealed partial class NcContractSystem : EntitySystem
             : GetFallbackPointSelector(defaultToStore);
     }
 
-    private static ContractPointSelectorPrototype? GetFallbackPointSelector(bool defaultToStore) =>
-        defaultToStore ? new ContractPointSelectorPrototype() : null;
+    private static ContractPointSelectorPrototype? GetFallbackPointSelector(bool defaultToStore)
+    {
+        return defaultToStore ? new ContractPointSelectorPrototype() : null;
+    }
 
     private static void RemoveInvalidPointOptions(List<WeightedContractPointOptionEntry> options)
     {
         for (var i = options.Count - 1; i >= 0; i--)
+        {
             if (!IsContractPointOptionUsable(options[i]))
                 options.RemoveAt(i);
+        }
     }
 
-    private static bool IsContractPointOptionUsable(in WeightedContractPointOptionEntry option) =>
-        option.Weight > 0 && option.Type switch
+    private static bool IsContractPointOptionUsable(in WeightedContractPointOptionEntry option)
+    {
+        return option.Weight > 0 && option.Type switch
         {
             ContractPointSelectorType.Store => true,
             ContractPointSelectorType.MarkerId or ContractPointSelectorType.MarkerGroup =>
                 !string.IsNullOrWhiteSpace(option.Id),
-            _ => false
+            _ => false,
         };
+    }
 
     private static ContractFlowStatus ComputeContractFlowStatus(ContractServerData contract)
     {
@@ -194,8 +204,10 @@ public sealed partial class NcContractSystem : EntitySystem
         return ContractFlowStatus.InProgress;
     }
 
-    private static void SyncContractFlowStatus(ContractServerData contract) =>
+    private static void SyncContractFlowStatus(ContractServerData contract)
+    {
         contract.FlowStatus = ComputeContractFlowStatus(contract);
+    }
 
     private static string ResolveObjectiveTargetId(ContractObjectiveConfigData config)
     {
@@ -208,15 +220,19 @@ public sealed partial class NcContractSystem : EntitySystem
         return string.Empty;
     }
 
-    private static string ResolveTrackedObjectivePrototypeId(string? runtimePrototype, string? fallbackTargetId) =>
-        !string.IsNullOrWhiteSpace(runtimePrototype)
+    private static string ResolveTrackedObjectivePrototypeId(string? runtimePrototype, string? fallbackTargetId)
+    {
+        return !string.IsNullOrWhiteSpace(runtimePrototype)
             ? runtimePrototype
             : fallbackTargetId ?? string.Empty;
+    }
 
-    private static string ResolvePinpointerPrototypeId(string? prototypeId) =>
-        string.IsNullOrWhiteSpace(prototypeId)
+    private static string ResolvePinpointerPrototypeId(string? prototypeId)
+    {
+        return string.IsNullOrWhiteSpace(prototypeId)
             ? NcContractTuning.DefaultContractPinpointerPrototypeId
             : prototypeId;
+    }
 
     private static void ResetContractTargetProgress(ContractServerData contract)
     {

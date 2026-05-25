@@ -1,9 +1,7 @@
 using Content.Shared._Forge.Trade;
 using Robust.Shared.Audio;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreStructuredSystem : EntitySystem
 {
@@ -30,10 +28,10 @@ public sealed partial class StoreStructuredSystem : EntitySystem
                 AudioParams.Default.WithVolume(-2f));
 
             var popup = comp.Contracts.TryGetValue(msg.ContractId, out var contract) &&
-                contract.Taken &&
-                !contract.Completed
-                    ? Loc.GetString("nc-store-contract-partial-turned-in")
-                    : Loc.GetString("nc-store-contract-completed");
+                        contract.Taken &&
+                        !contract.Completed
+                ? Loc.GetString("nc-store-contract-partial-turned-in")
+                : Loc.GetString("nc-store-contract-completed");
 
             _popups.PopupEntity(popup, uid, user);
         }

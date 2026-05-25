@@ -1,9 +1,7 @@
 using Content.Shared._Forge.Trade;
 using Robust.Shared.Random;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -22,7 +20,10 @@ public sealed partial class NcContractSystem : EntitySystem
     private readonly Dictionary<QuasiKey, SoftFairState> _softFair = new();
     private readonly Queue<QuasiKey> _softFairOrder = new();
 
-    private double NextUnit() => _random.NextFloat();
+    private double NextUnit()
+    {
+        return _random.NextFloat();
+    }
 
     private static bool TryNormalizeRange(
         IntRange range,
@@ -71,8 +72,8 @@ public sealed partial class NcContractSystem : EntitySystem
         p -= Math.Floor(p);
         _quasiPhase[key] = p;
 
-        var idx = (int) Math.Floor(p * buckets);
-        if ((uint) idx >= (uint) buckets)
+        var idx = (int)Math.Floor(p * buckets);
+        if ((uint)idx >= (uint)buckets)
             idx = buckets - 1;
 
         return min + idx;
@@ -112,7 +113,7 @@ public sealed partial class NcContractSystem : EntitySystem
             if (_softFair.Count >= MaxRngCache)
                 EvictSoftFairOldest(RngEvictChunk);
 
-            state = new();
+            state = new SoftFairState();
             _softFair[key] = state;
             _softFairOrder.Enqueue(key);
         }
@@ -132,7 +133,9 @@ public sealed partial class NcContractSystem : EntitySystem
             state.Streak = 0;
             state.Heat.Clear();
             for (var i = 0; i < buckets; i++)
+            {
                 state.Heat.Add(0);
+            }
         }
 
         Span<double> weights = stackalloc double[buckets];
@@ -161,7 +164,9 @@ public sealed partial class NcContractSystem : EntitySystem
         }
 
         for (var i = 0; i < state.Heat.Count; i++)
+        {
             state.Heat[i] *= SoftFairDecay;
+        }
 
         state.Heat[idx] += 1.0;
         state.Streak = idx == state.LastIdx ? state.Streak + 1 : 1;
@@ -241,8 +246,8 @@ public sealed partial class NcContractSystem : EntitySystem
             return list[random.Next(list.Count)];
 
         var r = total <= int.MaxValue
-            ? random.Next((int) total)
-            : (long) (random.NextDouble() * total);
+            ? random.Next((int)total)
+            : (long)(random.NextDouble() * total);
 
         long acc = 0;
         for (var i = 0; i < list.Count; i++)
@@ -257,8 +262,10 @@ public sealed partial class NcContractSystem : EntitySystem
         }
 
         for (var i = list.Count - 1; i >= 0; i--)
+        {
             if (weights[i] > 0)
                 return list[i];
+        }
 
         return list[^1];
     }

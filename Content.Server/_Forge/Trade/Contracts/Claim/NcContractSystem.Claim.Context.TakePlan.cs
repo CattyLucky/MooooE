@@ -1,9 +1,7 @@
 using Content.Shared._Forge.Trade;
 using Content.Shared.Stacks;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -216,7 +214,7 @@ public sealed partial class NcContractSystem : EntitySystem
         if (take <= 0)
             return 0;
 
-        planOut.Add(new(root, ent, take, true, targetItem, matchMode));
+        planOut.Add(new ClaimTakeEntry(root, ent, take, true, targetItem, matchMode));
         return take;
     }
 
@@ -230,7 +228,7 @@ public sealed partial class NcContractSystem : EntitySystem
         int index
     )
     {
-        planOut.Add(new(root, ent, 1, false, targetItem, matchMode));
+        planOut.Add(new ClaimTakeEntry(root, ent, 1, false, targetItem, matchMode));
         items[index] = EntityUid.Invalid;
         return 1;
     }

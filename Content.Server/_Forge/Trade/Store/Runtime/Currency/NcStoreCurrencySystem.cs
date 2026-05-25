@@ -3,9 +3,7 @@ using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed class NcStoreCurrencySystem : EntitySystem, IStoreCurrencyService
 {
@@ -95,8 +93,10 @@ public sealed class NcStoreCurrencySystem : EntitySystem, IStoreCurrencyService
         return true;
     }
 
-    public bool CanHandleCurrency(string currencyId) =>
-        !string.IsNullOrWhiteSpace(currencyId) && TryResolveHandler(currencyId, out _);
+    public bool CanHandleCurrency(string currencyId)
+    {
+        return !string.IsNullOrWhiteSpace(currencyId) && TryResolveHandler(currencyId, out _);
+    }
 
     public bool CanGiveCurrency(EntityUid user, string currencyId, int amount)
     {
@@ -137,7 +137,9 @@ public sealed class NcStoreCurrencySystem : EntitySystem, IStoreCurrencyService
                 continue;
 
             foreach (var rollback in _handlers)
+            {
                 rollback.RollbackCurrencyIssueTransaction(EntityUid.Invalid);
+            }
 
             return false;
         }
@@ -148,13 +150,17 @@ public sealed class NcStoreCurrencySystem : EntitySystem, IStoreCurrencyService
     public void CommitCurrencyIssueTransaction(EntityUid user)
     {
         foreach (var h in _handlers)
+        {
             h.CommitCurrencyIssueTransaction(user);
+        }
     }
 
     public void RollbackCurrencyIssueTransaction(EntityUid user)
     {
         foreach (var h in _handlers)
+        {
             h.RollbackCurrencyIssueTransaction(user);
+        }
     }
 
     public override void Initialize()
@@ -190,8 +196,10 @@ public sealed class NcStoreCurrencySystem : EntitySystem, IStoreCurrencyService
     private static bool HasWhitelistedCurrency(NcStoreComponent store)
     {
         foreach (var currencyId in store.CurrencyWhitelist)
+        {
             if (!string.IsNullOrWhiteSpace(currencyId))
                 return true;
+        }
 
         return false;
     }

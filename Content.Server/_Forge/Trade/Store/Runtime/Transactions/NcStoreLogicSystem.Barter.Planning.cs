@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -65,8 +63,10 @@ public sealed partial class NcStoreLogicSystem
         List<NcBarterCostEntry> costs,
         int times,
         BarterAvailabilityContext? context = null
-    ) =>
-        TryBuildBarterCostPlan(root, costs, times, out _, context);
+    )
+    {
+        return TryBuildBarterCostPlan(root, costs, times, out _, context);
+    }
 
     private bool TryBuildBarterCostPlan(
         EntityUid root,
@@ -76,7 +76,7 @@ public sealed partial class NcStoreLogicSystem
         BarterAvailabilityContext? context = null
     )
     {
-        plan = new();
+        plan = new BarterCostPlan();
 
         if (times <= 0 || costs.Count == 0)
             return false;
@@ -100,8 +100,10 @@ public sealed partial class NcStoreLogicSystem
         });
 
         for (var i = 0; i < demands.Count; i++)
+        {
             if (!TryReserveBarterDemand(plan, items, demands[i], context?.DemandCandidates))
                 return false;
+        }
 
         return plan.Reservations.Count > 0;
     }

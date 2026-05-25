@@ -4,9 +4,7 @@ using Content.Shared.Players;
 using Content.Shared.Preferences;
 using Robust.Shared.Player;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -130,13 +128,15 @@ public sealed partial class NcContractSystem : EntitySystem
         return true;
     }
 
-    private static bool ContractConditionApplies(ContractConditionPhase configured, ContractConditionPhase phase) =>
-        configured switch
+    private static bool ContractConditionApplies(ContractConditionPhase configured, ContractConditionPhase phase)
+    {
+        return configured switch
         {
             ContractConditionPhase.Always => true,
             ContractConditionPhase.TakeAndClaim => phase is ContractConditionPhase.Take or ContractConditionPhase.Claim,
-            _ => configured == phase
+            _ => configured == phase,
         };
+    }
 
     private static List<ContractConditionDef> CloneContractConditions(IReadOnlyList<ContractConditionDef> conditions)
     {
@@ -145,13 +145,13 @@ public sealed partial class NcContractSystem : EntitySystem
         {
             var condition = conditions[i];
             result.Add(
-                new()
+                new ContractConditionDef
                 {
                     Type = condition.Type,
                     Id = condition.Id,
                     Phase = condition.Phase,
                     Invert = condition.Invert,
-                    Args = new(condition.Args, StringComparer.Ordinal)
+                    Args = new Dictionary<string, string>(condition.Args, StringComparer.Ordinal),
                 });
         }
 
@@ -231,13 +231,13 @@ public sealed partial class NcContractSystem : EntitySystem
             if (!system._contractGhostRolePlayTime.TryGetTrackerTimes(context.Player, out var playTimes))
             {
                 Sawmill.Error($"Unable to check contract ghost role requirements for {context.Player}.");
-                playTimes = new();
+                playTimes = new Dictionary<string, TimeSpan>();
             }
 
             var selectedCharacter =
                 system._contractGhostRolePrefs.GetPreferences(context.Player.UserId).SelectedCharacter;
             var profile = selectedCharacter as HumanoidCharacterProfile
-                ?? HumanoidCharacterProfile.DefaultWithSpecies();
+                          ?? HumanoidCharacterProfile.DefaultWithSpecies();
             var isWhitelisted = context.Player.ContentData()?.Whitelisted ?? false;
 
             var reasons = new List<string>();

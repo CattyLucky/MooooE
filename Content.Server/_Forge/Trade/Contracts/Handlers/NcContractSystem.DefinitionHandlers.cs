@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -45,11 +43,15 @@ public sealed partial class NcContractSystem : EntitySystem
         _definitionHandlersByCandidateKind[handler.CandidateKind] = handler;
     }
 
-    private bool TryGetDefinitionHandler(NcContractOfferType type, out IContractDefinitionHandler handler) =>
-        _definitionHandlersByOfferType.TryGetValue(type, out handler!);
+    private bool TryGetDefinitionHandler(NcContractOfferType type, out IContractDefinitionHandler handler)
+    {
+        return _definitionHandlersByOfferType.TryGetValue(type, out handler!);
+    }
 
-    private bool TryGetDefinitionHandler(ContractPoolCandidateKind kind, out IContractDefinitionHandler handler) =>
-        _definitionHandlersByCandidateKind.TryGetValue(kind, out handler!);
+    private bool TryGetDefinitionHandler(ContractPoolCandidateKind kind, out IContractDefinitionHandler handler)
+    {
+        return _definitionHandlersByCandidateKind.TryGetValue(kind, out handler!);
+    }
 
     private interface IContractDefinitionHandler
     {
@@ -97,10 +99,12 @@ public sealed partial class NcContractSystem : EntitySystem
             NcContractSystem system,
             EntityUid store,
             ContractPoolCandidate candidate
-        ) =>
-            candidate.Supply != null
+        )
+        {
+            return candidate.Supply != null
                 ? system.CreateSupplyContractData(store, candidate.Supply)
                 : CreateInvalidContractData(candidate);
+        }
     }
 
     private sealed class RetrievalContractDefinitionHandler : IContractDefinitionHandler
@@ -130,10 +134,12 @@ public sealed partial class NcContractSystem : EntitySystem
             NcContractSystem system,
             EntityUid store,
             ContractPoolCandidate candidate
-        ) =>
-            candidate.Retrieval != null
+        )
+        {
+            return candidate.Retrieval != null
                 ? system.CreateRetrievalContractData(store, candidate.Retrieval)
                 : CreateInvalidContractData(candidate);
+        }
     }
 
     private sealed class HuntContractDefinitionHandler : IContractDefinitionHandler
@@ -171,10 +177,12 @@ public sealed partial class NcContractSystem : EntitySystem
             NcContractSystem system,
             EntityUid store,
             ContractPoolCandidate candidate
-        ) =>
-            candidate.Hunt != null
+        )
+        {
+            return candidate.Hunt != null
                 ? system.CreateHuntContractData(store, candidate.Hunt)
                 : CreateInvalidContractData(candidate);
+        }
     }
 
     private sealed class GhostRoleContractDefinitionHandler : IContractDefinitionHandler
@@ -204,10 +212,12 @@ public sealed partial class NcContractSystem : EntitySystem
             NcContractSystem system,
             EntityUid store,
             ContractPoolCandidate candidate
-        ) =>
-            candidate.GhostRole != null
+        )
+        {
+            return candidate.GhostRole != null
                 ? system.CreateGhostRoleContractData(store, candidate.GhostRole)
                 : CreateInvalidContractData(candidate);
+        }
     }
 
     private sealed class ArtifactStudyContractDefinitionHandler : IContractDefinitionHandler
@@ -237,9 +247,11 @@ public sealed partial class NcContractSystem : EntitySystem
             NcContractSystem system,
             EntityUid store,
             ContractPoolCandidate candidate
-        ) =>
-            candidate.ArtifactStudy != null
+        )
+        {
+            return candidate.ArtifactStudy != null
                 ? system.CreateArtifactStudyContractData(store, candidate.ArtifactStudy)
                 : CreateInvalidContractData(candidate);
+        }
     }
 }

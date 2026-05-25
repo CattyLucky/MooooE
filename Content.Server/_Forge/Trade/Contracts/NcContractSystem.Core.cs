@@ -2,9 +2,7 @@ using Content.Shared._Forge.Trade;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -69,7 +67,10 @@ public sealed partial class NcContractSystem : EntitySystem
         base.Shutdown();
     }
 
-    private void OnPrototypesReloaded(PrototypesReloadedEventArgs ev) => ClearCaches();
+    private void OnPrototypesReloaded(PrototypesReloadedEventArgs ev)
+    {
+        ClearCaches();
+    }
 
     private void ClearCaches()
     {
@@ -93,10 +94,12 @@ public sealed partial class NcContractSystem : EntitySystem
 
     private static List<ContractTargetServerData> GetEffectiveTargets(ContractServerData contract)
     {
-        contract.Targets ??= new();
+        contract.Targets ??= new List<ContractTargetServerData>();
         for (var i = contract.Targets.Count - 1; i >= 0; i--)
+        {
             if (contract.Targets[i] == null)
                 contract.Targets.RemoveAt(i);
+        }
 
         return contract.Targets;
     }
@@ -117,7 +120,7 @@ public sealed partial class NcContractSystem : EntitySystem
         var best = 0;
         var parents = proto.Parents;
 
-        if (parents is { Length: > 0, })
+        if (parents is { Length: > 0 })
         {
             foreach (var parentId in parents)
             {

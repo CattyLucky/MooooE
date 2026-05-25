@@ -2,9 +2,7 @@ using Content.Shared._Forge.Trade;
 using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -13,8 +11,10 @@ public sealed partial class NcStoreLogicSystem
 
     private IStoreCurrencyService Currency => _currency;
 
-    public bool TryTakeCurrency(EntityUid user, string stackType, int amount) =>
-        Currency.TryTakeCurrency(user, stackType, amount);
+    public bool TryTakeCurrency(EntityUid user, string stackType, int amount)
+    {
+        return Currency.TryTakeCurrency(user, stackType, amount);
+    }
 
     private void InitializeServices()
     {
@@ -29,30 +29,50 @@ public sealed partial class NcStoreLogicSystem
         out string currency,
         out int unitPrice,
         out int balance
-    ) =>
-        Currency.TryPickCurrencyForBuy(store, listing, snapshot, out currency, out unitPrice, out balance);
+    )
+    {
+        return Currency.TryPickCurrencyForBuy(store, listing, snapshot, out currency, out unitPrice, out balance);
+    }
 
     public bool TryPickCurrencyForSell(
         NcStoreComponent store,
         NcStoreListingDef listing,
         out string currency,
         out int unitPrice
-    ) =>
-        Currency.TryPickCurrencyForSell(store, listing, out currency, out unitPrice);
+    )
+    {
+        return Currency.TryPickCurrencyForSell(store, listing, out currency, out unitPrice);
+    }
 
-    public bool CanHandleCurrency(string stackType) => Currency.CanHandleCurrency(stackType);
+    public bool CanHandleCurrency(string stackType)
+    {
+        return Currency.CanHandleCurrency(stackType);
+    }
 
-    public bool CanGiveCurrency(EntityUid user, string stackType, int amount) =>
-        Currency.CanGiveCurrency(user, stackType, amount);
+    public bool CanGiveCurrency(EntityUid user, string stackType, int amount)
+    {
+        return Currency.CanGiveCurrency(user, stackType, amount);
+    }
 
-    public bool TryGiveCurrency(EntityUid user, string stackType, int amount) =>
-        Currency.TryGiveCurrency(user, stackType, amount);
+    public bool TryGiveCurrency(EntityUid user, string stackType, int amount)
+    {
+        return Currency.TryGiveCurrency(user, stackType, amount);
+    }
 
-    private bool BeginCurrencyIssueTransaction() => Currency.BeginCurrencyIssueTransaction();
+    private bool BeginCurrencyIssueTransaction()
+    {
+        return Currency.BeginCurrencyIssueTransaction();
+    }
 
-    private void CommitCurrencyIssueTransaction(EntityUid user) => Currency.CommitCurrencyIssueTransaction(user);
+    private void CommitCurrencyIssueTransaction(EntityUid user)
+    {
+        Currency.CommitCurrencyIssueTransaction(user);
+    }
 
-    private void RollbackCurrencyIssueTransaction(EntityUid user) => Currency.RollbackCurrencyIssueTransaction(user);
+    private void RollbackCurrencyIssueTransaction(EntityUid user)
+    {
+        Currency.RollbackCurrencyIssueTransaction(user);
+    }
 
 
     private sealed partial class StoreSpawnService : IStoreRewardSpawner
@@ -77,8 +97,10 @@ public sealed partial class NcStoreLogicSystem
             string productEntity,
             EntityPrototype productProto,
             int units
-        ) =>
-            SpawnPurchasedProduct(user, productEntity, productProto, 1, units);
+        )
+        {
+            return SpawnPurchasedProduct(user, productEntity, productProto, 1, units);
+        }
 
         public bool BeginRewardTransaction()
         {
@@ -98,7 +120,9 @@ public sealed partial class NcStoreLogicSystem
                 return;
 
             for (var i = 0; i < _transactionSpawnedScratch.Count; i++)
+            {
                 _sys.QueuePickupToHandsOrCrateNextTick(user, _transactionSpawnedScratch[i]);
+            }
 
             _sys._inventory.InvalidateInventoryCache(user);
             _rewardTransactionActive = false;
@@ -147,6 +171,7 @@ public sealed partial class NcStoreLogicSystem
                 return 0;
 
             if (TryGetStackPurchaseConfig(productProto, out var stackTypeId, out var maxPerStack))
+            {
                 return SpawnStackPurchasedProduct(
                     user,
                     productEntity,
@@ -154,6 +179,7 @@ public sealed partial class NcStoreLogicSystem
                     unitsPerPurchase,
                     stackTypeId,
                     maxPerStack);
+            }
 
             return SpawnSinglePurchasedProduct(user, productEntity, purchases, unitsPerPurchase);
         }

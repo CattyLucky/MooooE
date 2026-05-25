@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -40,12 +38,13 @@ public sealed partial class NcContractSystem : EntitySystem
         try
         {
             var storeNearbyItemsPrepared = false;
-            var hasCrateWork = crate is not null && crateItems is { Count: > 0, };
+            var hasCrateWork = crate is not null && crateItems is { Count: > 0 };
             PopulateProgressContractIds(comp);
 
             try
             {
                 for (var i = 0; i < _progressContractIdsScratch.Count; i++)
+                {
                     UpdateProgressForContract(
                         comp,
                         _progressContractIdsScratch[i],
@@ -57,6 +56,7 @@ public sealed partial class NcContractSystem : EntitySystem
                         includeStoreWorldItems,
                         hasCrateWork,
                         ref storeNearbyItemsPrepared);
+                }
             }
             finally
             {
@@ -74,7 +74,9 @@ public sealed partial class NcContractSystem : EntitySystem
     {
         _progressContractIdsScratch.Clear();
         foreach (var contractId in comp.Contracts.Keys)
+        {
             _progressContractIdsScratch.Add(contractId);
+        }
     }
 
     private bool TryGetProgressContract(
@@ -122,15 +124,15 @@ public sealed partial class NcContractSystem : EntitySystem
             ref storeNearbyItemsPrepared);
 
         if (TryUpdateRetrievalSpawnedProgress(
-            store,
-            contractId,
-            contract,
-            user,
-            userItems,
-            crate,
-            crateItems,
-            _scratchStoreNearbyItems,
-            hasCrateWork))
+                store,
+                contractId,
+                contract,
+                user,
+                userItems,
+                crate,
+                crateItems,
+                _scratchStoreNearbyItems,
+                hasCrateWork))
         {
             ApplyPartialTurnInProgress(store, contractId, contract);
             return;
@@ -154,9 +156,11 @@ public sealed partial class NcContractSystem : EntitySystem
         ContractServerData contract,
         IReadOnlyList<EntityUid> userItems,
         IReadOnlyList<EntityUid>? crateItems
-    ) =>
-        TryGetObjectiveHandler(contract.ExecutionKind, out var handler) &&
-        handler.TryUpdateProgress(this, store, contractId, contract, userItems, crateItems);
+    )
+    {
+        return TryGetObjectiveHandler(contract.ExecutionKind, out var handler) &&
+               handler.TryUpdateProgress(this, store, contractId, contract, userItems, crateItems);
+    }
 
     private void EnsureStoreNearbyProgressItems(
         EntityUid store,

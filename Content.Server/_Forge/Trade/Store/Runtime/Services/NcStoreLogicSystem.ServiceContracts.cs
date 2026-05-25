@@ -1,9 +1,7 @@
 using Content.Shared._Forge.Trade;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 internal interface IStoreCurrencyService
 {

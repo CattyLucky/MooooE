@@ -3,9 +3,7 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Stacks;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -34,7 +32,7 @@ public sealed partial class NcContractSystem : EntitySystem
             if (depth != 0)
                 return depth;
 
-            var mode = ((int) a.MatchMode).CompareTo((int) b.MatchMode);
+            var mode = ((int)a.MatchMode).CompareTo((int)b.MatchMode);
             if (mode != 0)
                 return mode;
 
@@ -59,7 +57,7 @@ public sealed partial class NcContractSystem : EntitySystem
         if (matchMode == PrototypeMatchMode.Tag)
         {
             return TryResolveContractTagTargetId(expectedProtoId, out var tagId) &&
-                ContractPrototypeHasTag(candidateId, tagId);
+                   ContractPrototypeHasTag(candidateId, tagId);
         }
 
         if (matchMode != PrototypeMatchMode.Matcher)

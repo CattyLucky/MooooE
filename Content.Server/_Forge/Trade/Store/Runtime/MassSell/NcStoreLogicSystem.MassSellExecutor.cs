@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -24,11 +22,11 @@ public sealed partial class NcStoreLogicSystem
             return false;
 
         if (!TryExecuteRewardListWithPreCommit(
-            user,
-            rewards,
-            "MassSell",
-            () => TryCommitMassSellTake(container, items, plan),
-            out var reason))
+                user,
+                rewards,
+                "MassSell",
+                () => TryCommitMassSellTake(container, items, plan),
+                out var reason))
         {
             Sawmill.Warning($"[NcStore] TryMassSellFromContainer failed: {reason}");
             return false;
@@ -44,8 +42,9 @@ public sealed partial class NcStoreLogicSystem
         EntityUid container,
         List<EntityUid> items,
         MassSellPlan plan
-    ) =>
-        _transactionCoordinator.TryCommitInventoryTake(
+    )
+    {
+        return _transactionCoordinator.TryCommitInventoryTake(
             "MassSell",
             () =>
             {
@@ -60,20 +59,23 @@ public sealed partial class NcStoreLogicSystem
 
                     var listing = step.Listing;
                     if (listing.RemainingCount >= 0 && listing.RemainingCount < step.Count)
+                    {
                         return
                             $"listing '{listing.Id}' has only {listing.RemainingCount} units remaining for planned sell x{step.Count}";
+                    }
 
                     if (!_inventory.TryTakeProductUnitsFromCachedList(
-                        container,
-                        items,
-                        listing.ProductEntity,
-                        step.Count,
-                        listing.MatchMode))
+                            container,
+                            items,
+                            listing.ProductEntity,
+                            step.Count,
+                            listing.MatchMode))
                         return $"failed to consume mass-sell product '{listing.ProductEntity}' x{step.Count}";
                 }
 
                 return null;
             });
+    }
 
     private static void ApplyMassSellListingRemaining(MassSellPlan plan)
     {

@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -28,15 +26,20 @@ public sealed partial class NcContractSystem : EntitySystem
         MissingProof,
         ObjectiveNotCompleted,
         ObjectiveFailed,
-        ExecutionFailed
+        ExecutionFailed,
     }
 
     private readonly record struct ClaimAttemptResult(bool Success, ClaimFailureReason Reason, string? Details)
     {
-        public static ClaimAttemptResult Ok() => new(true, ClaimFailureReason.None, null);
+        public static ClaimAttemptResult Ok()
+        {
+            return new ClaimAttemptResult(true, ClaimFailureReason.None, null);
+        }
 
-        public static ClaimAttemptResult Fail(ClaimFailureReason reason, string? details = null) =>
-            new(false, reason, details);
+        public static ClaimAttemptResult Fail(ClaimFailureReason reason, string? details = null)
+        {
+            return new ClaimAttemptResult(false, reason, details);
+        }
     }
 
     private readonly record struct PoolEntry(ContractRewardDef Def, string Key);
@@ -46,7 +49,7 @@ public sealed partial class NcContractSystem : EntitySystem
         Req,
         Tc,
         TReq,
-        RAmount
+        RAmount,
     }
 
     private enum ContractPoolCandidateKind : byte
@@ -55,7 +58,7 @@ public sealed partial class NcContractSystem : EntitySystem
         Retrieval = 2,
         Hunt = 3,
         GhostRole = 4,
-        ArtifactStudy = 5
+        ArtifactStudy = 5,
     }
 
     private sealed class ContractPoolCandidate

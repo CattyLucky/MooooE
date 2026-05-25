@@ -1,6 +1,5 @@
 namespace Content.Server._Forge.Trade;
 
-
 public sealed partial class NcContractSystem
 {
     private readonly IContractObjectiveRuntimeStore _objectiveRuntime = new ContractObjectiveRuntimeService();

@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -77,12 +75,12 @@ public sealed partial class NcContractSystem : EntitySystem
             return ClaimAttemptResult.Fail(ClaimFailureReason.NotTaken, $"Contract '{contractId}' is not taken yet.");
 
         if (!TryEvaluateContractConditions(
-            ContractConditionPhase.Claim,
-            store,
-            user,
-            contractId,
-            contract,
-            out var conditionFailure))
+                ContractConditionPhase.Claim,
+                store,
+                user,
+                contractId,
+                contract,
+                out var conditionFailure))
         {
             return ClaimAttemptResult.Fail(
                 ClaimFailureReason.InvalidTarget,
@@ -100,8 +98,10 @@ public sealed partial class NcContractSystem : EntitySystem
     }
 
 
-    private static bool RequiresRetrievalRouteRewardClaim(ContractServerData contract) =>
-        RequiresRetrievalRouteDelivery(contract);
+    private static bool RequiresRetrievalRouteRewardClaim(ContractServerData contract)
+    {
+        return RequiresRetrievalRouteDelivery(contract);
+    }
 
     private ClaimAttemptResult TryClaimInventoryDeliveryContract(
         EntityUid store,
@@ -159,18 +159,23 @@ public sealed partial class NcContractSystem : EntitySystem
 
         var objectiveJournal = new ObjectiveConsumeJournal();
         if (!TryGiveContractRewardsWithPreCommit(
-            user,
-            contract.Rewards,
-            () =>
-            {
-                if (contract.Config.RetrievalClaimMode != NcRetrievalClaimMode.DestinationProof)
-                    return ClaimAttemptResult.Ok();
+                user,
+                contract.Rewards,
+                () =>
+                {
+                    if (contract.Config.RetrievalClaimMode != NcRetrievalClaimMode.DestinationProof)
+                        return ClaimAttemptResult.Ok();
 
-                return TryConsumeObjectiveProof(store, user, contractId, contract, objectiveJournal, out var proofFail)
-                    ? ClaimAttemptResult.Ok()
-                    : proofFail;
-            },
-            out var rewardExecFail))
+                    return TryConsumeObjectiveProof(store,
+                        user,
+                        contractId,
+                        contract,
+                        objectiveJournal,
+                        out var proofFail)
+                        ? ClaimAttemptResult.Ok()
+                        : proofFail;
+                },
+                out var rewardExecFail))
         {
             RollbackObjectiveConsumeJournal(objectiveJournal);
             return rewardExecFail;

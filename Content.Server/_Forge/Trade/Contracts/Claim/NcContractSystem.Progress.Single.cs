@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -19,15 +17,15 @@ public sealed partial class NcContractSystem : EntitySystem
     {
         var targets = GetEffectiveTargets(contract);
         if (TryUpdateSimpleContractProgress(
-            contract,
-            targets,
-            store,
-            user,
-            userItems,
-            crate,
-            crateItems,
-            storeNearbyItems,
-            hasCrateWork))
+                contract,
+                targets,
+                store,
+                user,
+                userItems,
+                crate,
+                crateItems,
+                storeNearbyItems,
+                hasCrateWork))
             return;
 
         ClearProgressPerContractScratch();

@@ -2,9 +2,7 @@ using Content.Shared._Forge.Trade;
 using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreSystemStructuredLoader
 {
@@ -24,8 +22,10 @@ public sealed partial class StoreSystemStructuredLoader
         }
 
         foreach (var pool in listingProto.ReceivePools)
+        {
             if (TryResolveRewardPoolIcon(pool.Pool, out var poolIcon))
                 return poolIcon;
+        }
 
         foreach (var cost in listingProto.Cost)
         {
@@ -102,8 +102,10 @@ public sealed partial class StoreSystemStructuredLoader
         return false;
     }
 
-    private bool TryResolveRewardPoolIcon(string poolId, out string icon) =>
-        TryResolveRewardPoolIcon(poolId, out icon, new(StringComparer.Ordinal), 0);
+    private bool TryResolveRewardPoolIcon(string poolId, out string icon)
+    {
+        return TryResolveRewardPoolIcon(poolId, out icon, new HashSet<string>(StringComparer.Ordinal), 0);
+    }
 
     private bool TryResolveCurrencyIcon(string currency, out string icon)
     {
@@ -125,13 +127,13 @@ public sealed partial class StoreSystemStructuredLoader
         {
             var c = source[i];
             result.Add(
-                new()
+                new NcBarterCostEntry
                 {
                     Prototype = c.Prototype,
                     Group = c.Group,
                     TagTarget = c.TagTarget,
                     Currency = c.Currency,
-                    Count = c.Count
+                    Count = c.Count,
                 });
         }
 
@@ -145,11 +147,11 @@ public sealed partial class StoreSystemStructuredLoader
         {
             var r = source[i];
             result.Add(
-                new()
+                new NcBarterReceiveEntry
                 {
                     Prototype = r.Prototype,
                     Currency = r.Currency,
-                    Count = r.Count
+                    Count = r.Count,
                 });
         }
 
@@ -163,11 +165,11 @@ public sealed partial class StoreSystemStructuredLoader
         {
             var r = source[i];
             result.Add(
-                new()
+                new NcBarterReceivePoolEntry
                 {
                     Pool = r.Pool,
                     Rolls = r.Rolls,
-                    Chance = r.Chance
+                    Chance = r.Chance,
                 });
         }
 

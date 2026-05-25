@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -32,8 +30,10 @@ public sealed partial class NcContractSystem : EntitySystem
         _targetResolvers[resolver.Kind] = resolver;
     }
 
-    private bool TryGetTargetResolver(ContractExecutionKind kind, out IContractTargetResolver resolver) =>
-        _targetResolvers.TryGetValue(kind, out resolver!);
+    private bool TryGetTargetResolver(ContractExecutionKind kind, out IContractTargetResolver resolver)
+    {
+        return _targetResolvers.TryGetValue(kind, out resolver!);
+    }
 
     private interface IContractTargetResolver
     {
@@ -75,8 +75,10 @@ public sealed partial class NcContractSystem : EntitySystem
             EntityUid store,
             string contractId,
             ContractServerData contract
-        ) =>
-            system.TryUpdateRetrievalRouteDeliveryProgress(store, contractId, contract);
+        )
+        {
+            return system.TryUpdateRetrievalRouteDeliveryProgress(store, contractId, contract);
+        }
 
         public virtual bool TryResolvePinpointerTarget(
             NcContractSystem system,
@@ -94,12 +96,14 @@ public sealed partial class NcContractSystem : EntitySystem
                 return true;
 
             if (UsesRetrievalSpawnedPinpointerTarget(contract))
+            {
                 return system.TryResolveRetrievalSpawnedPinpointerTargetForUser(
                     store,
                     user,
                     contract,
                     state,
                     out target);
+            }
 
             if (TryResolveCompletedProofTarget(system, contract, state, out target))
                 return true;

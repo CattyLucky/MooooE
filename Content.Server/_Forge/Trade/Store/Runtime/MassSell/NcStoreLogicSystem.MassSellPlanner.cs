@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -25,13 +23,20 @@ public sealed partial class NcStoreLogicSystem
         NcStoreComponent store,
         EntityUid container,
         IReadOnlyList<EntityUid> cachedItems
-    ) =>
-        ComputeMassSellPlanInternal(storeUid, store, cachedItems);
+    )
+    {
+        return ComputeMassSellPlanInternal(storeUid, store, cachedItems);
+    }
 
-    public Dictionary<string, int> GetMassSellValue(EntityUid storeUid, NcStoreComponent store, EntityUid container) =>
-        ComputeMassSellPlan(storeUid, store, container).IncomeByCurrency;
+    public Dictionary<string, int> GetMassSellValue(EntityUid storeUid, NcStoreComponent store, EntityUid container)
+    {
+        return ComputeMassSellPlan(storeUid, store, container).IncomeByCurrency;
+    }
 
-    public void ClearStoreRuntimeCaches(EntityUid store) => _massSellCatalogCache.Remove(store);
+    public void ClearStoreRuntimeCaches(EntityUid store)
+    {
+        _massSellCatalogCache.Remove(store);
+    }
 
     private MassSellPlan ComputeMassSellPlanInternal(
         EntityUid storeUid,
@@ -55,12 +60,14 @@ public sealed partial class NcStoreLogicSystem
         return plan;
     }
 
-    private static MassSellPlan CreateEmptyMassSellPlan() =>
-        new(
-            new(StringComparer.Ordinal),
-            new(StringComparer.Ordinal),
+    private static MassSellPlan CreateEmptyMassSellPlan()
+    {
+        return new MassSellPlan(
+            new Dictionary<string, int>(StringComparer.Ordinal),
+            new Dictionary<string, int>(StringComparer.Ordinal),
             new Dictionary<string, (string, int)>(StringComparer.Ordinal),
-            new());
+            new List<MassSellStep>());
+    }
 
     private sealed class MassSellCatalogCache
     {

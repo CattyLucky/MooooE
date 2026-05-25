@@ -1,8 +1,6 @@
 using Content.Shared.Stacks;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StackCurrencyHandler : ICurrencyHandler
 {
@@ -34,12 +32,12 @@ public sealed partial class StackCurrencyHandler : ICurrencyHandler
                 if (!_ents.TryGetComponent(ent, out StackComponent? st) || st.StackTypeId != currencyId)
                     continue;
 
-                var canAdd = (long) maxPerStack - st.Count;
+                var canAdd = (long)maxPerStack - st.Count;
                 if (canAdd <= 0)
                     continue;
 
                 var add = Math.Min(canAdd, remaining);
-                var newCount = (int) Math.Clamp(st.Count + add, 0L, maxPerStack);
+                var newCount = (int)Math.Clamp(st.Count + add, 0L, maxPerStack);
 
                 TrackIssueStackRestore(ent, st.Count);
                 _stacks.SetCount(ent, newCount, st);
@@ -58,7 +56,7 @@ public sealed partial class StackCurrencyHandler : ICurrencyHandler
             while (remaining > 0)
             {
                 var addL = Math.Min(remaining, maxPerStack);
-                var add = (int) Math.Clamp(addL, 1L, maxPerStack);
+                var add = (int)Math.Clamp(addL, 1L, maxPerStack);
 
                 EntityUid spawned;
                 try

@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -11,7 +9,7 @@ public sealed partial class NcStoreLogicSystem
         out List<NcBarterCostEntry> aggregated
     )
     {
-        aggregated = new();
+        aggregated = new List<NcBarterCostEntry>();
 
         var currencies = new Dictionary<string, int>(StringComparer.Ordinal);
         var prototypes = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -66,36 +64,44 @@ public sealed partial class NcStoreLogicSystem
         }
 
         foreach (var (currency, count) in currencies)
+        {
             aggregated.Add(
-                new()
+                new NcBarterCostEntry
                 {
                     Currency = currency,
-                    Count = count
+                    Count = count,
                 });
+        }
 
         foreach (var (prototype, count) in prototypes)
+        {
             aggregated.Add(
-                new()
+                new NcBarterCostEntry
                 {
                     Prototype = prototype,
-                    Count = count
+                    Count = count,
                 });
+        }
 
         foreach (var (group, count) in groups)
+        {
             aggregated.Add(
-                new()
+                new NcBarterCostEntry
                 {
                     Group = group,
-                    Count = count
+                    Count = count,
                 });
+        }
 
         foreach (var (tagTarget, count) in tags)
+        {
             aggregated.Add(
-                new()
+                new NcBarterCostEntry
                 {
                     TagTarget = tagTarget,
-                    Count = count
+                    Count = count,
                 });
+        }
 
         return aggregated.Count > 0;
     }
@@ -106,11 +112,11 @@ public sealed partial class NcStoreLogicSystem
             return false;
 
         target.TryGetValue(id, out var previous);
-        var total = (long) previous + count;
+        var total = (long)previous + count;
         if (total <= 0 || total > int.MaxValue)
             return false;
 
-        target[id] = (int) total;
+        target[id] = (int)total;
         return true;
     }
 
@@ -165,11 +171,11 @@ public sealed partial class NcStoreLogicSystem
         if (left <= 0 || right <= 0)
             return false;
 
-        var value = (long) left * right;
+        var value = (long)left * right;
         if (value <= 0 || value > int.MaxValue)
             return false;
 
-        result = (int) value;
+        result = (int)value;
         return true;
     }
 

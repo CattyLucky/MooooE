@@ -1,6 +1,5 @@
 namespace Content.Server._Forge.Trade;
 
-
 internal interface IContractObjectiveRuntimeStore
 {
     HashSet<(EntityUid Store, string ContractId)> ActiveGhostRoleObjectives { get; }

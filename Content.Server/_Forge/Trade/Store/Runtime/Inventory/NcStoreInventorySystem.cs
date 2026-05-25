@@ -3,9 +3,7 @@ using Content.Shared.Stacks;
 using Content.Shared.Tag;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreInventorySystem : EntitySystem
 {
@@ -44,8 +42,10 @@ public sealed partial class NcStoreInventorySystem : EntitySystem
             return;
 
         foreach (var root in affectedRoots)
+        {
             if (_inventoryCache.TryGetValue(root, out var entry))
                 MarkInventoryDirty(entry, false);
+        }
     }
 
     public override void Shutdown()

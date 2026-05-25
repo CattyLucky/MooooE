@@ -4,9 +4,7 @@ using Content.Shared.Tag;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -97,7 +95,7 @@ public sealed partial class NcContractSystem : EntitySystem
                 spawnPool.Add(itemId);
         }
 
-        spec = new(matchItems, matchStackTypes, spawnPool);
+        spec = new ContractMatcherSpec(matchItems, matchStackTypes, spawnPool);
     }
 
     private bool CacheContractMatcherSpec(string matcherId, ContractMatcherSpec spec, string sourceKind)

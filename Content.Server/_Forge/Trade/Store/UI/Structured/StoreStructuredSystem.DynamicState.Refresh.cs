@@ -3,9 +3,7 @@ using Content.Shared.Stacks;
 using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreStructuredSystem : EntitySystem
 {
@@ -15,8 +13,10 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         DynamicTabState tabs,
         DynamicScratch scratch,
         DynamicStateBuffer buf
-    ) =>
+    )
+    {
         _dynamicStatePublisher.PublishIfChanged(_ui, store, comp, tabs, scratch, buf);
+    }
 
     private bool TryFindWatchedRoot(EntityUid start, out EntityUid watchedRoot)
     {
@@ -150,13 +150,17 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             if (_storesByWatchedRoot.TryGetValue(root, out var stores))
             {
                 foreach (var s in stores)
+                {
                     _affectedStoresScratch.Add(s);
+                }
             }
         }
 
         _pendingRefreshEntities.Clear();
         foreach (var s in _affectedStoresScratch)
+        {
             MarkDirty(s);
+        }
     }
 
     private sealed class StoreDynamicStatePublisher
@@ -171,12 +175,12 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         )
         {
             if (scratch.EqualsLast(
-                buf,
-                comp.CatalogRevision,
-                tabs.HasBuyTab,
-                tabs.HasSellTab,
-                tabs.HasBarterTab,
-                tabs.HasContractsTab))
+                    buf,
+                    comp.CatalogRevision,
+                    tabs.HasBuyTab,
+                    tabs.HasSellTab,
+                    tabs.HasBarterTab,
+                    tabs.HasContractsTab))
                 return;
 
             comp.UiRevision = unchecked(comp.UiRevision + 1);
@@ -187,12 +191,12 @@ public sealed partial class StoreStructuredSystem : EntitySystem
                 new StoreDynamicState(
                     comp.UiRevision,
                     comp.CatalogRevision,
-                    new(buf.BalancesByCurrency),
-                    new(buf.RemainingById),
-                    new(buf.OwnedById),
-                    new(buf.CrateUnitsById),
-                    new(buf.CrateTotals),
-                    new(buf.Contracts),
+                    new Dictionary<string, int>(buf.BalancesByCurrency),
+                    new Dictionary<string, int>(buf.RemainingById),
+                    new Dictionary<string, int>(buf.OwnedById),
+                    new Dictionary<string, int>(buf.CrateUnitsById),
+                    new Dictionary<string, int>(buf.CrateTotals),
+                    new List<ContractClientData>(buf.Contracts),
                     tabs.HasBuyTab,
                     tabs.HasSellTab,
                     tabs.HasBarterTab,
@@ -200,7 +204,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
                     buf.ContractSkipCost,
                     buf.ContractSkipCurrency,
                     scratch.HasVisibleIds,
-                    new(buf.ListingScopeIds)
+                    new List<string>(buf.ListingScopeIds)
                 )
             );
 

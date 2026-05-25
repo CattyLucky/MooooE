@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -241,7 +239,7 @@ public sealed partial class NcContractSystem : EntitySystem
                 crateEntity,
                 crateItems,
                 storeNearbyItems,
-                crateEntity != null && crateItems is { Count: > 0, });
+                crateEntity != null && crateItems is { Count: > 0 });
             ApplyPartialTurnInProgress(store, contractId, contract);
         }
         finally

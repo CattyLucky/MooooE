@@ -1,8 +1,6 @@
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -12,6 +10,8 @@ public sealed partial class NcStoreLogicSystem
         EntityPrototype productProto,
         int purchases,
         int unitsPerPurchase
-    ) =>
-        _spawnService.SpawnPurchasedProduct(user, productEntity, productProto, purchases, unitsPerPurchase);
+    )
+    {
+        return _spawnService.SpawnPurchasedProduct(user, productEntity, productProto, purchases, unitsPerPurchase);
+    }
 }

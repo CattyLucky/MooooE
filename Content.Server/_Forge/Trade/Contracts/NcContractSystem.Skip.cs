@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -23,11 +21,13 @@ public sealed partial class NcContractSystem : EntitySystem
         if (string.IsNullOrWhiteSpace(cur))
         {
             foreach (var c in comp.CurrencyWhitelist)
+            {
                 if (!string.IsNullOrWhiteSpace(c))
                 {
                     cur = c;
                     break;
                 }
+            }
         }
 
         if (string.IsNullOrWhiteSpace(cur))

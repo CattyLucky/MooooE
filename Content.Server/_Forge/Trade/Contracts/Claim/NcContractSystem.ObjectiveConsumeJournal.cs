@@ -1,12 +1,13 @@
 namespace Content.Server._Forge.Trade;
 
-
 public sealed partial class NcContractSystem : EntitySystem
 {
     private void CommitObjectiveConsumeJournal(ObjectiveConsumeJournal journal)
     {
         for (var i = 0; i < journal.PendingDeletes.Count; i++)
+        {
             DeleteFinalEntityBestEffort(journal.PendingDeletes[i], "ObjectiveConsume");
+        }
 
         journal.Clear();
     }
@@ -81,10 +82,12 @@ public sealed partial class NcContractSystem : EntitySystem
                 return;
 
             for (var i = 0; i < ProofStateRestores.Count; i++)
+            {
                 if (ReferenceEquals(ProofStateRestores[i].State, state))
                     return;
+            }
 
-            ProofStateRestores.Add(new(state, state.ProofEntity));
+            ProofStateRestores.Add(new ProofStateRestore(state, state.ProofEntity));
             state.ProofEntity = null;
         }
 
@@ -94,22 +97,26 @@ public sealed partial class NcContractSystem : EntitySystem
         )
         {
             for (var i = 0; i < ProofIndexRestores.Count; i++)
+            {
                 if (ProofIndexRestores[i].Proof == proof)
                     return;
+            }
 
             var hadValue = proofIndex.TryGetValue(proof, out var previousKey);
-            ProofIndexRestores.Add(new(proof, hadValue, previousKey));
+            ProofIndexRestores.Add(new ProofIndexRestore(proof, hadValue, previousKey));
         }
 
         public void TrackHuntBody(ObjectiveRuntimeState state, EntityUid body)
         {
             for (var i = 0; i < HuntBodyRestores.Count; i++)
+            {
                 if (ReferenceEquals(HuntBodyRestores[i].State, state) &&
                     HuntBodyRestores[i].Body == body)
                     return;
+            }
 
             HuntBodyRestores.Add(
-                new(
+                new HuntBodyRestore(
                     state,
                     body,
                     state.HuntBodyEntity,
@@ -119,11 +126,13 @@ public sealed partial class NcContractSystem : EntitySystem
         public void TrackRoundEnd(GhostRoleRoundEndRecord record)
         {
             for (var i = 0; i < RoundEndRestores.Count; i++)
+            {
                 if (ReferenceEquals(RoundEndRestores[i].Record, record))
                     return;
+            }
 
             RoundEndRestores.Add(
-                new(
+                new RoundEndRestore(
                     record,
                     record.Outcome,
                     record.Details,
@@ -147,7 +156,7 @@ public sealed partial class NcContractSystem : EntitySystem
                 if (targets[i] != body)
                     continue;
 
-                indexes ??= new();
+                indexes ??= new List<int>();
                 indexes.Add(i);
             }
 

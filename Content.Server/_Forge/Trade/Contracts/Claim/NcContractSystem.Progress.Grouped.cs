@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -20,8 +18,10 @@ public sealed partial class NcContractSystem : EntitySystem
     private void SeedEmptyProgressClaims()
     {
         foreach (var (key, required) in _progressRequiredByKeyScratch)
+        {
             if (required <= 0)
                 _progressClaimableByKeyScratch[key] = 0;
+        }
     }
 
     private void ReserveGroupedContractProgress(

@@ -3,9 +3,7 @@ using Content.Shared.Stacks;
 using Content.Shared.Tag;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreSystemStructuredLoader
 {
@@ -112,8 +110,10 @@ public sealed partial class StoreSystemStructuredLoader
         return ok;
     }
 
-    private static string GetCatalogEntryProductId(StoreCatalogEntry entry) =>
-        entry.MatchMode == PrototypeMatchMode.Tag ? entry.TagTarget : entry.Proto;
+    private static string GetCatalogEntryProductId(StoreCatalogEntry entry)
+    {
+        return entry.MatchMode == PrototypeMatchMode.Tag ? entry.TagTarget : entry.Proto;
+    }
 
     private bool ValidateMatcherEntry(
         StoreCatalogEntry entry,
@@ -136,7 +136,7 @@ public sealed partial class StoreSystemStructuredLoader
             return false;
         }
 
-        var hasItems = matcher.Items is { Count: > 0, };
+        var hasItems = matcher.Items is { Count: > 0 };
         if (!hasItems)
         {
             Sawmill.Warning(

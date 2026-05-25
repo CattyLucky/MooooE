@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreStructuredSystem
 {
@@ -64,7 +62,7 @@ public sealed partial class StoreStructuredSystem
             ? listing.Categories[0]
             : Loc.GetString("nc-store-category-fallback");
 
-        entry = new(
+        entry = new StoreListingStaticData(
             listing.Id,
             listing.Mode,
             category,
@@ -91,7 +89,7 @@ public sealed partial class StoreStructuredSystem
         var (hasBuy, hasSell, hasBarter) = GetCatalogModeFlags(list);
         var uiColors = ResolveUiColors(comp);
 
-        return new(
+        return new StoreCatalogMessage(
             comp.CatalogRevision,
             list,
             hasBuy,
@@ -109,7 +107,7 @@ public sealed partial class StoreStructuredSystem
             _prototypes.TryIndex(themeId, out var theme))
             return CloneUiColors(theme.Colors);
 
-        return new();
+        return new StoreUiColorsData();
     }
 
     private bool HasContractsProfile(NcStoreComponent comp)
@@ -123,8 +121,9 @@ public sealed partial class StoreStructuredSystem
         return _prototypes.HasIndex(contracts);
     }
 
-    private static StoreUiColorsData CloneUiColors(StoreUiColorsData colors) =>
-        new()
+    private static StoreUiColorsData CloneUiColors(StoreUiColorsData colors)
+    {
+        return new StoreUiColorsData
         {
             TabsShellBackground = colors.TabsShellBackground,
             TabsShellBorder = colors.TabsShellBorder,
@@ -152,8 +151,9 @@ public sealed partial class StoreStructuredSystem
             ListingCardBackground = colors.ListingCardBackground,
             ListingCardBorder = colors.ListingCardBorder,
             ListingDivider = colors.ListingDivider,
-            ListingTitleColor = colors.ListingTitleColor
+            ListingTitleColor = colors.ListingTitleColor,
         };
+    }
 
     private static (bool HasBuy, bool HasSell, bool HasBarter) GetCatalogModeFlags(List<StoreListingStaticData> list)
     {
@@ -184,13 +184,13 @@ public sealed partial class StoreStructuredSystem
         {
             var c = source[i];
             result.Add(
-                new()
+                new NcBarterCostEntry
                 {
                     Prototype = c.Prototype,
                     Group = c.Group,
                     TagTarget = c.TagTarget,
                     Currency = c.Currency,
-                    Count = c.Count
+                    Count = c.Count,
                 });
         }
 
@@ -204,11 +204,11 @@ public sealed partial class StoreStructuredSystem
         {
             var r = source[i];
             result.Add(
-                new()
+                new NcBarterReceiveEntry
                 {
                     Prototype = r.Prototype,
                     Currency = r.Currency,
-                    Count = r.Count
+                    Count = r.Count,
                 });
         }
 
@@ -224,11 +224,11 @@ public sealed partial class StoreStructuredSystem
         {
             var r = source[i];
             result.Add(
-                new()
+                new NcBarterReceivePoolEntry
                 {
                     Pool = r.Pool,
                     Rolls = r.Rolls,
-                    Chance = r.Chance
+                    Chance = r.Chance,
                 });
         }
 

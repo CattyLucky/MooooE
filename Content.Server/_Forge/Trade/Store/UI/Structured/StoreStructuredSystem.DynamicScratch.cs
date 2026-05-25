@@ -1,14 +1,12 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreStructuredSystem : EntitySystem
 {
     private sealed partial class DynamicScratch
     {
-        private readonly DynamicStateBuffer[] _buffers = { new(), new(), };
+        private readonly DynamicStateBuffer[] _buffers = { new(), new() };
         private readonly List<ContractClientData> _contractsCache = new();
         private readonly Dictionary<string, int> _cratePreviewTotals = new();
         private readonly Dictionary<string, int> _cratePreviewUnitsById = new();
@@ -42,9 +40,15 @@ public sealed partial class StoreStructuredSystem : EntitySystem
 
         public bool HasVisibleIds { get; private set; }
 
-        public DynamicStateBuffer GetReadBuffer() => _buffers[_activeIndex];
+        public DynamicStateBuffer GetReadBuffer()
+        {
+            return _buffers[_activeIndex];
+        }
 
-        public DynamicStateBuffer GetWriteBuffer() => _buffers[1 - _activeIndex];
+        public DynamicStateBuffer GetWriteBuffer()
+        {
+            return _buffers[1 - _activeIndex];
+        }
 
         public bool UpdateVisibleIds(IReadOnlyList<string>? ids)
         {
@@ -79,7 +83,9 @@ public sealed partial class StoreStructuredSystem : EntitySystem
 
             _visibleListingIds.Clear();
             foreach (var id in _visibleIncomingScratch)
+            {
                 _visibleListingIds.Add(id);
+            }
 
             _visibleSig = sig;
             HasVisibleIds = true;
@@ -90,7 +96,9 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         {
             var sig = 17;
             foreach (var id in ids)
+            {
                 sig = unchecked(sig + StableStringHash(id) * 31);
+            }
 
             sig = unchecked(sig * 31 + ids.Count);
             return sig;
@@ -101,10 +109,12 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             unchecked
             {
                 const int fnvPrime = 16777619;
-                var hash = unchecked((int) 2166136261u);
+                var hash = unchecked((int)2166136261u);
 
                 for (var i = 0; i < value.Length; i++)
+                {
                     hash = (hash ^ value[i]) * fnvPrime;
+                }
 
                 return hash;
             }
@@ -146,12 +156,16 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             _cratePreviewTotals.Clear();
 
             foreach (var (key, value) in plan.UnitsByListingId)
+            {
                 if (!string.IsNullOrWhiteSpace(key) && value > 0)
                     _cratePreviewUnitsById[key] = value;
+            }
 
             foreach (var (key, value) in plan.IncomeByCurrency)
+            {
                 if (!string.IsNullOrWhiteSpace(key) && value > 0)
                     _cratePreviewTotals[key] = value;
+            }
 
             _cratePreviewRoot = crateUid;
             _cratePreviewCatalogRevision = catalogRevision;
@@ -172,10 +186,14 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         private void CopyCachedCratePreviewToBuffer(DynamicStateBuffer buf)
         {
             foreach (var (key, value) in _cratePreviewUnitsById)
+            {
                 buf.CrateUnitsById[key] = value;
+            }
 
             foreach (var (key, value) in _cratePreviewTotals)
+            {
                 buf.CrateTotals[key] = value;
+            }
         }
 
         public bool TryPopulateCachedContracts(int signature, DynamicStateBuffer buf)
@@ -218,14 +236,14 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             var prev = GetReadBuffer();
 
             return DictEquals(prev.BalancesByCurrency, next.BalancesByCurrency) &&
-                DictEquals(prev.RemainingById, next.RemainingById) &&
-                DictEquals(prev.OwnedById, next.OwnedById) &&
-                DictEquals(prev.CrateUnitsById, next.CrateUnitsById) &&
-                DictEquals(prev.CrateTotals, next.CrateTotals) &&
-                StringListEquals(prev.ListingScopeIds, next.ListingScopeIds) &&
-                ListEquals(prev.Contracts, next.Contracts) &&
-                prev.ContractSkipCost == next.ContractSkipCost &&
-                string.Equals(prev.ContractSkipCurrency, next.ContractSkipCurrency, StringComparison.Ordinal);
+                   DictEquals(prev.RemainingById, next.RemainingById) &&
+                   DictEquals(prev.OwnedById, next.OwnedById) &&
+                   DictEquals(prev.CrateUnitsById, next.CrateUnitsById) &&
+                   DictEquals(prev.CrateTotals, next.CrateTotals) &&
+                   StringListEquals(prev.ListingScopeIds, next.ListingScopeIds) &&
+                   ListEquals(prev.Contracts, next.Contracts) &&
+                   prev.ContractSkipCost == next.ContractSkipCost &&
+                   string.Equals(prev.ContractSkipCurrency, next.ContractSkipCurrency, StringComparison.Ordinal);
         }
 
         public void Commit(int catalogRevision, bool hasBuyTab, bool hasSellTab, bool hasBarterTab, bool hasContracts)

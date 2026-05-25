@@ -1,9 +1,7 @@
 using Content.Shared._Forge.Trade;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreSystemStructuredLoader : EntitySystem
 {
@@ -31,14 +29,20 @@ public sealed partial class StoreSystemStructuredLoader : EntitySystem
         _contracts.ClearStoreRuntimeCaches(uid);
     }
 
-    private void OnMapInit(EntityUid uid, NcStoreComponent comp, MapInitEvent args) =>
+    private void OnMapInit(EntityUid uid, NcStoreComponent comp, MapInitEvent args)
+    {
         EnsureLoadedInternal(uid, comp, "MapInit", true);
+    }
 
-    public void EnsureLoaded(EntityUid uid, NcStoreComponent comp, string reason) =>
+    public void EnsureLoaded(EntityUid uid, NcStoreComponent comp, string reason)
+    {
         EnsureLoadedInternal(uid, comp, reason, true);
+    }
 
-    private void OnStartup(EntityUid uid, NcStoreComponent comp, ComponentStartup args) =>
+    private void OnStartup(EntityUid uid, NcStoreComponent comp, ComponentStartup args)
+    {
         EnsureLoadedInternal(uid, comp, "Startup", true);
+    }
 
     private void EnsureLoadedInternal(EntityUid uid, NcStoreComponent comp, string reason, bool allowContractsInit)
     {
@@ -78,13 +82,19 @@ public sealed partial class StoreSystemStructuredLoader : EntitySystem
         var total = 0;
 
         foreach (var id in profile.Buy)
+        {
             total += LoadPresetForMode(id, StoreMode.Buy, comp, ctx);
+        }
 
         foreach (var id in profile.Sell)
+        {
             total += LoadPresetForMode(id, StoreMode.Sell, comp, ctx);
+        }
 
         foreach (var id in profile.Barter)
+        {
             total += LoadBarterPreset(id, comp, ctx);
+        }
 
         AddContractSkipCurrencyIfNeeded(comp, profile, ctx);
 
@@ -200,11 +210,11 @@ public sealed partial class StoreSystemStructuredLoader : EntitySystem
                     ProductEntity = productId,
                     MatchMode = entry.MatchMode,
                     Mode = mode,
-                    Categories = new() { categoryName, },
-                    Conditions = new(),
+                    Categories = new List<string> { categoryName },
+                    Conditions = new List<ListingConditionPrototype>(),
                     RemainingCount = entry.Count ?? -1,
                     UnitsPerPurchase = Math.Max(1, entry.Amount),
-                    Cost = new()
+                    Cost = new Dictionary<string, int>(),
                 };
 
                 ApplyCatalogEntryDisplayMetadata(listing);

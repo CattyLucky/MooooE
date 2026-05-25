@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreStructuredSystem
 {
@@ -17,8 +15,10 @@ public sealed partial class StoreStructuredSystem
                 return false;
 
             foreach (var (k, v) in a)
+            {
                 if (!b.TryGetValue(k, out var bv) || bv != v)
                     return false;
+            }
 
             return true;
         }
@@ -32,8 +32,10 @@ public sealed partial class StoreStructuredSystem
                 return false;
 
             for (var i = 0; i < a.Count; i++)
+            {
                 if (!ContractEquals(a[i], b[i]))
                     return false;
+            }
 
             return true;
         }
@@ -47,8 +49,10 @@ public sealed partial class StoreStructuredSystem
                 return false;
 
             for (var i = 0; i < a.Count; i++)
+            {
                 if (!string.Equals(a[i], b[i], StringComparison.Ordinal))
                     return false;
+            }
 
             return true;
         }
@@ -91,8 +95,8 @@ public sealed partial class StoreStructuredSystem
                 return false;
 
             return TargetsEquals(a.Targets, b.Targets) &&
-                RewardsEquals(a.Rewards, b.Rewards) &&
-                RuntimeEquals(a.Runtime, b.Runtime);
+                   RewardsEquals(a.Rewards, b.Rewards) &&
+                   RuntimeEquals(a.Runtime, b.Runtime);
         }
 
         private static bool RuntimeEquals(ContractRuntimeContextData? a, ContractRuntimeContextData? b)
@@ -104,14 +108,14 @@ public sealed partial class StoreStructuredSystem
                 return false;
 
             return a.Stage == b.Stage &&
-                a.StageGoal == b.StageGoal &&
-                a.AcceptTimeoutRemainingSeconds == b.AcceptTimeoutRemainingSeconds &&
-                a.GhostRoleSurvivalRemainingSeconds == b.GhostRoleSurvivalRemainingSeconds &&
-                a.GhostRolePendingAcceptance == b.GhostRolePendingAcceptance &&
-                a.Failed == b.Failed &&
-                a.Outcome == b.Outcome &&
-                string.Equals(a.FailureReason, b.FailureReason, StringComparison.Ordinal) &&
-                string.Equals(a.StatusHint, b.StatusHint, StringComparison.Ordinal);
+                   a.StageGoal == b.StageGoal &&
+                   a.AcceptTimeoutRemainingSeconds == b.AcceptTimeoutRemainingSeconds &&
+                   a.GhostRoleSurvivalRemainingSeconds == b.GhostRoleSurvivalRemainingSeconds &&
+                   a.GhostRolePendingAcceptance == b.GhostRolePendingAcceptance &&
+                   a.Failed == b.Failed &&
+                   a.Outcome == b.Outcome &&
+                   string.Equals(a.FailureReason, b.FailureReason, StringComparison.Ordinal) &&
+                   string.Equals(a.StatusHint, b.StatusHint, StringComparison.Ordinal);
         }
 
         private static bool TargetsEquals(List<ContractTargetClientData>? a, List<ContractTargetClientData>? b)

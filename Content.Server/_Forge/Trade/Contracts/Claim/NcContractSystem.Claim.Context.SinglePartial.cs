@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -44,16 +42,16 @@ public sealed partial class NcContractSystem : EntitySystem
         }
 
         if (!TryAppendTakePlanForRequirement(
-            store,
-            user,
-            crateEntity,
-            crateItems,
-            storeNearbyItems,
-            target.TargetItem,
-            target.MatchMode,
-            remaining,
-            takePlan,
-            out fail))
+                store,
+                user,
+                crateEntity,
+                crateItems,
+                storeNearbyItems,
+                target.TargetItem,
+                target.MatchMode,
+                remaining,
+                takePlan,
+                out fail))
         {
             ClearClaimPlanningScratch();
             return false;

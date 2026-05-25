@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -19,8 +17,9 @@ public sealed partial class NcContractSystem : EntitySystem
         return contract;
     }
 
-    private static ContractServerData CreateInvalidContractData(ContractPoolCandidate candidate) =>
-        new()
+    private static ContractServerData CreateInvalidContractData(ContractPoolCandidate candidate)
+    {
+        return new ContractServerData
         {
             Id = candidate.Id,
             Name = candidate.Id,
@@ -28,18 +27,23 @@ public sealed partial class NcContractSystem : EntitySystem
             Repeatable = candidate.Repeatable,
             ObjectiveType = ContractObjectiveType.Delivery,
             ExecutionKind = ContractExecutionKind.InventoryDelivery,
-            FlowStatus = ContractFlowStatus.Failed
+            FlowStatus = ContractFlowStatus.Failed,
         };
+    }
 
     private static int CalculateTotalRequired(List<ContractTargetServerData> targets)
     {
         var totalRequired = 0;
         foreach (var target in targets)
+        {
             totalRequired = SaturatingAdd(totalRequired, Math.Max(0, target.Required));
+        }
 
         return totalRequired;
     }
 
-    private static string GetPrimaryTargetId(List<ContractTargetServerData> targets) =>
-        targets.Count > 0 ? targets[0].TargetItem : string.Empty;
+    private static string GetPrimaryTargetId(List<ContractTargetServerData> targets)
+    {
+        return targets.Count > 0 ? targets[0].TargetItem : string.Empty;
+    }
 }

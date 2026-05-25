@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -10,7 +8,7 @@ public sealed partial class NcStoreLogicSystem
     {
         if (!_massSellCatalogCache.TryGetValue(storeUid, out var cache))
         {
-            cache = new();
+            cache = new MassSellCatalogCache();
             _massSellCatalogCache[storeUid] = cache;
         }
 
@@ -90,15 +88,19 @@ public sealed partial class NcStoreLogicSystem
         return OrdinalIds.Compare(left.Id, right.Id);
     }
 
-    private static int CompareMassSellMatchModePriority(PrototypeMatchMode left, PrototypeMatchMode right) =>
-        GetMassSellMatchModePriority(left).CompareTo(GetMassSellMatchModePriority(right));
+    private static int CompareMassSellMatchModePriority(PrototypeMatchMode left, PrototypeMatchMode right)
+    {
+        return GetMassSellMatchModePriority(left).CompareTo(GetMassSellMatchModePriority(right));
+    }
 
-    private static int GetMassSellMatchModePriority(PrototypeMatchMode mode) =>
-        mode switch
+    private static int GetMassSellMatchModePriority(PrototypeMatchMode mode)
+    {
+        return mode switch
         {
             PrototypeMatchMode.Exact => 0,
             PrototypeMatchMode.Matcher => 1,
             PrototypeMatchMode.Tag => 2,
-            _ => 3
+            _ => 3,
         };
+    }
 }

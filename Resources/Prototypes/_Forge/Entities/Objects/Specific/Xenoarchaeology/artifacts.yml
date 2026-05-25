@@ -1,22 +1,50 @@
 - type: entity
   parent: BaseXenoArtifactItem
-  id: ForgeContractStudyArtifactItem
-  name: contract alien artifact
-  description: A controlled artifact prepared for Forge study contracts.
-  suffix: Forge, Study Contract
+  id: ForgeContractStudyArtifactEasy
+  name: simple contract artifact
+  description: A controlled artifact prepared for simple Forge study contracts.
+  suffix: Forge, Study Contract, Easy
   components:
   - type: Artifact
-    nodesMin: 2
-    nodesMax: 3
   - type: ForgeArtifactStudyPreset
-    nodeCount: 5
-    triggers:
-    - TriggerInteraction
-    - TriggerExamine
-    - TriggerItemLanded
-    - TriggerMusic
-    effects:
-    - EffectGoodFeeling
-    - EffectBadFeeling
-    - EffectLightFlicker
-    - EffectJunkSpawn
+    nodeCountMin: 3
+    nodeCountMax: 4
+    excludedEffects:
+    - EffectBoom
+    - EffectSingulo
+    - EffectTesla
+    - EffectPhasing
+
+- type: entity
+  parent: BaseXenoArtifactItem
+  id: ForgeContractStudyArtifactMedium
+  name: standard contract artifact
+  description: A controlled artifact prepared for standard Forge study contracts.
+  suffix: Forge, Study Contract, Medium
+  components:
+  - type: Artifact
+  - type: ForgeArtifactStudyPreset
+    nodeCountMin: 5
+    nodeCountMax: 7
+    excludedEffects:
+    - EffectBoom
+    - EffectSingulo
+    - EffectTesla
+    - EffectPhasing
+
+- type: entity
+  parent: BaseXenoArtifactItem
+  id: ForgeContractStudyArtifactHard
+  name: complex contract artifact
+  description: A controlled artifact prepared for complex Forge study contracts.
+  suffix: Forge, Study Contract, Hard
+  components:
+  - type: Artifact
+  - type: ForgeArtifactStudyPreset
+    nodeCountMin: 11
+    nodeCountMax: 13
+    excludedEffects:
+    - EffectBoom
+    - EffectSingulo
+    - EffectTesla
+    - EffectPhasing

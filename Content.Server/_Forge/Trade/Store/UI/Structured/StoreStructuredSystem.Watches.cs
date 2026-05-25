@@ -1,6 +1,5 @@
 namespace Content.Server._Forge.Trade;
 
-
 public sealed partial class StoreStructuredSystem
 {
     private bool EnsureCrateWatchUpToDate(EntityUid storeUid, EntityUid user)
@@ -42,7 +41,7 @@ public sealed partial class StoreStructuredSystem
     {
         if (!_storesByWatchedRoot.TryGetValue(root, out var set))
         {
-            set = new();
+            set = new HashSet<EntityUid>();
             _storesByWatchedRoot[root] = set;
         }
 

@@ -3,9 +3,7 @@ using Content.Shared.Stacks;
 using Content.Shared.Tag;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -15,7 +13,7 @@ public sealed partial class NcStoreLogicSystem
         out List<BarterCostDemand> demands
     )
     {
-        demands = new(costs.Count);
+        demands = new List<BarterCostDemand>(costs.Count);
 
         for (var i = 0; i < costs.Count; i++)
         {
@@ -42,10 +40,10 @@ public sealed partial class NcStoreLogicSystem
                     return false;
 
                 demands.Add(
-                    new()
+                    new BarterCostDemand
                     {
                         Currency = cost.Currency,
-                        Required = required
+                        Required = required,
                     });
                 continue;
             }
@@ -56,11 +54,11 @@ public sealed partial class NcStoreLogicSystem
                     return false;
 
                 demands.Add(
-                    new()
+                    new BarterCostDemand
                     {
                         Prototype = cost.Prototype,
                         PrototypeStackType = _inventory.GetProductStackType(cost.Prototype) ?? string.Empty,
-                        Required = required
+                        Required = required,
                     });
                 continue;
             }
@@ -71,11 +69,11 @@ public sealed partial class NcStoreLogicSystem
                     return false;
 
                 demands.Add(
-                    new()
+                    new BarterCostDemand
                     {
                         Group = cost.Group,
                         GroupPrototype = group,
-                        Required = required
+                        Required = required,
                     });
                 continue;
             }
@@ -86,10 +84,10 @@ public sealed partial class NcStoreLogicSystem
                 return false;
 
             demands.Add(
-                new()
+                new BarterCostDemand
                 {
                     Tag = tagTarget.Tag,
-                    Required = required
+                    Required = required,
                 });
         }
 
@@ -173,7 +171,9 @@ public sealed partial class NcStoreLogicSystem
     )
     {
         for (var i = 0; i < source.Count; i++)
+        {
             GetOrAddBarterReservableItem(target, i).CopyFrom(source[i]);
+        }
 
         if (source.Count < target.Count)
             target.RemoveRange(source.Count, target.Count - source.Count);
@@ -291,7 +291,7 @@ public sealed partial class NcStoreLogicSystem
         }
 
         plan.Reservations.Add(
-            new(
+            new BarterCostReservation(
                 item.Entity,
                 count,
                 item.IsStack,

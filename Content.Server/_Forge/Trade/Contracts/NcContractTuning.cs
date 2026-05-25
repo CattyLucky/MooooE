@@ -1,8 +1,6 @@
 using System.Numerics;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 internal static class NcContractTuning
 {
@@ -30,6 +28,6 @@ internal static class NcContractTuning
         new(0.75f, 0.75f),
         new(-0.75f, 0.75f),
         new(0.75f, -0.75f),
-        new(-0.75f, -0.75f)
+        new(-0.75f, -0.75f),
     };
 }

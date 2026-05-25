@@ -4,9 +4,7 @@ using Content.Shared.Access.Components;
 using Content.Shared.Storage.Components;
 using Content.Shared.UserInterface;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreStructuredSystem
 {
@@ -62,8 +60,10 @@ public sealed partial class StoreStructuredSystem
             RefreshStoresAffectedBy(uid);
     }
 
-    private void OnContractsChanged(EntityUid uid, NcStoreComponent comp, ref NcContractsChangedEvent args) =>
+    private void OnContractsChanged(EntityUid uid, NcStoreComponent comp, ref NcContractsChangedEvent args)
+    {
         MarkDirty(uid);
+    }
 
     private void OnStorageClose(EntityUid uid, EntityStorageComponent comp, ref StorageAfterCloseEvent args)
     {

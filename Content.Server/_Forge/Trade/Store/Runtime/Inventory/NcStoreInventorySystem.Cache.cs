@@ -4,9 +4,7 @@ using Content.Shared.Inventory;
 using Content.Shared.Stacks;
 using Robust.Shared.Containers;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreInventorySystem
 {
@@ -24,8 +22,10 @@ public sealed partial class NcStoreInventorySystem
             return;
 
         foreach (var root in affectedRoots)
+        {
             if (_inventoryCache.TryGetValue(root, out var entry))
                 entry.Revision = unchecked(entry.Revision + 1);
+        }
     }
 
     public void InvalidateInventoryCache(EntityUid root)
@@ -40,10 +40,12 @@ public sealed partial class NcStoreInventorySystem
         _rootsByItem.Clear(); // Phase A1: keep reverse index in sync with main cache.
     }
 
-    public int GetInventoryRevision(EntityUid root) =>
-        _inventoryCache.TryGetValue(root, out var entry)
+    public int GetInventoryRevision(EntityUid root)
+    {
+        return _inventoryCache.TryGetValue(root, out var entry)
             ? entry.Revision
             : 0;
+    }
 
     private List<EntityUid> GetOrBuildDeepItemsCache(EntityUid owner)
     {
@@ -67,7 +69,7 @@ public sealed partial class NcStoreInventorySystem
         if (_inventoryCache.TryGetValue(owner, out var entry))
             return entry;
 
-        entry = new();
+        entry = new InventoryCacheEntry();
         _inventoryCache[owner] = entry;
         return entry;
     }
@@ -91,9 +93,11 @@ public sealed partial class NcStoreInventorySystem
         entry.SnapshotRevision = entry.Revision;
     }
 
-    private static void MarkSnapshotCacheEscaped(InventoryCacheEntry entry) =>
+    private static void MarkSnapshotCacheEscaped(InventoryCacheEntry entry)
+    {
         // Callers receive the live internal items list and may mutate it in-place.
         entry.SnapshotRevision = UncachedRevision;
+    }
 
     private static void MarkInventoryDirty(InventoryCacheEntry entry, bool itemsStillCurrent)
     {
@@ -122,28 +126,36 @@ public sealed partial class NcStoreInventorySystem
         {
             var slotEnum = new InventorySystem.InventorySlotEnumerator(inventory);
             while (slotEnum.NextItem(out var item))
+            {
                 Enqueue(item);
+            }
         }
 
         if (_ents.TryGetComponent(owner, out ItemSlotsComponent? itemSlots))
         {
             foreach (var slot in itemSlots.Slots.Values)
-                if (slot is { HasItem: true, Item: not null, })
+            {
+                if (slot is { HasItem: true, Item: not null })
                     Enqueue(slot.Item.Value);
+            }
         }
 
         if (_ents.TryGetComponent(owner, out HandsComponent? hands))
         {
             foreach (var hand in hands.Hands.Values)
+            {
                 if (hand.HeldEntity.HasValue)
                     Enqueue(hand.HeldEntity.Value);
+            }
         }
 
         if (_ents.TryGetComponent(owner, out ContainerManagerComponent? cmcRoot))
         {
             foreach (var container in cmcRoot.Containers.Values)
-                foreach (var entity in container.ContainedEntities)
-                    Enqueue(entity);
+            foreach (var entity in container.ContainedEntities)
+            {
+                Enqueue(entity);
+            }
         }
 
         while (_scratchQueue.Count > 0)
@@ -153,8 +165,10 @@ public sealed partial class NcStoreInventorySystem
                 continue;
 
             foreach (var container in cmc.Containers.Values)
-                foreach (var child in container.ContainedEntities)
-                    Enqueue(child);
+            foreach (var child in container.ContainedEntities)
+            {
+                Enqueue(child);
+            }
         }
 
         RefreshReverseIndexForRebuild(owner, cached, _scratchResult);
@@ -190,7 +204,7 @@ public sealed partial class NcStoreInventorySystem
 
             if (!_rootsByItem.TryGetValue(ent, out var rootsSet))
             {
-                rootsSet = new();
+                rootsSet = new HashSet<EntityUid>();
                 _rootsByItem[ent] = rootsSet;
             }
 

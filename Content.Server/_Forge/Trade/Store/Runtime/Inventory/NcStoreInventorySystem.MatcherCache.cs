@@ -2,9 +2,7 @@ using Content.Shared._Forge.Trade;
 using Content.Shared.Tag;
 using Robust.Shared.Prototypes;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreInventorySystem
 {
@@ -93,9 +91,11 @@ public sealed partial class NcStoreInventorySystem
         try
         {
             foreach (var stackTypeId in matcher.MatchStackTypes)
+            {
                 if (countedStackTypes.Add(stackTypeId) &&
                     snapshot.StackTypeCounts.TryGetValue(stackTypeId, out var stackCount))
                     total += stackCount;
+            }
 
             foreach (var itemProtoId in matcher.Items)
             {
@@ -290,7 +290,9 @@ public sealed partial class NcStoreInventorySystem
         public readonly HashSet<string> MatchStackTypes = new(StringComparer.Ordinal);
 
         public CompiledMatcher(NcMatcherPrototype source)
-            : this(source.Items) { }
+            : this(source.Items)
+        {
+        }
 
         public CompiledMatcher(IReadOnlyList<string> items)
         {

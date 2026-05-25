@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreStructuredSystem
 {
@@ -11,7 +9,7 @@ public sealed partial class StoreStructuredSystem
         var targets = MapContractTargetsToClient(contract);
         var rewards = CloneContractRewards(contract);
 
-        return new(
+        return new ContractClientData(
             contract.Id,
             contract.Name,
             contract.Description,
@@ -47,11 +45,11 @@ public sealed partial class StoreStructuredSystem
     private static List<ContractTargetClientData> MapContractTargetsToClient(ContractServerData contract)
     {
         var sourceTargets = contract.Targets;
-        var targets = sourceTargets is { Count: > 0, }
+        var targets = sourceTargets is { Count: > 0 }
             ? new List<ContractTargetClientData>(sourceTargets.Count)
             : new List<ContractTargetClientData>(1);
 
-        if (sourceTargets is { Count: > 0, })
+        if (sourceTargets is { Count: > 0 })
         {
             foreach (var target in sourceTargets)
             {
@@ -59,9 +57,9 @@ public sealed partial class StoreStructuredSystem
                     continue;
 
                 targets.Add(
-                    new(target.TargetItem, target.Required, target.Progress)
+                    new ContractTargetClientData(target.TargetItem, target.Required, target.Progress)
                     {
-                        MatchMode = target.MatchMode
+                        MatchMode = target.MatchMode,
                     });
             }
 
@@ -71,9 +69,9 @@ public sealed partial class StoreStructuredSystem
         if (!string.IsNullOrWhiteSpace(contract.TargetItem) && contract.Required > 0)
         {
             targets.Add(
-                new(contract.TargetItem, contract.Required, contract.Progress)
+                new ContractTargetClientData(contract.TargetItem, contract.Required, contract.Progress)
                 {
-                    MatchMode = contract.MatchMode
+                    MatchMode = contract.MatchMode,
                 });
         }
 
@@ -84,7 +82,7 @@ public sealed partial class StoreStructuredSystem
     {
         var rewards = contract.Rewards;
         return rewards.Count > 0
-            ? new(rewards)
+            ? new List<ContractRewardData>(rewards)
             : new List<ContractRewardData>(0);
     }
 
@@ -115,28 +113,30 @@ public sealed partial class StoreStructuredSystem
     {
         var config = contract.Config;
         return (contract.IsInventoryDelivery || contract.IsRetrievalRouteDelivery) &&
-            config.RetrievalSpawnEnabled &&
-            config.RetrievalRequireSpawnedEntities;
+               config.RetrievalSpawnEnabled &&
+               config.RetrievalRequireSpawnedEntities;
     }
 
-    private static bool IsRetrievalRouteContract(ContractServerData contract) =>
-        (contract.IsInventoryDelivery || contract.IsRetrievalRouteDelivery) &&
-        !string.IsNullOrWhiteSpace(contract.Config.RetrievalRouteId);
+    private static bool IsRetrievalRouteContract(ContractServerData contract)
+    {
+        return (contract.IsInventoryDelivery || contract.IsRetrievalRouteDelivery) &&
+               !string.IsNullOrWhiteSpace(contract.Config.RetrievalRouteId);
+    }
 
     private static bool IsRetrievalBearerProofContract(ContractServerData contract)
     {
         var config = contract.Config;
         return IsRetrievalRouteContract(contract) &&
-            config.RetrievalProofEnabled &&
-            config.RetrievalProofOwnership == NcRetrievalProofOwnership.Bearer;
+               config.RetrievalProofEnabled &&
+               config.RetrievalProofOwnership == NcRetrievalProofOwnership.Bearer;
     }
 
     private static ContractRuntimeContextData CloneRuntimeContext(ContractRuntimeContextData? runtime)
     {
         if (runtime == null)
-            return new();
+            return new ContractRuntimeContextData();
 
-        return new()
+        return new ContractRuntimeContextData
         {
             Stage = runtime.Stage,
             StageGoal = runtime.StageGoal,
@@ -146,7 +146,7 @@ public sealed partial class StoreStructuredSystem
             Failed = runtime.Failed,
             Outcome = runtime.Outcome,
             FailureReason = runtime.FailureReason,
-            StatusHint = runtime.StatusHint
+            StatusHint = runtime.StatusHint,
         };
     }
 }

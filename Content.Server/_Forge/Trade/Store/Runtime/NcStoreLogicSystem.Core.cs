@@ -8,9 +8,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem : EntitySystem, IStoreRewardExecutionService, IStoreCurrencyDebitService
 {
@@ -36,9 +34,13 @@ public sealed partial class NcStoreLogicSystem : EntitySystem, IStoreRewardExecu
         InitializeServices();
     }
 
-    public void InvalidateInventoryCache(EntityUid root) => _inventory.InvalidateInventoryCache(root);
+    public void InvalidateInventoryCache(EntityUid root)
+    {
+        _inventory.InvalidateInventoryCache(root);
+    }
 
-    public void QueuePickupToHandsOrCrateNextTick(EntityUid user, EntityUid spawned) =>
+    public void QueuePickupToHandsOrCrateNextTick(EntityUid user, EntityUid spawned)
+    {
         Timer.Spawn(
             0,
             () =>
@@ -88,9 +90,12 @@ public sealed partial class NcStoreLogicSystem : EntitySystem, IStoreRewardExecu
 
                 InvalidateInventoryCache(user);
             });
+    }
 
-    public EntityUid? GetPulledClosedCrate(EntityUid user) =>
-        TryGetPulledClosedCrate(user, out var crate) ? crate : null;
+    public EntityUid? GetPulledClosedCrate(EntityUid user)
+    {
+        return TryGetPulledClosedCrate(user, out var crate) ? crate : null;
+    }
 
     public bool TryGetPulledClosedCrate(EntityUid user, out EntityUid crate)
     {
@@ -119,6 +124,9 @@ public sealed partial class NcStoreLogicSystem : EntitySystem, IStoreRewardExecu
 
     private sealed class OrdinalIdComparer : IComparer<string>
     {
-        public int Compare(string? x, string? y) => string.CompareOrdinal(x, y);
+        public int Compare(string? x, string? y)
+        {
+            return string.CompareOrdinal(x, y);
+        }
     }
 }

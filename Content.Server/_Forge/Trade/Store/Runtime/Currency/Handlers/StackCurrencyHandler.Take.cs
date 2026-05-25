@@ -1,8 +1,6 @@
 using Content.Shared.Stacks;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StackCurrencyHandler : ICurrencyHandler
 {

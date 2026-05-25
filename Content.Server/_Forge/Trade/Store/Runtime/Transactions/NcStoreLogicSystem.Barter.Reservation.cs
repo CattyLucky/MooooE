@@ -1,8 +1,6 @@
 using Content.Shared.Stacks;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -29,8 +27,10 @@ public sealed partial class NcStoreLogicSystem
             });
     }
 
-    private string? TryExecuteBarterCostPlanPreCommit(EntityUid root, BarterCostPlan plan) =>
-        TryExecuteBarterCostPlan(root, plan);
+    private string? TryExecuteBarterCostPlanPreCommit(EntityUid root, BarterCostPlan plan)
+    {
+        return TryExecuteBarterCostPlan(root, plan);
+    }
 
     private bool ValidateBarterCostReservation(EntityUid root, BarterCostReservation reservation)
     {

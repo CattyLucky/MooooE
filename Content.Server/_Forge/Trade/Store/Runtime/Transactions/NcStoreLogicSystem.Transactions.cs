@@ -2,23 +2,21 @@ using Content.Shared._Forge.Trade;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
     public bool TryBuy(string listingId, EntityUid machine, NcStoreComponent? store, EntityUid user, int count = 1)
     {
         if (!TryPrepareBuy(
-            listingId,
-            store,
-            user,
-            count,
-            out var listing,
-            out var effectiveProtoId,
-            out _,
-            out var plan))
+                listingId,
+                store,
+                user,
+                count,
+                out var listing,
+                out var effectiveProtoId,
+                out _,
+                out var plan))
             return false;
 
         var rewards = _transactionCoordinator.BuildSingleReward(
@@ -26,13 +24,13 @@ public sealed partial class NcStoreLogicSystem
             effectiveProtoId,
             plan.TotalUnits);
         if (!TryExecuteRewardListWithPreCommit(
-            user,
-            rewards,
-            "Buy",
-            () => TryTakeCurrency(user, plan.Currency, plan.TotalPrice)
-                ? null
-                : $"failed to take currency '{plan.Currency}' x{plan.TotalPrice}",
-            out var reason))
+                user,
+                rewards,
+                "Buy",
+                () => TryTakeCurrency(user, plan.Currency, plan.TotalPrice)
+                    ? null
+                    : $"failed to take currency '{plan.Currency}' x{plan.TotalPrice}",
+                out var reason))
         {
             Sawmill.Warning($"[NcStore] TryBuy failed for listing '{listing.Id}': {reason}");
             return false;
@@ -65,8 +63,8 @@ public sealed partial class NcStoreLogicSystem
             return false;
 
         if (!store.ListingIndex.TryGetValue(
-            NcStoreComponent.MakeListingKey(StoreMode.Buy, listingId),
-            out var foundListing))
+                NcStoreComponent.MakeListingKey(StoreMode.Buy, listingId),
+                out var foundListing))
             return false;
 
         // Phase M2: for Matcher listings, ProductEntity is an NcMatcherPrototype id. Resolve
@@ -116,7 +114,7 @@ public sealed partial class NcStoreLogicSystem
                 return false;
             }
 
-            if (matcher.Items is not { Count: > 0, })
+            if (matcher.Items is not { Count: > 0 })
             {
                 Sawmill.Warning(
                     $"[NcStore] Buy prepare failed: matcher '{listing.ProductEntity}' has no items to pick from.");
@@ -160,7 +158,7 @@ public sealed partial class NcStoreLogicSystem
         if (!TryComputeBuyTotals(unitPrice, purchases, unitsPerPurchase, out var totalPrice, out var totalUnits))
             return false;
 
-        plan = new(currency, unitPrice, purchases, totalPrice, totalUnits, unitsPerPurchase);
+        plan = new BuyExecutionPlan(currency, unitPrice, purchases, totalPrice, totalUnits, unitsPerPurchase);
         return true;
     }
 
@@ -175,16 +173,16 @@ public sealed partial class NcStoreLogicSystem
         totalPrice = 0;
         totalUnits = 0;
 
-        var totalPriceLong = (long) unitPrice * purchases;
+        var totalPriceLong = (long)unitPrice * purchases;
         if (totalPriceLong > int.MaxValue)
             return false;
 
-        var totalUnitsLong = (long) purchases * unitsPerPurchase;
+        var totalUnitsLong = (long)purchases * unitsPerPurchase;
         if (totalUnitsLong <= 0 || totalUnitsLong > int.MaxValue)
             return false;
 
-        totalPrice = (int) totalPriceLong;
-        totalUnits = (int) totalUnitsLong;
+        totalPrice = (int)totalPriceLong;
+        totalUnits = (int)totalUnitsLong;
         return true;
     }
 
@@ -199,9 +197,11 @@ public sealed partial class NcStoreLogicSystem
         BuyExecutionPlan plan,
         int spawnedUnits,
         int deliveredPurchases
-    ) =>
+    )
+    {
         Sawmill.Info(
             $"TryBuy: OK {listing.ProductEntity} x{spawnedUnits} ({deliveredPurchases} purchases) for {plan.UnitPrice} {plan.Currency} each");
+    }
 
     public bool TrySell(string listingId, EntityUid machine, NcStoreComponent? store, EntityUid user, int count = 1)
     {
@@ -222,7 +222,7 @@ public sealed partial class NcStoreLogicSystem
         if (store == null)
             return false;
         return TrySellScenario(listingId, store, user, container, count, out var sold) &&
-            LogSellFromContainer(sold, listingId, store, container);
+               LogSellFromContainer(sold, listingId, store, container);
     }
 
     private bool TrySellScenario(
@@ -238,8 +238,8 @@ public sealed partial class NcStoreLogicSystem
         if (store.Listings.Count == 0 || count <= 0)
             return false;
         if (!store.ListingIndex.TryGetValue(
-            NcStoreComponent.MakeListingKey(StoreMode.Sell, listingId),
-            out var listing))
+                NcStoreComponent.MakeListingKey(StoreMode.Sell, listingId),
+                out var listing))
             return false;
         if (!TryPickCurrencyForSell(store, listing, out var currency, out var unitPrice) || unitPrice <= 0)
             return false;
@@ -266,11 +266,11 @@ public sealed partial class NcStoreLogicSystem
         if (actual <= 0)
             return false;
 
-        var totalL = (long) unitPrice * actual;
+        var totalL = (long)unitPrice * actual;
         if (totalL > int.MaxValue)
             return false;
 
-        if (!CanGiveCurrency(user, currency, (int) totalL))
+        if (!CanGiveCurrency(user, currency, (int)totalL))
         {
             Sawmill.Error(
                 $"TrySell: payout currency '{currency}' cannot be issued to {ToPrettyString(user)}; " +
@@ -278,13 +278,13 @@ public sealed partial class NcStoreLogicSystem
             return false;
         }
 
-        var rewards = _transactionCoordinator.BuildSingleReward(StoreRewardType.Currency, currency, (int) totalL);
+        var rewards = _transactionCoordinator.BuildSingleReward(StoreRewardType.Currency, currency, (int)totalL);
         if (!TryExecuteRewardListWithPreCommit(
-            user,
-            rewards,
-            "Sell",
-            () => TryCommitSellTake(root, listing, actual),
-            out var reason))
+                user,
+                rewards,
+                "Sell",
+                () => TryCommitSellTake(root, listing, actual),
+                out var reason))
         {
             Sawmill.Warning($"[NcStore] TrySell failed for listing '{listing.Id}': {reason}");
             return false;
@@ -303,28 +303,30 @@ public sealed partial class NcStoreLogicSystem
         return true;
     }
 
-    private string? TryCommitSellTake(EntityUid root, NcStoreListingDef listing, int amount) =>
-        _transactionCoordinator.TryCommitInventoryTake(
+    private string? TryCommitSellTake(EntityUid root, NcStoreListingDef listing, int amount)
+    {
+        return _transactionCoordinator.TryCommitInventoryTake(
             "Sell",
             () =>
             {
                 if (!_inventory.TryTakeProductUnitsFromRootCached(
-                    root,
-                    listing.ProductEntity,
-                    amount,
-                    listing.MatchMode))
+                        root,
+                        listing.ProductEntity,
+                        amount,
+                        listing.MatchMode))
                     return $"failed to consume sold product '{listing.ProductEntity}' x{amount}";
 
                 return null;
             });
+    }
 
     private bool LogSellFromContainer(int sold, string listingId, NcStoreComponent store, EntityUid container)
     {
         if (sold <= 0)
             return false;
         if (!store.ListingIndex.TryGetValue(
-            NcStoreComponent.MakeListingKey(StoreMode.Sell, listingId),
-            out var listing))
+                NcStoreComponent.MakeListingKey(StoreMode.Sell, listingId),
+                out var listing))
             return true;
         if (!TryPickCurrencyForSell(store, listing, out var currency, out var unitPrice) || unitPrice <= 0)
             return true;

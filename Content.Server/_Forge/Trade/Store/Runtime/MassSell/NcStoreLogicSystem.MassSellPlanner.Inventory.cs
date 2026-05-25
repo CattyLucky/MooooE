@@ -1,8 +1,6 @@
 using Content.Shared.Stacks;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcStoreLogicSystem
 {
@@ -32,7 +30,7 @@ public sealed partial class NcStoreLogicSystem
             TrackMassSellPrototypeEntity(ent, protoCounts, 1);
         }
 
-        return new(stackTypeCounts, protoCounts, stackTypeProtoCounts);
+        return new MassSellInventoryState(stackTypeCounts, protoCounts, stackTypeProtoCounts);
     }
 
     private void TrackMassSellStackEntity(
@@ -61,7 +59,7 @@ public sealed partial class NcStoreLogicSystem
 
         if (!stackTypeProtoCounts.TryGetValue(stackTypeId, out var perProto))
         {
-            perProto = new(StringComparer.Ordinal);
+            perProto = new Dictionary<string, int>(StringComparer.Ordinal);
             stackTypeProtoCounts[stackTypeId] = perProto;
         }
 

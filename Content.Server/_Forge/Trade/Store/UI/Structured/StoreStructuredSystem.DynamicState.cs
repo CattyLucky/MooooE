@@ -1,9 +1,7 @@
 using System.Diagnostics;
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreStructuredSystem : EntitySystem
 {
@@ -63,14 +61,18 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         }
     }
 
-    private static double GetElapsedMilliseconds(long started) =>
-        (Stopwatch.GetTimestamp() - started) * 1000d /
-        Stopwatch.Frequency;
+    private static double GetElapsedMilliseconds(long started)
+    {
+        return (Stopwatch.GetTimestamp() - started) * 1000d /
+               Stopwatch.Frequency;
+    }
 
-    private EntityUid? GetDynamicCrate(EntityUid user) =>
-        _logic.TryGetPulledClosedCrate(user, out var pulledCrate)
+    private EntityUid? GetDynamicCrate(EntityUid user)
+    {
+        return _logic.TryGetPulledClosedCrate(user, out var pulledCrate)
             ? pulledCrate
             : null;
+    }
 
     private DynamicTabState GetDynamicTabState(NcStoreComponent comp)
     {
@@ -91,7 +93,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
                 break;
         }
 
-        return new(hasBuyTab, hasSellTab, hasBarterTab, HasContractsProfile(comp));
+        return new DynamicTabState(hasBuyTab, hasSellTab, hasBarterTab, HasContractsProfile(comp));
     }
 
     private DynamicContractNeeds GetDynamicContractNeeds(NcStoreComponent comp, bool hasContractsTab)
@@ -106,7 +108,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             out var needCrateItems,
             out var needStoreWorldItems);
 
-        return new(hasTakenContracts, needUserItems, needCrateItems, needStoreWorldItems);
+        return new DynamicContractNeeds(hasTakenContracts, needUserItems, needCrateItems, needStoreWorldItems);
     }
 
     private static DynamicScanNeeds GetDynamicScanNeeds(
@@ -119,7 +121,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         var needUserSnapshot = NeedsDynamicUserSnapshot(comp);
         var needUserItems = needUserSnapshot || contractNeeds.NeedUserItems;
         var needCrateScan = crateUid != null && (hasSellTab || contractNeeds.NeedCrateItems);
-        return new(needUserSnapshot, needUserItems, needCrateScan);
+        return new DynamicScanNeeds(needUserSnapshot, needUserItems, needCrateScan);
     }
 
     private static bool NeedsDynamicUserSnapshot(NcStoreComponent comp)
@@ -289,13 +291,20 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         }
     }
 
-    private static bool IsVisibleBuyListing(NcStoreListingDef listing, DynamicScratch scratch) =>
-        listing.Mode == StoreMode.Buy && scratch.ShouldSendBuyDynamicFor(listing.Id);
+    private static bool IsVisibleBuyListing(NcStoreListingDef listing, DynamicScratch scratch)
+    {
+        return listing.Mode == StoreMode.Buy && scratch.ShouldSendBuyDynamicFor(listing.Id);
+    }
 
-    private static bool ShouldSendListingRemaining(NcStoreListingDef listing, bool isVisibleBuyListing) =>
-        listing.RemainingCount != -1 || isVisibleBuyListing;
+    private static bool ShouldSendListingRemaining(NcStoreListingDef listing, bool isVisibleBuyListing)
+    {
+        return listing.RemainingCount != -1 || isVisibleBuyListing;
+    }
 
-    private static bool ShouldSendListingOwned(int owned, bool isVisibleBuyListing) => owned > 0 || isVisibleBuyListing;
+    private static bool ShouldSendListingOwned(int owned, bool isVisibleBuyListing)
+    {
+        return owned > 0 || isVisibleBuyListing;
+    }
 
     private void PopulateDynamicCratePreview(
         EntityUid store,

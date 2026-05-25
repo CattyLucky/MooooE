@@ -1,8 +1,6 @@
 using Content.Shared._Forge.Trade;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class NcContractSystem : EntitySystem
 {
@@ -32,8 +30,10 @@ public sealed partial class NcContractSystem : EntitySystem
         _objectiveHandlers[handler.Kind] = handler;
     }
 
-    private bool TryGetObjectiveHandler(ContractExecutionKind kind, out IContractObjectiveHandler handler) =>
-        _objectiveHandlers.TryGetValue(kind, out handler!);
+    private bool TryGetObjectiveHandler(ContractExecutionKind kind, out IContractObjectiveHandler handler)
+    {
+        return _objectiveHandlers.TryGetValue(kind, out handler!);
+    }
 
     private interface IContractObjectiveHandler
     {
@@ -109,8 +109,10 @@ public sealed partial class NcContractSystem : EntitySystem
             EntityUid user,
             string contractId,
             ContractServerData contract
-        ) =>
-            true;
+        )
+        {
+            return true;
+        }
 
         public virtual bool TryUpdateProgress(
             NcContractSystem system,
@@ -119,8 +121,10 @@ public sealed partial class NcContractSystem : EntitySystem
             ContractServerData contract,
             IReadOnlyList<EntityUid> userItems,
             IReadOnlyList<EntityUid>? crateItems
-        ) =>
-            false;
+        )
+        {
+            return false;
+        }
 
         public virtual void RefreshObjectiveProgress(
             NcContractSystem system,
@@ -139,14 +143,18 @@ public sealed partial class NcContractSystem : EntitySystem
             ref bool needsUserItems,
             ref bool needsCrateItems,
             ref bool needsStoreWorldItems
-        ) { }
+        )
+        {
+        }
 
         public virtual void OnTrackedTargetResolved(
             NcContractSystem system,
             (EntityUid Store, string ContractId) key,
             NcStoreComponent comp,
             ContractServerData contract
-        ) { }
+        )
+        {
+        }
     }
 
     private sealed class InventoryDeliveryObjectiveHandler : ContractObjectiveHandlerBase
@@ -160,8 +168,10 @@ public sealed partial class NcContractSystem : EntitySystem
             string contractId,
             NcStoreComponent comp,
             ContractServerData contract
-        ) =>
-            system.TryClaimInventoryDeliveryContract(store, user, contractId, comp, contract);
+        )
+        {
+            return system.TryClaimInventoryDeliveryContract(store, user, contractId, comp, contract);
+        }
 
         public override bool TryInitializeRuntimeOnTake(
             NcContractSystem system,
@@ -169,8 +179,10 @@ public sealed partial class NcContractSystem : EntitySystem
             EntityUid user,
             string contractId,
             ContractServerData contract
-        ) =>
-            system.TryInitializeInventoryDeliverySupportRuntime(store, user, contractId, contract);
+        )
+        {
+            return system.TryInitializeInventoryDeliverySupportRuntime(store, user, contractId, contract);
+        }
 
         public override void AnalyzeProgressRequirements(
             ContractServerData contract,
@@ -196,8 +208,10 @@ public sealed partial class NcContractSystem : EntitySystem
             string contractId,
             NcStoreComponent comp,
             ContractServerData contract
-        ) =>
-            system.TryClaimTrackedDeliveryContract(store, user, contractId, comp, contract);
+        )
+        {
+            return system.TryClaimTrackedDeliveryContract(store, user, contractId, comp, contract);
+        }
 
         public override bool TryInitializeRuntimeOnTake(
             NcContractSystem system,
@@ -205,8 +219,10 @@ public sealed partial class NcContractSystem : EntitySystem
             EntityUid user,
             string contractId,
             ContractServerData contract
-        ) =>
-            system.TryInitializeDeliveryObjectiveRuntime(store, user, contractId, contract);
+        )
+        {
+            return system.TryInitializeDeliveryObjectiveRuntime(store, user, contractId, contract);
+        }
 
         public override bool TryUpdateProgress(
             NcContractSystem system,
@@ -237,8 +253,10 @@ public sealed partial class NcContractSystem : EntitySystem
             (EntityUid Store, string ContractId) key,
             NcStoreComponent comp,
             ContractServerData contract
-        ) =>
+        )
+        {
             system.HandleTrackedDeliveryTargetResolved(key, comp, contract);
+        }
     }
 
     private sealed class RetrievalRouteDeliveryObjectiveHandler : ContractObjectiveHandlerBase
@@ -252,8 +270,10 @@ public sealed partial class NcContractSystem : EntitySystem
             string contractId,
             NcStoreComponent comp,
             ContractServerData contract
-        ) =>
-            system.TryClaimRetrievalRouteReward(store, user, contractId, comp, contract);
+        )
+        {
+            return system.TryClaimRetrievalRouteReward(store, user, contractId, comp, contract);
+        }
 
         public override bool TryInitializeRuntimeOnTake(
             NcContractSystem system,
@@ -261,8 +281,10 @@ public sealed partial class NcContractSystem : EntitySystem
             EntityUid user,
             string contractId,
             ContractServerData contract
-        ) =>
-            system.TryInitializeInventoryDeliverySupportRuntime(store, user, contractId, contract);
+        )
+        {
+            return system.TryInitializeInventoryDeliverySupportRuntime(store, user, contractId, contract);
+        }
 
         public override bool TryUpdateProgress(
             NcContractSystem system,
@@ -289,8 +311,10 @@ public sealed partial class NcContractSystem : EntitySystem
             string contractId,
             NcStoreComponent comp,
             ContractServerData contract
-        ) =>
-            system.TryClaimObjectiveContract(store, user, contractId, comp, contract);
+        )
+        {
+            return system.TryClaimObjectiveContract(store, user, contractId, comp, contract);
+        }
 
         public override bool TryInitializeRuntimeOnTake(
             NcContractSystem system,
@@ -298,8 +322,10 @@ public sealed partial class NcContractSystem : EntitySystem
             EntityUid user,
             string contractId,
             ContractServerData contract
-        ) =>
-            system.TryInitializeHuntObjectiveRuntimeOnTake(store, user, contractId, contract);
+        )
+        {
+            return system.TryInitializeHuntObjectiveRuntimeOnTake(store, user, contractId, contract);
+        }
 
         public override bool TryUpdateProgress(
             NcContractSystem system,
@@ -334,8 +360,10 @@ public sealed partial class NcContractSystem : EntitySystem
             (EntityUid Store, string ContractId) key,
             NcStoreComponent comp,
             ContractServerData contract
-        ) =>
+        )
+        {
             system.HandleHuntObjectiveTargetResolved(key, comp, contract);
+        }
     }
 
     private sealed class GhostRoleObjectiveHandler : ContractObjectiveHandlerBase
@@ -349,8 +377,10 @@ public sealed partial class NcContractSystem : EntitySystem
             string contractId,
             NcStoreComponent comp,
             ContractServerData contract
-        ) =>
-            system.TryClaimObjectiveContract(store, user, contractId, comp, contract);
+        )
+        {
+            return system.TryClaimObjectiveContract(store, user, contractId, comp, contract);
+        }
 
         public override bool TryInitializeRuntimeOnTake(
             NcContractSystem system,
@@ -358,8 +388,10 @@ public sealed partial class NcContractSystem : EntitySystem
             EntityUid user,
             string contractId,
             ContractServerData contract
-        ) =>
-            system.TryInitializeGhostRoleObjective(store, user, contractId, contract);
+        )
+        {
+            return system.TryInitializeGhostRoleObjective(store, user, contractId, contract);
+        }
 
         public override bool TryUpdateProgress(
             NcContractSystem system,
@@ -390,8 +422,10 @@ public sealed partial class NcContractSystem : EntitySystem
             (EntityUid Store, string ContractId) key,
             NcStoreComponent comp,
             ContractServerData contract
-        ) =>
+        )
+        {
             system.HandleGhostRoleTargetResolved(key, comp, contract);
+        }
     }
 
     private sealed class ArtifactStudyObjectiveHandler : ContractObjectiveHandlerBase
@@ -405,8 +439,10 @@ public sealed partial class NcContractSystem : EntitySystem
             string contractId,
             NcStoreComponent comp,
             ContractServerData contract
-        ) =>
-            system.TryClaimArtifactStudyContract(store, user, contractId, comp, contract);
+        )
+        {
+            return system.TryClaimArtifactStudyContract(store, user, contractId, comp, contract);
+        }
 
         public override bool TryInitializeRuntimeOnTake(
             NcContractSystem system,
@@ -414,8 +450,10 @@ public sealed partial class NcContractSystem : EntitySystem
             EntityUid user,
             string contractId,
             ContractServerData contract
-        ) =>
-            system.TryInitializeArtifactStudyObjective(store, user, contractId, contract);
+        )
+        {
+            return system.TryInitializeArtifactStudyObjective(store, user, contractId, contract);
+        }
 
         public override bool TryUpdateProgress(
             NcContractSystem system,
@@ -435,8 +473,10 @@ public sealed partial class NcContractSystem : EntitySystem
             EntityUid store,
             string contractId,
             ContractServerData contract
-        ) =>
+        )
+        {
             system.SyncArtifactStudyObjectiveProgress(store, contractId, contract);
+        }
 
         public override void AnalyzeProgressRequirements(
             ContractServerData contract,
@@ -454,7 +494,9 @@ public sealed partial class NcContractSystem : EntitySystem
             (EntityUid Store, string ContractId) key,
             NcStoreComponent comp,
             ContractServerData contract
-        ) =>
+        )
+        {
             system.HandleArtifactStudyTargetResolved(key, comp, contract);
+        }
     }
 }

@@ -11,9 +11,7 @@ using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
-
 namespace Content.Server._Forge.Trade;
-
 
 public sealed partial class StoreStructuredSystem : EntitySystem
 {
@@ -65,7 +63,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         if (_dynamicScratchByStore.TryGetValue(storeUid, out var scratch))
             return scratch;
 
-        scratch = new();
+        scratch = new DynamicScratch();
         _dynamicScratchByStore[storeUid] = scratch;
         return scratch;
     }
