@@ -11,6 +11,10 @@
       minVisible: 2
       maxVisible: 3
       fillWeight: 2
+    - pool: ForgeExpeditionArtifactStudyOrders
+      minVisible: 3
+      maxVisible: 3
+      fillWeight: 1
     - pool: ForgeExpeditionGhostOrders
       minVisible: 1
       maxVisible: 2
@@ -46,9 +50,16 @@
   - type: Hunt
     id: ForgeTestHuntCarps
     weight: 2
+
+- type: ncContractOfferPool
+  id: ForgeExpeditionArtifactStudyOrders
+  name: "Изучение артефактов"
+  order: 25
+  color: "#9C6ADE"
+  entries:
   - type: ArtifactStudy
     id: ForgeTestStudyArtifactEasy
-    weight: 2
+    weight: 1
   - type: ArtifactStudy
     id: ForgeTestStudyArtifactMedium
     weight: 1
