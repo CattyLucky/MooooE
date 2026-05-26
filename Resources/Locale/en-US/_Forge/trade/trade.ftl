@@ -42,6 +42,11 @@ nc-store-popup-invalid-listing = This listing is no longer available.
 nc-store-popup-transaction-failed = The transaction failed.
 
 nc-store-contracts-empty = No active contracts are available. Check back later.
+nc-store-contracts-category-empty = No contracts are currently available in this category.
+nc-store-contract-category-all = All
+nc-store-contract-category-button = { $name } ({ $count })
+nc-store-contract-category-all-tooltip = Show every available contract.
+nc-store-contract-category-tooltip = Show contracts in the "{ $category }" category.
 nc-store-contract-title-fallback = Contract
 nc-store-contract-badge-single = One-time
 nc-store-contract-badge-single-tooltip =

@@ -42,6 +42,11 @@ nc-store-popup-invalid-listing = Этот лот больше недоступе
 nc-store-popup-transaction-failed = Сделка не удалась.
 
 nc-store-contracts-empty = Активных контрактов пока нет. Проверьте позже.
+nc-store-contracts-category-empty = В этой категории сейчас нет контрактов.
+nc-store-contract-category-all = Все
+nc-store-contract-category-button = { $name } ({ $count })
+nc-store-contract-category-all-tooltip = Показать все доступные контракты.
+nc-store-contract-category-tooltip = Показать контракты категории «{ $category }».
 nc-store-contract-title-fallback = Контракт
 nc-store-contract-badge-single = Разовый
 nc-store-contract-badge-single-tooltip =
