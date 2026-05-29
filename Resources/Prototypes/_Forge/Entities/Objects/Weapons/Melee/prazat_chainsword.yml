@@ -82,9 +82,9 @@
         variation: 0.025
     activatedDamage:
       types:
-        Slash: 60
+        Slash: 55
         Piercing: 10
-        Structural: 100
+        Structural: 50
   - type: ToggleableVisuals
     spriteLayer: chainsword
     inhandVisuals:
