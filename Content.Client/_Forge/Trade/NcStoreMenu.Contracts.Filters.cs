@@ -162,13 +162,15 @@ public sealed partial class NcStoreMenu
                 ? Loc.GetString("nc-store-contract-category-all-tooltip")
                 : Loc.GetString("nc-store-contract-category-tooltip", ("category", name)),
             ToggleMode = true,
-            Group = _contractPoolButtonGroup,
-            Pressed = string.Equals(id, _selectedContractPoolFilterId, StringComparison.Ordinal),
             ClipText = false,
             HorizontalExpand = false,
             MinWidth = CalculateContractFilterButtonMinWidth(name, count),
             Margin = new(0, 0, 2, 0)
         };
+
+        button.Group = _contractPoolButtonGroup;
+        if (string.Equals(id, _selectedContractPoolFilterId, StringComparison.Ordinal) && !button.Pressed)
+            button.Pressed = true;
 
         button.ModulateSelfOverride = Color.White;
         button.OnPressed += _ => SelectContractPoolFilter(id);
@@ -192,10 +194,18 @@ public sealed partial class NcStoreMenu
 
     private void UpdateContractPoolFilterButtonStates()
     {
+        if (!_contractPoolButtonsById.TryGetValue(_selectedContractPoolFilterId, out var selectedButton))
+        {
+            _selectedContractPoolFilterId = ContractAllPoolFilterId;
+            _contractPoolButtonsById.TryGetValue(_selectedContractPoolFilterId, out selectedButton);
+        }
+
+        if (selectedButton != null && !selectedButton.Pressed)
+            selectedButton.Pressed = true;
+
         foreach (var (id, button) in _contractPoolButtonsById)
         {
-            var selected = string.Equals(id, _selectedContractPoolFilterId, StringComparison.Ordinal);
-            button.Pressed = selected;
+            var selected = ReferenceEquals(button, selectedButton);
             button.StyleBoxOverride = CreateContractPoolFilterButtonStyle(id, selected);
             button.ModulateSelfOverride = Color.White;
             button.Label.FontColorOverride = selected

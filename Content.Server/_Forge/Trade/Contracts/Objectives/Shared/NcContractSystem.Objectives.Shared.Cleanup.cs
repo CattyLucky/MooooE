@@ -27,9 +27,13 @@ public sealed partial class NcContractSystem : EntitySystem
 
         DeactivateTrackedDeliveryDropoff(key, state);
 
+        state.HuntDungeonGenerationTask = null;
+        state.HuntPendingPinpointerUser = null;
+
         CleanupRetrievalSpawnedEntities(state, deleteTrackedEntities);
         CleanupSpawnedHuntBodyTarget(state, deleteTrackedEntities);
         CleanupHuntSpawnedTargets(state, deleteTrackedEntities);
+        CleanupHuntDebris(state, deleteTrackedEntities);
 
         CleanupObjectivePinpointers(key, state);
         CleanupGhostRoleSurvivalObjective(state);
@@ -162,5 +166,16 @@ public sealed partial class NcContractSystem : EntitySystem
 
         if (deleteBody && !TerminatingOrDeleted(body))
             Del(body);
+    }
+
+    private void CleanupHuntDebris(ObjectiveRuntimeState state, bool deleteDebris)
+    {
+        if (state.HuntDebrisEntity is not { } debris || debris == EntityUid.Invalid)
+            return;
+
+        state.HuntDebrisEntity = null;
+
+        if (deleteDebris && !TerminatingOrDeleted(debris))
+            Del(debris);
     }
 }

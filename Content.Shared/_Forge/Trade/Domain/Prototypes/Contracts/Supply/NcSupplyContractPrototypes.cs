@@ -1,4 +1,5 @@
 using Robust.Shared.Prototypes;
+using Content.Shared.FixedPoint;
 
 
 namespace Content.Shared._Forge.Trade;
@@ -18,6 +19,18 @@ public sealed partial class NcSupplyTargetEntry
     /// <summary>ncTradeTag id. Trade tag targets wrap a TagPrototype plus UI metadata.</summary>
     [DataField("tagTarget")]
     public string TagTarget { get; set; } = string.Empty;
+
+    /// <summary>ReagentPrototype id required in the target solution.</summary>
+    [DataField("reagent")]
+    public string Reagent { get; set; } = string.Empty;
+
+    /// <summary>Solution name used for reagent targets.</summary>
+    [DataField("solution")]
+    public string Solution { get; set; } = "drink";
+
+    /// <summary>Minimum amount of the reagent required in one non-stack turn-in item.</summary>
+    [DataField("reagentAmount")]
+    public FixedPoint2 ReagentAmount { get; set; } = FixedPoint2.New(1);
 
     /// <summary>Required amount. If this is a range, it is rolled once when the contract is generated.</summary>
     [DataField("count", required: true)]
@@ -58,6 +71,13 @@ public sealed partial class NcSupplyContractPrototype : IPrototype
     /// <summary>Optional number of targets to pick from the targets pool. Fixed 0 means unset / require all targets.</summary>
     [DataField("targetCount", required: false)]
     public IntRange TargetCount { get; private set; } = IntRange.Fixed(0);
+
+    /// <summary>
+    /// Fraction of consumed non-stack turn-in entities returned to the claimant.
+    /// Returned entities are marked as blocked from future contract turn-in.
+    /// </summary>
+    [DataField("returnFraction")]
+    public float ReturnFraction { get; private set; }
 
     /// <summary>Unified Supply rewards. Use type: Currency, Item or Pool with count.</summary>
     [DataField("reward", required: true)]

@@ -52,6 +52,8 @@ public sealed partial class NcContractSystem : EntitySystem
                     hasCrateWork,
                     ordered.ProtoId,
                     ordered.MatchMode,
+                    "drink",
+                    default,
                     required);
         }
     }

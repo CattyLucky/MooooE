@@ -356,10 +356,14 @@ public sealed partial class NcContractCard : PanelContainer
         if (_data.Targets is { Count: > 0, })
         {
             foreach (var target in _data.Targets)
-                GoalsHost.AddChild(BuildTargetRow(target.TargetItem, target.Required, target.MatchMode));
+                GoalsHost.AddChild(BuildTargetRow(
+                    target.TargetItem,
+                    target.Required,
+                    target.MatchMode,
+                    _data.Icon));
         }
         else if (!string.IsNullOrWhiteSpace(_data.TargetItem))
-            GoalsHost.AddChild(BuildTargetRow(_data.TargetItem, _data.Required));
+            GoalsHost.AddChild(BuildTargetRow(_data.TargetItem, _data.Required, PrototypeMatchMode.Exact, _data.Icon));
     }
 
     private void PopulateTurnIn()

@@ -1,4 +1,5 @@
 using Content.Shared._Forge.Trade;
+using Content.Shared.FixedPoint;
 using Content.Shared.Stacks;
 
 namespace Content.Server._Forge.Trade;
@@ -42,6 +43,8 @@ public sealed partial class NcContractSystem : EntitySystem
             hasCrateWork,
             target.TargetItem,
             target.MatchMode,
+            target.Solution,
+            target.ReagentAmount,
             required);
 
         target.Progress = progressed;
@@ -61,6 +64,8 @@ public sealed partial class NcContractSystem : EntitySystem
         bool hasCrateWork,
         string targetItem,
         PrototypeMatchMode matchMode,
+        string solution,
+        FixedPoint2 reagentAmount,
         int required
     )
     {
@@ -77,6 +82,8 @@ public sealed partial class NcContractSystem : EntitySystem
             hasCrateWork,
             targetItem,
             matchMode,
+            solution,
+            reagentAmount,
             required);
 
         return Math.Clamp(progressed, 0, required);
@@ -92,16 +99,18 @@ public sealed partial class NcContractSystem : EntitySystem
         bool hasCrateWork,
         string targetItem,
         PrototypeMatchMode matchMode,
+        string solution,
+        FixedPoint2 reagentAmount,
         int required
     )
     {
         var need = required;
 
         if (crate is { } crateRoot && hasCrateWork)
-            need -= ReserveProgressFromSource(crateRoot, crateItems, targetItem, matchMode, need);
+            need -= ReserveProgressFromSource(crateRoot, crateItems, targetItem, matchMode, need, solution, reagentAmount);
 
-        need -= ReserveProgressFromSource(user, userItems, targetItem, matchMode, need);
-        need -= ReserveProgressFromSource(store, storeNearbyItems, targetItem, matchMode, need, true);
+        need -= ReserveProgressFromSource(user, userItems, targetItem, matchMode, need, solution, reagentAmount);
+        need -= ReserveProgressFromSource(store, storeNearbyItems, targetItem, matchMode, need, solution, reagentAmount, true);
 
         var progressed = required - Math.Max(0, need);
         return Math.Max(0, progressed);
@@ -113,6 +122,8 @@ public sealed partial class NcContractSystem : EntitySystem
         string targetItem,
         PrototypeMatchMode matchMode,
         int need,
+        string solution,
+        FixedPoint2 reagentAmount,
         bool worldTurnInSource = false
     )
     {
@@ -125,6 +136,8 @@ public sealed partial class NcContractSystem : EntitySystem
             targetItem,
             matchMode,
             need,
+            solution,
+            reagentAmount,
             _progressVirtualStackLeftScratch,
             _progressConsumedEntitiesScratch,
             worldTurnInSource);
@@ -169,6 +182,8 @@ public sealed partial class NcContractSystem : EntitySystem
         string expectedProtoId,
         PrototypeMatchMode matchMode,
         int need,
+        string solution,
+        FixedPoint2 reagentAmount,
         Dictionary<EntityUid, int> virtualStackLeft,
         HashSet<EntityUid> consumedNonStack,
         bool worldTurnInSource = false
@@ -176,6 +191,17 @@ public sealed partial class NcContractSystem : EntitySystem
     {
         if (need <= 0)
             return 0;
+
+        if (matchMode == PrototypeMatchMode.Reagent)
+            return ReserveProgressFromReagentItems(
+                root,
+                items,
+                expectedProtoId,
+                solution,
+                reagentAmount,
+                need,
+                consumedNonStack,
+                worldTurnInSource);
 
         return TryGetStackTypeId(expectedProtoId, out var stackTypeId)
             ? ReserveProgressFromStackItems(root, items, stackTypeId, need, virtualStackLeft, worldTurnInSource)
@@ -188,6 +214,38 @@ public sealed partial class NcContractSystem : EntitySystem
                 virtualStackLeft,
                 consumedNonStack,
                 worldTurnInSource);
+    }
+
+    private int ReserveProgressFromReagentItems(
+        EntityUid root,
+        IReadOnlyList<EntityUid> items,
+        string reagentId,
+        string solution,
+        FixedPoint2 reagentAmount,
+        int need,
+        HashSet<EntityUid> consumedNonStack,
+        bool worldTurnInSource
+    )
+    {
+        var reserved = 0;
+
+        for (var i = 0; i < items.Count && reserved < need; i++)
+        {
+            var ent = items[i];
+            if (!CanUseContractPlanningEntity(root, ent, worldTurnInSource))
+                continue;
+
+            if (TryComp(ent, out StackComponent? _))
+                continue;
+
+            if (!MatchesReagentTarget(ent, reagentId, solution, reagentAmount))
+                continue;
+
+            if (consumedNonStack.Add(ent))
+                reserved += 1;
+        }
+
+        return reserved;
     }
 
     private int ReserveProgressFromStackItems(

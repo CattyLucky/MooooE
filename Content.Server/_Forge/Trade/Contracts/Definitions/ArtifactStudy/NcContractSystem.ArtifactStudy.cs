@@ -33,6 +33,7 @@ public sealed partial class NcContractSystem : EntitySystem
         {
             Id = proto.ID,
             Name = proto.Name,
+            Icon = proto.Icon,
             Description = proto.Description,
             Repeatable = proto.Repeatable,
             Taken = false,

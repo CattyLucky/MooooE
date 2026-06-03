@@ -1,4 +1,6 @@
 using Content.Shared._Forge.Trade;
+using Content.Shared.Chemistry.Reagent;
+using Content.Shared.FixedPoint;
 using Content.Shared.Tag;
 using Robust.Shared.Prototypes;
 
@@ -27,6 +29,9 @@ public sealed partial class NcContractSystem : EntitySystem
         if (!TryValidateSupplyTargetCount(proto))
             valid = false;
 
+        if (!TryValidateSupplyReturnFraction(proto))
+            valid = false;
+
         for (var i = 0; i < proto.Targets.Count; i++)
         {
             if (!TryValidateSupplyTarget(proto.ID, i, proto.Targets[i]))
@@ -40,6 +45,16 @@ public sealed partial class NcContractSystem : EntitySystem
             valid = false;
 
         return valid;
+    }
+
+    private bool TryValidateSupplyReturnFraction(NcSupplyContractPrototype proto)
+    {
+        if (proto.ReturnFraction >= 0f && proto.ReturnFraction <= 1f)
+            return true;
+
+        Sawmill.Warning(
+            $"[Contracts] Supply contract '{proto.ID}' has invalid returnFraction={proto.ReturnFraction}. Expected 0..1.");
+        return false;
     }
 
     private bool TryValidateSupplyTargetCount(NcSupplyContractPrototype proto)
@@ -76,11 +91,12 @@ public sealed partial class NcContractSystem : EntitySystem
         var hasPrototype = !string.IsNullOrWhiteSpace(entry.Prototype);
         var hasGroup = !string.IsNullOrWhiteSpace(entry.Group);
         var hasTagTarget = !string.IsNullOrWhiteSpace(entry.TagTarget);
+        var hasReagent = !string.IsNullOrWhiteSpace(entry.Reagent);
 
-        if (CountNonEmpty(entry.Prototype, entry.Group, entry.TagTarget) != 1)
+        if (CountNonEmpty(entry.Prototype, entry.Group, entry.TagTarget, entry.Reagent) != 1)
         {
             Sawmill.Warning(
-                $"[Contracts] Supply contract '{contractId}' target #{index} must specify exactly one of prototype/group/tagTarget.");
+                $"[Contracts] Supply contract '{contractId}' target #{index} must specify exactly one of prototype/group/tagTarget/reagent.");
             return false;
         }
 
@@ -103,6 +119,32 @@ public sealed partial class NcContractSystem : EntitySystem
             Sawmill.Warning(
                 $"[Contracts] Supply contract '{contractId}' target #{index} has non-positive weight={entry.Weight}. " +
                 "Weight is used when targetCount is configured and must be > 0.");
+            return false;
+        }
+
+        if (hasReagent)
+        {
+            if (string.IsNullOrWhiteSpace(entry.Solution))
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Supply contract '{contractId}' target #{index} uses reagent '{entry.Reagent}' but has empty solution.");
+                return false;
+            }
+
+            if (entry.ReagentAmount <= FixedPoint2.Zero)
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Supply contract '{contractId}' target #{index} uses reagent '{entry.Reagent}' " +
+                    $"but has non-positive reagentAmount={entry.ReagentAmount}.");
+                return false;
+            }
+
+            if (_prototypes.HasIndex<ReagentPrototype>(entry.Reagent))
+                return true;
+
+            Sawmill.Warning(
+                $"[Contracts] Supply contract '{contractId}' target #{index} references missing reagent prototype " +
+                $"'{entry.Reagent}'.");
             return false;
         }
 

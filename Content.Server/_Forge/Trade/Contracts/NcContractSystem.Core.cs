@@ -1,4 +1,5 @@
 using Content.Shared._Forge.Trade;
+using Content.Shared.Chemistry.EntitySystems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
@@ -17,6 +18,7 @@ public sealed partial class NcContractSystem : EntitySystem
     [Dependency] private readonly NcStoreInventorySystem _inventory = default!;
     [Dependency] private readonly NcStoreLogicSystem _logic = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
+    [Dependency] private readonly SharedSolutionContainerSystem _solutions = default!;
 
     private readonly Dictionary<(string ProtoId, PrototypeMatchMode MatchMode), int> _progressClaimableByKeyScratch =
         new();

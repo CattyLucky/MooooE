@@ -171,7 +171,71 @@ public sealed partial class NcContractSystem : EntitySystem
         if (!source.SpawnCargo)
             return true;
 
+        if (source.SpaceSpawn.Enabled)
+            return TryValidateRetrievalSpaceSpawn(routeId, source) &&
+                   TryValidateRetrievalSpaceSpawnAnchor(routeId, source.Point);
+
         return TryValidateRetrievalSpawnPointSelector(routeId, source.Point);
+    }
+
+    private static bool TryValidateRetrievalSpaceSpawn(string routeId, NcRetrievalSourcePresetPrototype source)
+    {
+        var valid = true;
+        var space = source.SpaceSpawn;
+
+        if (space.MinDistance < 0f)
+        {
+            Sawmill.Warning(
+                $"[Contracts] Retrieval source '{source.ID}' for route '{routeId}' spaceSpawn.minDistance must be >= 0.");
+            valid = false;
+        }
+
+        if (space.MaxDistance < 0f)
+        {
+            Sawmill.Warning(
+                $"[Contracts] Retrieval source '{source.ID}' for route '{routeId}' spaceSpawn.maxDistance must be >= 0.");
+            valid = false;
+        }
+
+        if (space.MinDistance > 0f &&
+            space.MaxDistance > 0f &&
+            space.MaxDistance < space.MinDistance)
+        {
+            Sawmill.Warning(
+                $"[Contracts] Retrieval source '{source.ID}' for route '{routeId}' spaceSpawn.maxDistance must be >= minDistance.");
+            valid = false;
+        }
+
+        if (space.SafetyRadius < 0f)
+        {
+            Sawmill.Warning(
+                $"[Contracts] Retrieval source '{source.ID}' for route '{routeId}' spaceSpawn.safetyRadius must be >= 0.");
+            valid = false;
+        }
+
+        if (space.PlacementAttempts < 0)
+        {
+            Sawmill.Warning(
+                $"[Contracts] Retrieval source '{source.ID}' for route '{routeId}' spaceSpawn.placementAttempts must be >= 0.");
+            valid = false;
+        }
+
+        return valid;
+    }
+
+    private bool TryValidateRetrievalSpaceSpawnAnchor(
+        string contractId,
+        ContractPointSelectorPrototype selector
+    )
+    {
+        return selector.Type switch
+        {
+            ContractPointSelectorType.Store => true,
+            ContractPointSelectorType.MarkerId => RequireRetrievalSpawnPointId(contractId, selector),
+            ContractPointSelectorType.MarkerGroup => RequireRetrievalSpawnPointId(contractId, selector),
+            ContractPointSelectorType.Weighted => TryValidateRetrievalSpawnWeightedSelector(contractId, selector),
+            _ => RejectRetrievalUnknownSpawnPoint(contractId, selector.Type),
+        };
     }
 
     private bool TryValidateRetrievalRouteDestination(string routeId, NcRetrievalDestinationPresetPrototype destination)

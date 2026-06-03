@@ -20,6 +20,7 @@ public sealed partial class NcContractSystem : EntitySystem
         {
             Id = proto.ID,
             Name = proto.Name,
+            Icon = proto.Icon,
             Description = proto.Description,
             Repeatable = proto.Repeatable,
             Taken = false,
@@ -46,6 +47,7 @@ public sealed partial class NcContractSystem : EntitySystem
         return new ContractObjectiveConfigData
         {
             AllowStoreWorldTurnIn = ShouldAllowSupplyStoreWorldTurnIn(proto),
+            SupplyReturnFraction = Math.Clamp(proto.ReturnFraction, 0f, 1f),
         };
     }
 
@@ -189,13 +191,14 @@ public sealed partial class NcContractSystem : EntitySystem
 
         var hasPrototype = !string.IsNullOrWhiteSpace(entry.Prototype);
         var hasTagTarget = !string.IsNullOrWhiteSpace(entry.TagTarget);
+        var hasReagent = !string.IsNullOrWhiteSpace(entry.Reagent);
 
         var required = RollFair(
             new QuasiKey(
                 QuasiKeyKind.Req,
                 store,
                 contractId,
-                $"supply-target:{index}:{entry.Prototype}:{entry.Group}:{entry.TagTarget}"),
+                $"supply-target:{index}:{entry.Prototype}:{entry.Group}:{entry.TagTarget}:{entry.Reagent}:{entry.Solution}:{entry.ReagentAmount}"),
             entry.Count,
             1);
 
@@ -222,6 +225,20 @@ public sealed partial class NcContractSystem : EntitySystem
                 Required = required,
                 Progress = 0,
                 MatchMode = PrototypeMatchMode.Tag,
+            };
+            return true;
+        }
+
+        if (hasReagent)
+        {
+            target = new ContractTargetServerData
+            {
+                TargetItem = entry.Reagent,
+                Solution = string.IsNullOrWhiteSpace(entry.Solution) ? "drink" : entry.Solution,
+                ReagentAmount = entry.ReagentAmount,
+                Required = required,
+                Progress = 0,
+                MatchMode = PrototypeMatchMode.Reagent,
             };
             return true;
         }

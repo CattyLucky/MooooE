@@ -12,6 +12,7 @@ public sealed partial class StoreStructuredSystem
         return new ContractClientData(
             contract.Id,
             contract.Name,
+            contract.Icon,
             contract.Description,
             contract.Repeatable,
             contract.Taken,
@@ -60,6 +61,8 @@ public sealed partial class StoreStructuredSystem
                     new ContractTargetClientData(target.TargetItem, target.Required, target.Progress)
                     {
                         MatchMode = target.MatchMode,
+                        Solution = target.Solution,
+                        ReagentAmount = target.ReagentAmount,
                     });
             }
 

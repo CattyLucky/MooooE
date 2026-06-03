@@ -1,4 +1,6 @@
+using System.Threading.Tasks;
 using Content.Shared._Forge.Trade;
+using Content.Shared.Procedural;
 using Robust.Shared.Map;
 
 namespace Content.Server._Forge.Trade;
@@ -61,6 +63,9 @@ public sealed partial class NcContractSystem : EntitySystem
         public bool GhostRoleTaken;
         public bool HuntActive;
         public EntityUid? HuntBodyEntity;
+        public EntityUid? HuntDebrisEntity;
+        public Task<List<Dungeon>>? HuntDungeonGenerationTask;
+        public EntityUid? HuntPendingPinpointerUser;
         public bool HuntTargetWasKilled;
         public EntityCoordinates? LastKnownTargetCoordinates;
         public EntityUid? ProofEntity;

@@ -51,7 +51,9 @@ public sealed partial class NcContractSystem : EntitySystem
                 target.MatchMode,
                 remaining,
                 takePlan,
-                out fail))
+                out fail,
+                target.Solution,
+                target.ReagentAmount))
         {
             ClearClaimPlanningScratch();
             return false;
@@ -163,14 +165,18 @@ public sealed partial class NcContractSystem : EntitySystem
                 target.TargetItem,
                 target.MatchMode,
                 need,
-                takePlan);
+                takePlan,
+                target.Solution,
+                target.ReagentAmount);
             need -= AppendTakePlanFromSource(
                 user,
                 _scratchUserItems,
                 target.TargetItem,
                 target.MatchMode,
                 need,
-                takePlan);
+                takePlan,
+                target.Solution,
+                target.ReagentAmount);
             need -= AppendTakePlanFromSource(
                 store,
                 storeNearbyItems,
@@ -178,6 +184,8 @@ public sealed partial class NcContractSystem : EntitySystem
                 target.MatchMode,
                 need,
                 takePlan,
+                target.Solution,
+                target.ReagentAmount,
                 true);
         }
 

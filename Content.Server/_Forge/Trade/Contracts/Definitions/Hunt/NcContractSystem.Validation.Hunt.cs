@@ -1,4 +1,5 @@
 using Content.Shared._Forge.Trade;
+using Content.Shared.Procedural;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._Forge.Trade;
@@ -41,14 +42,149 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
         }
 
-        return spawn.Point.Type switch
+        var valid = spawn.Point.Type switch
         {
             ContractPointSelectorType.MarkerId => RequireHuntSpawnPointId(contractId, spawn.Point),
             ContractPointSelectorType.MarkerGroup => RequireHuntSpawnPointId(contractId, spawn.Point),
             ContractPointSelectorType.Weighted => TryValidateHuntSpawnWeightedSelector(contractId, spawn.Point),
-            ContractPointSelectorType.Store => RejectHuntStoreSpawnPoint(contractId),
+            ContractPointSelectorType.Store => true,
             _ => RejectHuntUnknownSpawnPoint(contractId, spawn.Point.Type),
         };
+
+        if (!TryValidateHuntDebris(contractId, spawn.Debris))
+            valid = false;
+
+        if (!TryValidateHuntDungeons(contractId, spawn.Dungeons))
+            valid = false;
+
+        if (!TryValidateHuntDebrisPlacement(contractId, spawn))
+            valid = false;
+
+        return valid;
+    }
+
+    private bool TryValidateHuntDebris(string contractId, List<NcHuntDebrisEntry> debris)
+    {
+        if (debris.Count == 0)
+            return true;
+
+        var valid = true;
+        for (var i = 0; i < debris.Count; i++)
+        {
+            var entry = debris[i];
+            if (entry == null)
+            {
+                Sawmill.Warning($"[Contracts] Hunt contract '{contractId}' spawn.debris[{i}] is empty.");
+                valid = false;
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(entry.Prototype))
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Hunt contract '{contractId}' spawn.debris[{i}] must define prototype.");
+                valid = false;
+            }
+            else if (!_prototypes.HasIndex<EntityPrototype>(entry.Prototype))
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Hunt contract '{contractId}' spawn.debris[{i}] references missing entity prototype '{entry.Prototype}'.");
+                valid = false;
+            }
+
+            if (entry.Weight <= 0)
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Hunt contract '{contractId}' spawn.debris[{i}] weight must be > 0.");
+                valid = false;
+            }
+        }
+
+        return valid;
+    }
+
+    private bool TryValidateHuntDungeons(string contractId, List<NcHuntDungeonEntry> dungeons)
+    {
+        if (dungeons.Count == 0)
+            return true;
+
+        var valid = true;
+        for (var i = 0; i < dungeons.Count; i++)
+        {
+            var entry = dungeons[i];
+            if (entry == null)
+            {
+                Sawmill.Warning($"[Contracts] Hunt contract '{contractId}' spawn.dungeons[{i}] is empty.");
+                valid = false;
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(entry.Prototype))
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Hunt contract '{contractId}' spawn.dungeons[{i}] must define prototype.");
+                valid = false;
+            }
+            else if (!_prototypes.HasIndex<DungeonConfigPrototype>(entry.Prototype))
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Hunt contract '{contractId}' spawn.dungeons[{i}] references missing dungeonConfig '{entry.Prototype}'.");
+                valid = false;
+            }
+
+            if (entry.Weight <= 0)
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Hunt contract '{contractId}' spawn.dungeons[{i}] weight must be > 0.");
+                valid = false;
+            }
+        }
+
+        return valid;
+    }
+
+    private static bool TryValidateHuntDebrisPlacement(string contractId, NcHuntSpawnData spawn)
+    {
+        var valid = true;
+
+        if (spawn.DebrisMinDistance < 0)
+        {
+            Sawmill.Warning(
+                $"[Contracts] Hunt contract '{contractId}' spawn.debrisMinDistance must be >= 0.");
+            valid = false;
+        }
+
+        if (spawn.DebrisMaxDistance < 0)
+        {
+            Sawmill.Warning(
+                $"[Contracts] Hunt contract '{contractId}' spawn.debrisMaxDistance must be >= 0.");
+            valid = false;
+        }
+
+        if (spawn.DebrisMinDistance > 0 &&
+            spawn.DebrisMaxDistance > 0 &&
+            spawn.DebrisMaxDistance < spawn.DebrisMinDistance)
+        {
+            Sawmill.Warning(
+                $"[Contracts] Hunt contract '{contractId}' spawn.debrisMaxDistance must be >= debrisMinDistance.");
+            valid = false;
+        }
+
+        if (spawn.DebrisSafetyRadius < 0)
+        {
+            Sawmill.Warning(
+                $"[Contracts] Hunt contract '{contractId}' spawn.debrisSafetyRadius must be >= 0.");
+            valid = false;
+        }
+
+        if (spawn.DebrisPlacementAttempts < 0)
+        {
+            Sawmill.Warning(
+                $"[Contracts] Hunt contract '{contractId}' spawn.debrisPlacementAttempts must be >= 0.");
+            valid = false;
+        }
+
+        return valid;
     }
 
     private static bool RequireHuntSpawnPointId(string contractId, ContractPointSelectorPrototype selector)
@@ -102,13 +238,6 @@ public sealed partial class NcContractSystem : EntitySystem
         }
 
         return valid;
-    }
-
-    private static bool RejectHuntStoreSpawnPoint(string contractId)
-    {
-        Sawmill.Warning(
-            $"[Contracts] Hunt contract '{contractId}' spawn.point.type=Store is forbidden. Spawned Hunt targets must spawn at contract markers.");
-        return false;
     }
 
     private static bool RejectHuntUnknownSpawnPoint(string contractId, ContractPointSelectorType type)

@@ -24,7 +24,32 @@ public sealed partial class NcRetrievalSourcePresetPrototype : IPrototype
     [DataField("fallbackToStore")]
     public bool FallbackToStore { get; private set; }
 
+    /// <summary>
+    ///     Optional map-space offset from the source anchor. Used for generated expedition cargo in open space.
+    /// </summary>
+    [DataField("spaceSpawn")]
+    public NcRetrievalSpaceSpawnData SpaceSpawn { get; private set; } = new();
+
     [IdDataField] public string ID { get; private set; } = default!;
+}
+
+[DataDefinition]
+public sealed partial class NcRetrievalSpaceSpawnData
+{
+    [DataField("enabled")]
+    public bool Enabled { get; set; }
+
+    [DataField("minDistance")]
+    public float MinDistance { get; set; }
+
+    [DataField("maxDistance")]
+    public float MaxDistance { get; set; }
+
+    [DataField("safetyRadius")]
+    public float SafetyRadius { get; set; }
+
+    [DataField("placementAttempts")]
+    public int PlacementAttempts { get; set; }
 }
 
 [Serializable, NetSerializable,]

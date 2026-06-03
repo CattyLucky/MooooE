@@ -43,10 +43,48 @@ public sealed partial class NcHuntCompletionData
 }
 
 [DataDefinition]
+public sealed partial class NcHuntDebrisEntry
+{
+    [DataField("prototype", required: true)]
+    public string Prototype { get; set; } = string.Empty;
+
+    [DataField("weight")]
+    public int Weight { get; set; } = 1;
+}
+
+[DataDefinition]
+public sealed partial class NcHuntDungeonEntry
+{
+    [DataField("prototype", required: true)]
+    public string Prototype { get; set; } = string.Empty;
+
+    [DataField("weight")]
+    public int Weight { get; set; } = 1;
+}
+
+[DataDefinition]
 public sealed partial class NcHuntSpawnData
 {
     [DataField("point", required: true)]
     public ContractPointSelectorPrototype Point { get; set; } = new();
+
+    [DataField("debris")]
+    public List<NcHuntDebrisEntry> Debris { get; set; } = new();
+
+    [DataField("dungeons")]
+    public List<NcHuntDungeonEntry> Dungeons { get; set; } = new();
+
+    [DataField("debrisMinDistance")]
+    public float DebrisMinDistance { get; set; }
+
+    [DataField("debrisMaxDistance")]
+    public float DebrisMaxDistance { get; set; }
+
+    [DataField("debrisSafetyRadius")]
+    public float DebrisSafetyRadius { get; set; }
+
+    [DataField("debrisPlacementAttempts")]
+    public int DebrisPlacementAttempts { get; set; }
 }
 
 [Prototype("ncHuntGroup")]

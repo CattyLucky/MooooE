@@ -14,6 +14,14 @@ internal static class NcContractTuning
     public const float TrackedDeliveryStoreRange = 1.5f;
     public const float TrackedDeliveryDropoffRange = 1.5f;
 
+    public const float HuntDebrisMinSpawnDistance = 1000f;
+    public const float HuntDebrisMaxSpawnDistance = 4000f;
+    public const float HuntDebrisSpawnSafetyRadius = 48f;
+    public const int HuntDebrisSpawnPlacementAttempts = 24;
+    public const float RetrievalSpaceSpawnDistance = 2000f;
+    public const float RetrievalSpaceSpawnSafetyRadius = 16f;
+    public const int RetrievalSpaceSpawnPlacementAttempts = 24;
+
     public const float GuardSpawnRingScaleStep = 0.65f;
     public const float GuardSpawnJitterScale = 0.2f;
     public static readonly TimeSpan TrackedDeliveryDropoffCheckInterval = TimeSpan.FromSeconds(0.5);

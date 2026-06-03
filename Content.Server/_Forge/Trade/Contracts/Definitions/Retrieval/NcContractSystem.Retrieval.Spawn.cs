@@ -1,5 +1,8 @@
+using System.Numerics;
 using Content.Shared._Forge.Trade;
 using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
+using Robust.Shared.Maths;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._Forge.Trade;
@@ -7,6 +10,7 @@ namespace Content.Server._Forge.Trade;
 public sealed partial class NcContractSystem : EntitySystem
 {
     private readonly List<string> _retrievalSpawnQueueScratch = new();
+    private List<Entity<MapGridComponent>> _retrievalSpaceSpawnGridScratch = new();
 
     private bool TryInitializeRetrievalSpawnRuntime(
         EntityUid store,
@@ -74,6 +78,9 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
         }
 
+        if (config.RetrievalSpaceSpawnEnabled)
+            return TryResolveRetrievalSpaceSpawnCoordinates(store, contractId, config, out spawnCoords);
+
         if (config.RetrievalSpawnPoint.Type == ContractPointSelectorType.Store)
         {
             Sawmill.Warning(
@@ -91,6 +98,131 @@ public sealed partial class NcContractSystem : EntitySystem
         Sawmill.Warning(
             $"[Contracts] Retrieval route init failed for '{contractId}': cannot resolve source marker.");
         return false;
+    }
+
+    private bool TryResolveRetrievalSpaceSpawnCoordinates(
+        EntityUid store,
+        string contractId,
+        ContractObjectiveConfigData config,
+        out EntityCoordinates spawnCoords
+    )
+    {
+        spawnCoords = EntityCoordinates.Invalid;
+
+        if (!TryResolveRetrievalSpaceSpawnAnchorCoordinates(store, config, out var anchorCoords))
+        {
+            Sawmill.Warning(
+                $"[Contracts] Retrieval route init failed for '{contractId}': cannot resolve source anchor.");
+            return false;
+        }
+
+        var attempts = Math.Max(1, config.RetrievalSpaceSpawnPlacementAttempts);
+        for (var i = 0; i < attempts; i++)
+        {
+            if (!TryGetRetrievalSpaceSpawnMapCoordinates(store, config, anchorCoords, out var spawnMapCoords))
+                continue;
+
+            spawnCoords = _xform.ToCoordinates(spawnMapCoords);
+            return spawnCoords != EntityCoordinates.Invalid;
+        }
+
+        Sawmill.Warning(
+            $"[Contracts] Retrieval route init failed for '{contractId}': cannot find clear space spawn point.");
+        return false;
+    }
+
+    private bool TryResolveRetrievalSpaceSpawnAnchorCoordinates(
+        EntityUid store,
+        ContractObjectiveConfigData config,
+        out EntityCoordinates coordinates
+    )
+    {
+        coordinates = EntityCoordinates.Invalid;
+
+        if (config.RetrievalSpawnPoint == null)
+            return false;
+
+        if (config.RetrievalSpawnPoint.Type == ContractPointSelectorType.Store)
+        {
+            if (!TryComp(store, out TransformComponent? storeXform))
+                return false;
+
+            coordinates = storeXform.Coordinates;
+            return coordinates != EntityCoordinates.Invalid;
+        }
+
+        return TryResolveObjectiveSpawnCoordinates(
+            store,
+            config.RetrievalSpawnPoint,
+            out coordinates,
+            config.RetrievalSpawnFallbackToStore);
+    }
+
+    private bool TryGetRetrievalSpaceSpawnMapCoordinates(
+        EntityUid store,
+        ContractObjectiveConfigData config,
+        EntityCoordinates anchorCoords,
+        out MapCoordinates spawnCoords
+    )
+    {
+        spawnCoords = MapCoordinates.Nullspace;
+
+        var anchorMapCoords = _xform.ToMapCoordinates(anchorCoords);
+        if (anchorMapCoords.MapId == MapId.Nullspace)
+            return false;
+
+        var angle = _random.NextAngle();
+        var direction = angle.ToVec();
+        var minDistance = Math.Max(0f, config.RetrievalSpaceSpawnMinDistance);
+        var maxDistance = Math.Max(minDistance, config.RetrievalSpaceSpawnMaxDistance);
+        var distance = MathHelper.CloseTo(minDistance, maxDistance)
+            ? minDistance
+            : _random.NextFloat(minDistance, maxDistance);
+        var lateral = (angle + Math.PI / 2).ToVec() *
+                      _random.NextFloat(
+                          -config.RetrievalSpaceSpawnSafetyRadius,
+                          config.RetrievalSpaceSpawnSafetyRadius);
+
+        var origin = GetRetrievalSpaceSpawnOrigin(store, anchorMapCoords, direction);
+        var candidate = new MapCoordinates(origin + direction * distance + lateral, anchorMapCoords.MapId);
+        if (!IsRetrievalSpaceSpawnAreaClear(candidate, config.RetrievalSpaceSpawnSafetyRadius))
+            return false;
+
+        spawnCoords = candidate;
+        return true;
+    }
+
+    private Vector2 GetRetrievalSpaceSpawnOrigin(EntityUid store, MapCoordinates anchorCoords, Vector2 direction)
+    {
+        if (!TryComp(store, out TransformComponent? storeXform) ||
+            storeXform.GridUid is not { } gridUid ||
+            !TryComp(gridUid, out MapGridComponent? grid))
+        {
+            return anchorCoords.Position;
+        }
+
+        var gridXform = Transform(gridUid);
+        if (gridXform.MapID != anchorCoords.MapId)
+            return anchorCoords.Position;
+
+        var bounds = _xform.GetWorldMatrix(gridXform).TransformBox(grid.LocalAABB);
+        var probe = anchorCoords.Position + direction * MathF.Max(bounds.Width, bounds.Height);
+        return bounds.ClosestPoint(probe);
+    }
+
+    private bool IsRetrievalSpaceSpawnAreaClear(MapCoordinates coords, float safetyRadius)
+    {
+        var diameter = Math.Max(1f, safetyRadius * 2f);
+        var bounds = Box2.CenteredAround(coords.Position, new Vector2(diameter, diameter));
+
+        _retrievalSpaceSpawnGridScratch.Clear();
+        _mapManager.FindGridsIntersecting(
+            coords.MapId,
+            bounds,
+            ref _retrievalSpaceSpawnGridScratch,
+            includeMap: false);
+
+        return _retrievalSpaceSpawnGridScratch.Count == 0;
     }
 
     private bool TryBuildRetrievalSpawnQueue(

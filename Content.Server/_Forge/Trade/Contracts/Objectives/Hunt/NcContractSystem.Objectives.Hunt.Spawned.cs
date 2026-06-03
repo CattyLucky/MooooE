@@ -64,6 +64,7 @@ public sealed partial class NcContractSystem : EntitySystem
         var state = GetOrCreateObjectiveRuntimeState(key);
         state.TargetEntity = null;
         state.HuntBodyEntity = null;
+        state.HuntDebrisEntity = null;
         state.HuntSpawnedTargets.Clear();
         state.HuntTargetWasKilled = false;
         state.LastKnownTargetCoordinates = null;
@@ -82,9 +83,26 @@ public sealed partial class NcContractSystem : EntitySystem
             _objectiveRuntime.ActiveHuntObjectives.Add((store, contractId));
         }
 
+        if (state.HuntDungeonGenerationTask != null)
+        {
+            state.HuntPendingPinpointerUser = user;
+            return true;
+        }
+
         if (!contract.Config.GivePinpointer)
             return true;
 
+        return TryIssueSpawnedHuntPinpointer(store, user, contractId, contract, state);
+    }
+
+    private bool TryIssueSpawnedHuntPinpointer(
+        EntityUid store,
+        EntityUid user,
+        string contractId,
+        ContractServerData contract,
+        ObjectiveRuntimeState state
+    )
+    {
         if (!TryResolveSpawnedHuntPinpointerTargetForUser(store, user, contract, state, out var pinpointerTarget))
             return false;
 
@@ -101,6 +119,6 @@ public sealed partial class NcContractSystem : EntitySystem
         if (spawnCoords == EntityCoordinates.Invalid)
             return false;
 
-        return TrySpawnObjectivePinpointer(user, pinpointerTarget, key, state, contract.Config, spawnCoords);
+        return TrySpawnObjectivePinpointer(user, pinpointerTarget, (store, contractId), state, contract.Config, spawnCoords);
     }
 }

@@ -12,6 +12,13 @@
   description: "Контрактная метка, снятая с последней подтвержденной цели."
   categories: [ HideSpawnMenu ]
 
+- type: entity
+  parent: PaperScrap
+  id: ForgeTradeContractProofHuntTrophy
+  name: "контрактная трофейная метка"
+  description: "Подтверждение зачистки опасной цели на экспедиционном обломке."
+  categories: [ HideSpawnMenu ]
+
 - type: ncRetrievalProofPreset
   id: ForgeTradeDeliveryReceiptProof
   prototype: ForgeTradeContractProofDeliveryReceipt

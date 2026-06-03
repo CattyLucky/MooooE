@@ -1,4 +1,6 @@
 using Content.Shared._Forge.Trade;
+using Content.Shared.Chemistry.Components.SolutionManager;
+using Content.Shared.FixedPoint;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Stacks;
@@ -77,12 +79,35 @@ public sealed partial class NcContractSystem : EntitySystem
         return false;
     }
 
+    private bool MatchesReagentTarget(
+        EntityUid candidateEntity,
+        string reagentId,
+        string solutionName,
+        FixedPoint2 requiredAmount
+    )
+    {
+        if (string.IsNullOrWhiteSpace(reagentId) || string.IsNullOrWhiteSpace(solutionName))
+            return false;
+
+        if (requiredAmount <= FixedPoint2.Zero)
+            return false;
+
+        if (!TryComp(candidateEntity, out SolutionContainerManagerComponent? manager) ||
+            !_solutions.TryGetSolution((candidateEntity, manager), solutionName, out _, out var solution))
+            return false;
+
+        return solution.GetTotalPrototypeQuantity(reagentId) >= requiredAmount;
+    }
+
     private bool CanUseContractPlanningEntity(EntityUid root, EntityUid ent, bool worldTurnInSource)
     {
         if (ent == EntityUid.Invalid || !Exists(ent))
             return false;
 
         if (TryComp(ent, out MobStateComponent? mobState) && mobState.CurrentState != MobState.Dead)
+            return false;
+
+        if (HasComp<NcContractTurnInBlockedComponent>(ent))
             return false;
 
         if (worldTurnInSource)

@@ -1,4 +1,5 @@
 using Content.Shared._Forge.Trade;
+using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 
@@ -239,6 +240,15 @@ public sealed partial class NcContractCard
                 return huntGroup.Name;
         }
 
+        if (matchMode == PrototypeMatchMode.Reagent)
+        {
+            if (_proto.TryIndex<ReagentPrototype>(protoId, out var reagent) &&
+                !string.IsNullOrWhiteSpace(reagent.LocalizedName))
+                return reagent.LocalizedName;
+
+            return protoId;
+        }
+
         return ResolveProtoName(protoId);
     }
 
@@ -284,6 +294,20 @@ public sealed partial class NcContractCard
             return Loc.GetString("nc-store-proto-tooltip-name-only", ("name", tagTarget.Name));
 
         return Loc.GetString("nc-store-proto-tooltip", ("name", tagTarget.Name), ("desc", tagTarget.Description));
+    }
+
+    private static string BuildReagentTooltip(ReagentPrototype? reagent)
+    {
+        if (reagent == null)
+            return string.Empty;
+
+        if (string.IsNullOrWhiteSpace(reagent.LocalizedDescription))
+            return Loc.GetString("nc-store-proto-tooltip-name-only", ("name", reagent.LocalizedName));
+
+        return Loc.GetString(
+            "nc-store-proto-tooltip",
+            ("name", reagent.LocalizedName),
+            ("desc", reagent.LocalizedDescription));
     }
 
     private static string BuildHuntGroupTooltip(NcHuntGroupPrototype? group)

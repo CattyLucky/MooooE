@@ -1,4 +1,5 @@
 using Content.Shared._Forge.Trade;
+using Content.Shared.Chemistry.Reagent;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Prototypes;
@@ -12,22 +13,28 @@ public sealed partial class NcContractCard
     private Control BuildTargetRow(
         string? protoId,
         int required,
-        PrototypeMatchMode matchMode = PrototypeMatchMode.Exact
+        PrototypeMatchMode matchMode = PrototypeMatchMode.Exact,
+        string? fallbackIcon = null
     )
     {
         var isTagTarget = matchMode == PrototypeMatchMode.Tag;
+        var isReagentTarget = matchMode == PrototypeMatchMode.Reagent;
         EntityPrototype? targetProto = null;
         NcMatcherPrototype? targetMatcher = null;
         NcItemGroupPrototype? targetGroup = null;
         NcHuntGroupPrototype? targetHuntGroup = null;
         NcTradeTagPrototype? targetTag = null;
+        ReagentPrototype? targetReagent = null;
         EntityPrototype? matcherFallbackProto = null;
         EntityPrototype? groupIconProto = null;
         EntityPrototype? tagIconProto = null;
         if (!string.IsNullOrWhiteSpace(protoId))
         {
-            if (!isTagTarget)
+            if (!isTagTarget && !isReagentTarget)
                 _proto.TryIndex(protoId, out targetProto);
+
+            if (isReagentTarget)
+                _proto.TryIndex(protoId, out targetReagent);
 
             if (isTagTarget && _proto.TryIndex<NcTradeTagPrototype>(protoId, out var tagTarget))
             {
@@ -81,7 +88,9 @@ public sealed partial class NcContractCard
                     ? BuildItemGroupTooltip(targetGroup)
                     : targetTag != null
                         ? BuildTradeTagTooltip(targetTag)
-                        : BuildHuntGroupTooltip(targetHuntGroup);
+                        : targetReagent != null
+                            ? BuildReagentTooltip(targetReagent)
+                            : BuildHuntGroupTooltip(targetHuntGroup);
         if (!string.IsNullOrWhiteSpace(tooltip))
             targetRow.ToolTip = tooltip;
 
@@ -125,7 +134,15 @@ public sealed partial class NcContractCard
             else if (tagIconProto != null)
                 AddPrototypeIcon(targetRow, tagIconProto.ID);
         }
-        else if (!isTagTarget && targetGroup == null && targetHuntGroup == null && !string.IsNullOrWhiteSpace(protoId))
+        else if (isReagentTarget &&
+                 !string.IsNullOrWhiteSpace(fallbackIcon) &&
+                 _proto.HasIndex<EntityPrototype>(fallbackIcon))
+            AddPrototypeIcon(targetRow, fallbackIcon);
+        else if (!isTagTarget &&
+                 !isReagentTarget &&
+                 targetGroup == null &&
+                 targetHuntGroup == null &&
+                 !string.IsNullOrWhiteSpace(protoId))
             AddPrototypeIcon(targetRow, protoId);
 
         var targetName = targetProto?.Name;
@@ -137,6 +154,8 @@ public sealed partial class NcContractCard
             targetName = targetHuntGroup?.Name;
         if (string.IsNullOrWhiteSpace(targetName))
             targetName = targetTag?.Name;
+        if (string.IsNullOrWhiteSpace(targetName))
+            targetName = targetReagent?.LocalizedName;
         if (string.IsNullOrWhiteSpace(targetName))
             targetName = protoId ?? Loc.GetString("nc-store-unknown-item");
 

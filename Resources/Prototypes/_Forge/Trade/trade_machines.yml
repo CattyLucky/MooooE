@@ -61,8 +61,6 @@
   id: ForgeExpeditionTradeProfile
   buy:
   - ForgeExpeditionBuy
-  sell:
-  - ForgeExpeditionSell
   barter:
   - ForgeExpeditionBarterPreset
   contracts: ForgeExpeditionTestContractsPreset

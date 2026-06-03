@@ -31,6 +31,12 @@ public sealed partial class NcContractSystem : EntitySystem
                 ? proto.Completion.Trophy
                 : string.Empty,
             HuntEnabled = true,
+            HuntDebris = CloneHuntDebrisEntries(proto.Spawn.Debris),
+            HuntDungeons = CloneHuntDungeonEntries(proto.Spawn.Dungeons),
+            HuntDebrisMinDistance = proto.Spawn.DebrisMinDistance,
+            HuntDebrisMaxDistance = proto.Spawn.DebrisMaxDistance,
+            HuntDebrisSafetyRadius = proto.Spawn.DebrisSafetyRadius,
+            HuntDebrisPlacementAttempts = proto.Spawn.DebrisPlacementAttempts,
             HuntCompletionMode = proto.Completion.Mode,
             HuntBodyPrototype = proto.Completion.Mode == NcHuntCompletionMode.BodyTurnIn
                 ? bodyTarget
@@ -43,6 +49,7 @@ public sealed partial class NcContractSystem : EntitySystem
         {
             Id = proto.ID,
             Name = proto.Name,
+            Icon = proto.Icon,
             Description = proto.Description,
             Repeatable = proto.Repeatable,
             Taken = false,
@@ -62,6 +69,46 @@ public sealed partial class NcContractSystem : EntitySystem
 
         SyncContractFlowStatus(contract);
         return contract;
+    }
+
+    private static List<NcHuntDebrisEntry> CloneHuntDebrisEntries(IReadOnlyList<NcHuntDebrisEntry> source)
+    {
+        var result = new List<NcHuntDebrisEntry>(source.Count);
+        for (var i = 0; i < source.Count; i++)
+        {
+            var entry = source[i];
+            if (entry == null)
+                continue;
+
+            result.Add(
+                new NcHuntDebrisEntry
+                {
+                    Prototype = entry.Prototype,
+                    Weight = entry.Weight,
+                });
+        }
+
+        return result;
+    }
+
+    private static List<NcHuntDungeonEntry> CloneHuntDungeonEntries(IReadOnlyList<NcHuntDungeonEntry> source)
+    {
+        var result = new List<NcHuntDungeonEntry>(source.Count);
+        for (var i = 0; i < source.Count; i++)
+        {
+            var entry = source[i];
+            if (entry == null)
+                continue;
+
+            result.Add(
+                new NcHuntDungeonEntry
+                {
+                    Prototype = entry.Prototype,
+                    Weight = entry.Weight,
+                });
+        }
+
+        return result;
     }
 
     private static List<ContractTargetServerData> BuildHuntTargets(NcHuntContractPrototype proto)

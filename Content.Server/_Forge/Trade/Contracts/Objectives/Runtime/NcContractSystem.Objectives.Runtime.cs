@@ -3,14 +3,19 @@ using Content.Server.Ghost.Roles;
 using Content.Server.Ghost.Roles.Components;
 using Content.Server.Mind;
 using Content.Server.Pinpointer;
+using Content.Server.Procedural;
 using Content.Shared._Forge.Trade;
 using Content.Shared.Damage;
 using Content.Shared.GameTicking;
+using Content.Shared.Maps;
 using Content.Shared.Mobs;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Events;
 using Content.Shared.Objectives.Components;
+using Content.Shared.Physics;
 using Content.Shared.Tag;
+using Robust.Shared.Map;
+using Robust.Shared.Map.Components;
 using Robust.Shared.Timing;
 
 namespace Content.Server._Forge.Trade;
@@ -18,11 +23,15 @@ namespace Content.Server._Forge.Trade;
 public sealed partial class NcContractSystem : EntitySystem
 {
     [Dependency] private readonly MetaDataSystem _contractMeta = default!;
+    [Dependency] private readonly DungeonSystem _dungeon = default!;
     [Dependency] private readonly MindSystem _contractMind = default!;
     [Dependency] private readonly GhostRoleSystem _ghostRoles = default!;
+    [Dependency] private readonly SharedMapSystem _map = default!;
+    [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly PinpointerSystem _pinpointer = default!;
     [Dependency] private readonly TagSystem _tags = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly TurfSystem _turf = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     private TimeSpan _nextGhostRoleTimeoutCheck = TimeSpan.Zero;
@@ -174,6 +183,7 @@ public sealed partial class NcContractSystem : EntitySystem
         if (_objectiveRuntime.ActiveHuntObjectives.Count > 0 && _timing.CurTime >= _nextHuntPinpointerCheck)
         {
             _nextHuntPinpointerCheck = _timing.CurTime + NcContractTuning.TrackedDeliveryDropoffCheckInterval;
+            UpdatePendingHuntDungeons();
             UpdateSpawnedHuntPinpointerTargets();
         }
 

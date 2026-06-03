@@ -59,6 +59,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             var hash = 17;
             AddHash(ref hash, contract.Id);
             AddHash(ref hash, contract.Name);
+            AddHash(ref hash, contract.Icon);
             AddHash(ref hash, contract.Description);
             AddHash(ref hash, contract.Repeatable);
             AddHash(ref hash, contract.Taken);

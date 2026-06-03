@@ -282,7 +282,11 @@ public enum PrototypeMatchMode : byte
     // Treat the "tagTarget" field as the ID of an NcTradeTagPrototype. The target wraps a raw
     // TagPrototype and UI metadata. Runtime matching checks tags declared on entity prototypes,
     // not runtime-added tags. Tags are never valid for spawn/buy contexts.
-    Tag = 2
+    Tag = 2,
+
+    // Treat the target id as a ReagentPrototype id. Runtime matching checks a non-stack
+    // turn-in entity's configured solution contents.
+    Reagent = 3
 }
 
 [Serializable]

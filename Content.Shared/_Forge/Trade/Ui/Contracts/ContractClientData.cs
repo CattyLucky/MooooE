@@ -14,6 +14,7 @@ public sealed class ContractClientData
     public ContractFlowStatus FlowStatus;
     public NcGhostRoleCompletionMode GhostRoleCompletionMode = NcGhostRoleCompletionMode.DeadBodyTurnIn;
     public NcHuntCompletionMode HuntCompletionMode = NcHuntCompletionMode.TrophyTurnIn;
+    public string Icon = string.Empty;
     public string Id = string.Empty;
     public bool IsRetrievalRoute;
     public PrototypeMatchMode MatchMode = PrototypeMatchMode.Exact;
@@ -44,6 +45,7 @@ public sealed class ContractClientData
     public ContractClientData(
         string id,
         string name,
+        string icon,
         string description,
         bool repeatable,
         bool taken,
@@ -75,6 +77,7 @@ public sealed class ContractClientData
     {
         Id = id;
         Name = name;
+        Icon = icon;
         Description = description;
         Repeatable = repeatable;
         Taken = taken;

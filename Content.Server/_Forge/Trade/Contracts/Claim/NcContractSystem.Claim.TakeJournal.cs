@@ -1,12 +1,20 @@
 using Content.Shared._Forge.Trade;
+using Content.Shared.Chemistry.Components;
+using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Stacks;
 
 namespace Content.Server._Forge.Trade;
 
 public sealed partial class NcContractSystem
 {
-    private void CommitClaimTakeJournal(ClaimTakeJournal journal)
+    private void CommitClaimTakeJournal(
+        ClaimTakeJournal journal,
+        EntityUid receiver,
+        float returnFraction = 0f
+    )
     {
+        ReturnClaimItemsBestEffort(journal, receiver, returnFraction);
+
         for (var i = 0; i < journal.PendingDeletes.Count; i++)
         {
             var ent = journal.PendingDeletes[i];
@@ -14,6 +22,65 @@ public sealed partial class NcContractSystem
         }
 
         journal.Clear();
+    }
+
+    private void ReturnClaimItemsBestEffort(
+        ClaimTakeJournal journal,
+        EntityUid receiver,
+        float returnFraction
+    )
+    {
+        if (returnFraction <= 0f || journal.ReturnCandidates.Count == 0)
+            return;
+
+        if (!Exists(receiver) || !TryComp(receiver, out TransformComponent? receiverXform))
+            return;
+
+        var returnCount = (int) MathF.Floor(journal.ReturnCandidates.Count * Math.Clamp(returnFraction, 0f, 1f));
+        if (returnCount <= 0)
+            return;
+
+        for (var i = 0; i < journal.ReturnCandidates.Count && returnCount > 0; i++)
+        {
+            var ent = journal.ReturnCandidates[i];
+            if (!TryGetPlanningEntityPrototypeId(ent, out var prototypeId))
+                continue;
+
+            try
+            {
+                var returned = Spawn(prototypeId, receiverXform.Coordinates);
+                CopySolutionsBestEffort(ent, returned);
+                EnsureComp<NcContractTurnInBlockedComponent>(returned);
+                _logic.QueuePickupToHandsOrCrateNextTick(receiver, returned);
+                returnCount--;
+            }
+            catch (Exception e)
+            {
+                Sawmill.Warning(
+                    $"[Claim] Failed to return consumed contract item prototype '{prototypeId}' to {ToPrettyString(receiver)}: {e}");
+            }
+        }
+    }
+
+    private void CopySolutionsBestEffort(EntityUid source, EntityUid target)
+    {
+        if (!TryComp(source, out SolutionContainerManagerComponent? sourceManager))
+            return;
+
+        foreach (var (name, sourceSolutionEnt) in _solutions.EnumerateSolutions((source, sourceManager), false))
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                continue;
+
+            var sourceSolution = sourceSolutionEnt.Comp.Solution;
+            if (!_solutions.EnsureSolutionEntity((target, null), name, out var targetSolutionEnt, sourceSolution.MaxVolume) ||
+                targetSolutionEnt == null)
+                continue;
+
+            _solutions.RemoveAllSolution(targetSolutionEnt.Value);
+            _solutions.SetCapacity(targetSolutionEnt.Value, sourceSolution.MaxVolume);
+            _solutions.TryAddSolution(targetSolutionEnt.Value, new(sourceSolution));
+        }
     }
 
     private void RollbackClaimTakeJournal(ClaimTakeJournal journal)
@@ -74,6 +141,7 @@ public sealed partial class NcContractSystem
     private sealed class ClaimTakeJournal
     {
         public readonly List<EntityUid> PendingDeletes = new();
+        public readonly List<EntityUid> ReturnCandidates = new();
 
         public readonly List<(EntityUid Cargo, (EntityUid Store, string ContractId) Key)>
             RetrievalCargoRestores = new();
@@ -124,6 +192,7 @@ public sealed partial class NcContractSystem
         public void Clear()
         {
             PendingDeletes.Clear();
+            ReturnCandidates.Clear();
             RetrievalCargoRestores.Clear();
             StackRestores.Clear();
             TurnInRestores.Clear();

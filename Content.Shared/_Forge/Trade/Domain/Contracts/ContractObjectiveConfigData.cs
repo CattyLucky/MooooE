@@ -26,6 +26,12 @@ public sealed class ContractObjectiveConfigData
 
     // Spawned Hunt runtime metadata.
     public bool HuntEnabled;
+    public List<NcHuntDebrisEntry> HuntDebris { get; set; } = new();
+    public List<NcHuntDungeonEntry> HuntDungeons { get; set; } = new();
+    public float HuntDebrisMinDistance;
+    public float HuntDebrisMaxDistance;
+    public float HuntDebrisSafetyRadius;
+    public int HuntDebrisPlacementAttempts;
     public bool PreserveTargetOnComplete;
     public NcRetrievalClaimMode RetrievalClaimMode;
     public bool RetrievalConsumeCargo;
@@ -43,11 +49,17 @@ public sealed class ContractObjectiveConfigData
     public NcRetrievalProofOwnership RetrievalProofOwnership;
     public NcRetrievalProofReissuePolicy RetrievalProofReissue;
     public bool RetrievalRequireSpawnedEntities;
+    public bool RetrievalSpaceSpawnEnabled;
+    public float RetrievalSpaceSpawnMinDistance;
+    public float RetrievalSpaceSpawnMaxDistance;
+    public float RetrievalSpaceSpawnSafetyRadius;
+    public int RetrievalSpaceSpawnPlacementAttempts;
     public bool RetrievalSpawnEnabled;
     public bool RetrievalSpawnFallbackToStore;
 
     // Inventory-delivery helper spawn metadata copied at contract creation time.
     public bool SpawnItems;
+    public float SupplyReturnFraction;
 
     public ContractPointSelectorPrototype? SpawnPoint { get; set; }
     public ContractPointSelectorPrototype? DropoffPoint { get; set; }

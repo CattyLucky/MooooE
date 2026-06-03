@@ -1,4 +1,5 @@
 using Content.Shared._Forge.Trade;
+using Content.Shared.FixedPoint;
 using Content.Shared.Stacks;
 
 namespace Content.Server._Forge.Trade;
@@ -15,15 +16,17 @@ public sealed partial class NcContractSystem : EntitySystem
         PrototypeMatchMode matchMode,
         int required,
         List<ClaimTakeEntry> takePlan,
-        out ClaimAttemptResult fail
+        out ClaimAttemptResult fail,
+        string solution = "drink",
+        FixedPoint2 reagentAmount = default
     )
     {
         fail = ClaimAttemptResult.Fail(ClaimFailureReason.None);
 
         var need = required;
-        need -= AppendTakePlanFromSource(crateEntity, crateItems, targetItem, matchMode, need, takePlan);
-        need -= AppendTakePlanFromSource(user, _scratchUserItems, targetItem, matchMode, need, takePlan);
-        need -= AppendTakePlanFromSource(store, storeNearbyItems, targetItem, matchMode, need, takePlan, true);
+        need -= AppendTakePlanFromSource(crateEntity, crateItems, targetItem, matchMode, need, takePlan, solution, reagentAmount);
+        need -= AppendTakePlanFromSource(user, _scratchUserItems, targetItem, matchMode, need, takePlan, solution, reagentAmount);
+        need -= AppendTakePlanFromSource(store, storeNearbyItems, targetItem, matchMode, need, takePlan, solution, reagentAmount, true);
 
         if (need <= 0)
             return true;
@@ -39,6 +42,8 @@ public sealed partial class NcContractSystem : EntitySystem
         PrototypeMatchMode matchMode,
         int need,
         List<ClaimTakeEntry> takePlan,
+        string solution,
+        FixedPoint2 reagentAmount,
         bool worldTurnInSource = false
     )
     {
@@ -51,6 +56,8 @@ public sealed partial class NcContractSystem : EntitySystem
             targetItem,
             matchMode,
             need,
+            solution,
+            reagentAmount,
             _claimVirtualStackLeftScratch,
             takePlan,
             worldTurnInSource);
@@ -83,6 +90,8 @@ public sealed partial class NcContractSystem : EntitySystem
         string expectedProtoId,
         PrototypeMatchMode matchMode,
         int need,
+        string solution,
+        FixedPoint2 reagentAmount,
         Dictionary<EntityUid, int> virtualStackLeft,
         List<ClaimTakeEntry> planOut,
         bool worldTurnInSource = false
@@ -90,6 +99,17 @@ public sealed partial class NcContractSystem : EntitySystem
     {
         if (need <= 0)
             return 0;
+
+        if (matchMode == PrototypeMatchMode.Reagent)
+            return ReserveTakePlanFromReagentItems(
+                root,
+                items,
+                expectedProtoId,
+                solution,
+                reagentAmount,
+                need,
+                planOut,
+                worldTurnInSource);
 
         return TryGetStackTypeId(expectedProtoId, out var stackTypeId)
             ? ReserveTakePlanFromStackItems(
@@ -111,6 +131,37 @@ public sealed partial class NcContractSystem : EntitySystem
                 virtualStackLeft,
                 planOut,
                 worldTurnInSource);
+    }
+
+    private int ReserveTakePlanFromReagentItems(
+        EntityUid root,
+        List<EntityUid> items,
+        string reagentId,
+        string solution,
+        FixedPoint2 reagentAmount,
+        int need,
+        List<ClaimTakeEntry> planOut,
+        bool worldTurnInSource
+    )
+    {
+        var reserved = 0;
+
+        for (var i = 0; i < items.Count && reserved < need; i++)
+        {
+            var ent = items[i];
+            if (!CanUseContractPlanningEntity(root, ent, worldTurnInSource))
+                continue;
+
+            if (TryComp(ent, out StackComponent? _))
+                continue;
+
+            if (!MatchesReagentTarget(ent, reagentId, solution, reagentAmount))
+                continue;
+
+            reserved += AppendClaimEntityTake(root, ent, reagentId, PrototypeMatchMode.Reagent, planOut, items, i);
+        }
+
+        return reserved;
     }
 
     private int ReserveTakePlanFromStackItems(

@@ -24,6 +24,9 @@ public sealed partial class NcContractSystem : EntitySystem
             NcGhostRoleSurvivalData.DefaultDurationSeconds);
         config.PinpointerPrototype = ResolvePinpointerPrototypeId(config.PinpointerPrototype);
         config.GuardCount = Math.Max(0, config.GuardCount);
+        NormalizeHuntDebrisConfig(config.HuntDebris);
+        NormalizeHuntDungeonConfig(config.HuntDungeons);
+        NormalizeHuntDebrisPlacementConfig(config);
 
         NormalizeRetrievalSpawnConfig(config);
         config.RetrievalDestinationRadius = Math.Max(0.25f, config.RetrievalDestinationRadius);
@@ -37,7 +40,60 @@ public sealed partial class NcContractSystem : EntitySystem
         RemoveBlankStrings(config.SpawnSpecific);
     }
 
+    private static void NormalizeHuntDebrisConfig(List<NcHuntDebrisEntry> debris)
+    {
+        for (var i = debris.Count - 1; i >= 0; i--)
+        {
+            var entry = debris[i];
+            if (entry == null ||
+                string.IsNullOrWhiteSpace(entry.Prototype) ||
+                entry.Weight <= 0)
+            {
+                debris.RemoveAt(i);
+            }
+        }
+    }
+
+    private static void NormalizeHuntDungeonConfig(List<NcHuntDungeonEntry> dungeons)
+    {
+        for (var i = dungeons.Count - 1; i >= 0; i--)
+        {
+            var entry = dungeons[i];
+            if (entry == null ||
+                string.IsNullOrWhiteSpace(entry.Prototype) ||
+                entry.Weight <= 0)
+            {
+                dungeons.RemoveAt(i);
+            }
+        }
+    }
+
+    private static void NormalizeHuntDebrisPlacementConfig(ContractObjectiveConfigData config)
+    {
+        config.HuntDebrisMinDistance = NormalizePositiveOrDefault(
+            config.HuntDebrisMinDistance,
+            NcContractTuning.HuntDebrisMinSpawnDistance);
+        config.HuntDebrisMaxDistance = NormalizePositiveOrDefault(
+            config.HuntDebrisMaxDistance,
+            NcContractTuning.HuntDebrisMaxSpawnDistance);
+
+        if (config.HuntDebrisMaxDistance < config.HuntDebrisMinDistance)
+            config.HuntDebrisMaxDistance = config.HuntDebrisMinDistance;
+
+        config.HuntDebrisSafetyRadius = NormalizePositiveOrDefault(
+            config.HuntDebrisSafetyRadius,
+            NcContractTuning.HuntDebrisSpawnSafetyRadius);
+        config.HuntDebrisPlacementAttempts = NormalizePositiveOrDefault(
+            config.HuntDebrisPlacementAttempts,
+            NcContractTuning.HuntDebrisSpawnPlacementAttempts);
+    }
+
     private static int NormalizePositiveOrDefault(int value, int fallback)
+    {
+        return value > 0 ? value : fallback;
+    }
+
+    private static float NormalizePositiveOrDefault(float value, float fallback)
     {
         return value > 0 ? value : fallback;
     }
@@ -52,13 +108,39 @@ public sealed partial class NcContractSystem : EntitySystem
 
         config.RetrievalSpawnPoint = NormalizeContractPointSelector(
             config.RetrievalSpawnPoint,
-            config.RetrievalSpawnFallbackToStore);
+            config.RetrievalSpaceSpawnEnabled || config.RetrievalSpawnFallbackToStore);
 
         if (config.RetrievalSpawnPoint != null)
+        {
+            NormalizeRetrievalSpaceSpawnConfig(config);
             return;
+        }
 
         config.RetrievalSpawnEnabled = false;
         config.RetrievalRequireSpawnedEntities = false;
+    }
+
+    private static void NormalizeRetrievalSpaceSpawnConfig(ContractObjectiveConfigData config)
+    {
+        if (!config.RetrievalSpaceSpawnEnabled)
+            return;
+
+        config.RetrievalSpaceSpawnMinDistance = NormalizePositiveOrDefault(
+            config.RetrievalSpaceSpawnMinDistance,
+            NcContractTuning.RetrievalSpaceSpawnDistance);
+        config.RetrievalSpaceSpawnMaxDistance = NormalizePositiveOrDefault(
+            config.RetrievalSpaceSpawnMaxDistance,
+            config.RetrievalSpaceSpawnMinDistance);
+
+        if (config.RetrievalSpaceSpawnMaxDistance < config.RetrievalSpaceSpawnMinDistance)
+            config.RetrievalSpaceSpawnMaxDistance = config.RetrievalSpaceSpawnMinDistance;
+
+        config.RetrievalSpaceSpawnSafetyRadius = NormalizePositiveOrDefault(
+            config.RetrievalSpaceSpawnSafetyRadius,
+            NcContractTuning.RetrievalSpaceSpawnSafetyRadius);
+        config.RetrievalSpaceSpawnPlacementAttempts = NormalizePositiveOrDefault(
+            config.RetrievalSpaceSpawnPlacementAttempts,
+            NcContractTuning.RetrievalSpaceSpawnPlacementAttempts);
     }
 
     private static void ClearRetrievalSpawnConfig(ContractObjectiveConfigData config)
@@ -66,6 +148,11 @@ public sealed partial class NcContractSystem : EntitySystem
         config.RetrievalSpawnPoint = null;
         config.RetrievalSpawnFallbackToStore = false;
         config.RetrievalRequireSpawnedEntities = false;
+        config.RetrievalSpaceSpawnEnabled = false;
+        config.RetrievalSpaceSpawnMinDistance = 0f;
+        config.RetrievalSpaceSpawnMaxDistance = 0f;
+        config.RetrievalSpaceSpawnSafetyRadius = 0f;
+        config.RetrievalSpaceSpawnPlacementAttempts = 0;
     }
 
     private static void NormalizeRetrievalClaimConfig(ContractObjectiveConfigData config)

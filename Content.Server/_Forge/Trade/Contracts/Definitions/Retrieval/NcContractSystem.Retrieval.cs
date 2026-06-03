@@ -18,6 +18,7 @@ public sealed partial class NcContractSystem : EntitySystem
         {
             Id = proto.ID,
             Name = proto.Name,
+            Icon = proto.Icon,
             Description = proto.Description,
             Repeatable = proto.Repeatable,
             Taken = false,
@@ -104,6 +105,11 @@ public sealed partial class NcContractSystem : EntitySystem
             config.RetrievalSpawnPoint = CloneContractPointSelector(source.Point);
             config.RetrievalSpawnFallbackToStore = source.FallbackToStore;
             config.RetrievalRequireSpawnedEntities = true;
+            config.RetrievalSpaceSpawnEnabled = source.SpaceSpawn.Enabled;
+            config.RetrievalSpaceSpawnMinDistance = source.SpaceSpawn.MinDistance;
+            config.RetrievalSpaceSpawnMaxDistance = source.SpaceSpawn.MaxDistance;
+            config.RetrievalSpaceSpawnSafetyRadius = source.SpaceSpawn.SafetyRadius;
+            config.RetrievalSpaceSpawnPlacementAttempts = source.SpaceSpawn.PlacementAttempts;
         }
 
         if (config.RetrievalClaimMode == NcRetrievalClaimMode.DestinationProof && proof != null)

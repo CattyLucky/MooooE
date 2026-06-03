@@ -63,7 +63,7 @@ public sealed partial class NcContractSystem : EntitySystem
             }
 
             RecordPartialTurnInProgress(ctx.Store, contractId, ctx.TakePlan, journal);
-            CommitClaimTakeJournal(journal);
+            CommitClaimTakeJournal(journal, ctx.User, ctx.Contract.Config.SupplyReturnFraction);
         }
         catch (Exception e)
         {
@@ -109,6 +109,13 @@ public sealed partial class NcContractSystem : EntitySystem
         if (_logic.IsProtectedFromDirectSale(entry.Root, entry.Entity))
         {
             fail = CreateClaimExecutionFailure($"Planned entity is protected: {ToPrettyString(entry.Entity)}");
+            return false;
+        }
+
+        if (HasComp<NcContractTurnInBlockedComponent>(entry.Entity))
+        {
+            fail = CreateClaimExecutionFailure(
+                $"Planned entity is blocked from contract turn-in: {ToPrettyString(entry.Entity)}");
             return false;
         }
 
@@ -172,9 +179,17 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
         }
 
+        if (HasComp<NcContractTurnInBlockedComponent>(entry.Entity))
+        {
+            fail = CreateClaimExecutionFailure(
+                $"Planned entity is blocked from contract turn-in: {ToPrettyString(entry.Entity)}");
+            return false;
+        }
+
         if (!entry.IsStack)
         {
             journal.PendingDeletes.Add(entry.Entity);
+            journal.ReturnCandidates.Add(entry.Entity);
             return true;
         }
 
@@ -290,7 +305,7 @@ public sealed partial class NcContractSystem : EntitySystem
                 return executeFail;
             }
 
-            CommitClaimTakeJournal(journal);
+            CommitClaimTakeJournal(journal, ctx.User, ctx.Contract.Config.SupplyReturnFraction);
             InvalidateClaimExecutionCaches(ctx);
             return ClaimAttemptResult.Ok();
         }
