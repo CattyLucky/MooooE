@@ -51,7 +51,7 @@
   id: ForgeExpeditionTradeTerminal
   parent: ForgeExpeditionTradeMachine
   name: торговый автомат экспедиций
-  description: Покупает и продает экспедиционное снаряжение, принимает бартер и выдает тестовые контракты.
+  description: Покупает и продает экспедиционное снаряжение, принимает бартер и выдает экспедиционные контракты.
   suffix: Forge, Trade, Expedition
   components:
   - type: NcStore
@@ -63,5 +63,5 @@
   - ForgeExpeditionBuy
   barter:
   - ForgeExpeditionBarterPreset
-  contracts: ForgeExpeditionTestContractsPreset
+  contracts: ForgeExpeditionContractsPreset
   theme: ForgeTradeUiThemeExpedition

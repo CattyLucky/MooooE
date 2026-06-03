@@ -1,5 +1,5 @@
 - type: dungeonPreset
-  id: ForgeHuntTiny
+  id: ForgeHuntDungeonLayout
   roomPacks:
   - 0,0,17,17
   - 20,0,37,17
@@ -8,11 +8,11 @@
   - -20,20,-3,37
 
 - type: dungeonConfig
-  id: ForgeHuntTinyBase
+  id: ForgeHuntDungeonBase
   layers:
   - !type:PrefabDunGen
     presets:
-    - ForgeHuntTiny
+    - ForgeHuntDungeonLayout
 
   - !type:CorridorDunGen
     width: 3
@@ -30,7 +30,7 @@
   - !type:JunctionDunGen
 
 - type: dungeonConfig
-  id: ForgeHuntTinyMineshaft
+  id: ForgeHuntDungeonMineshaft
   data:
     entities:
       Walls: WallRock
@@ -46,10 +46,10 @@
         - NFMineshaft
   layers:
   - !type:PrototypeDunGen
-    proto: ForgeHuntTinyBase
+    proto: ForgeHuntDungeonBase
 
 - type: dungeonConfig
-  id: ForgeHuntTinyHaunted
+  id: ForgeHuntDungeonHaunted
   data:
     entities:
       Walls: WallRock
@@ -65,10 +65,10 @@
         - NFHaunted
   layers:
   - !type:PrototypeDunGen
-    proto: ForgeHuntTinyBase
+    proto: ForgeHuntDungeonBase
 
 - type: dungeonConfig
-  id: ForgeHuntTinySalvageOutpost
+  id: ForgeHuntDungeonSalvageOutpost
   data:
     entities:
       Walls: WallMining
@@ -84,10 +84,10 @@
         - NFSalvageOutpost
   layers:
   - !type:PrototypeDunGen
-    proto: ForgeHuntTinyBase
+    proto: ForgeHuntDungeonBase
 
 - type: dungeonConfig
-  id: ForgeHuntTinyCaveFactory
+  id: ForgeHuntDungeonCaveFactory
   data:
     entities:
       Walls: WallSolid
@@ -103,10 +103,10 @@
         - NFCaveFactory
   layers:
   - !type:PrototypeDunGen
-    proto: ForgeHuntTinyBase
+    proto: ForgeHuntDungeonBase
 
 - type: dungeonConfig
-  id: ForgeHuntTinyMedSci
+  id: ForgeHuntDungeonMedSci
   data:
     entities:
       Walls: WallSolid
@@ -122,10 +122,10 @@
         - NFSalvageExperiment
   layers:
   - !type:PrototypeDunGen
-    proto: ForgeHuntTinyBase
+    proto: ForgeHuntDungeonBase
 
 - type: dungeonConfig
-  id: ForgeHuntTinySnowyLabs
+  id: ForgeHuntDungeonSnowyLabs
   data:
     entities:
       Walls: WallSilver
@@ -141,10 +141,10 @@
         - NFSnowyLabs
   layers:
   - !type:PrototypeDunGen
-    proto: ForgeHuntTinyBase
+    proto: ForgeHuntDungeonBase
 
 - type: dungeonConfig
-  id: ForgeHuntTinyFactoryDorms
+  id: ForgeHuntDungeonFactoryDorms
   data:
     entities:
       Walls: WallSolid
@@ -160,10 +160,10 @@
         - NFCaveFactory
   layers:
   - !type:PrototypeDunGen
-    proto: ForgeHuntTinyBase
+    proto: ForgeHuntDungeonBase
 
 - type: dungeonConfig
-  id: ForgeHuntTinyExperiment
+  id: ForgeHuntDungeonExperiment
   data:
     entities:
       Walls: WallSolid
@@ -179,10 +179,10 @@
         - NFSalvageExperiment
   layers:
   - !type:PrototypeDunGen
-    proto: ForgeHuntTinyBase
+    proto: ForgeHuntDungeonBase
 
 - type: dungeonConfig
-  id: ForgeHuntTinyLavaMercenary
+  id: ForgeHuntDungeonLavaMercenary
   data:
     entities:
       Walls: WallSolid
@@ -198,10 +198,10 @@
         - NFLavaMercenary
   layers:
   - !type:PrototypeDunGen
-    proto: ForgeHuntTinyBase
+    proto: ForgeHuntDungeonBase
 
 - type: dungeonConfig
-  id: ForgeHuntTinyLavaBrig
+  id: ForgeHuntDungeonLavaBrig
   data:
     entities:
       Walls: WallSolid
@@ -217,10 +217,10 @@
         - NFLavaBrig
   layers:
   - !type:PrototypeDunGen
-    proto: ForgeHuntTinyBase
+    proto: ForgeHuntDungeonBase
 
 - type: dungeonConfig
-  id: ForgeHuntTinyVirologyLab
+  id: ForgeHuntDungeonVirologyLab
   data:
     entities:
       Walls: WallSolid
@@ -236,4 +236,4 @@
         - NFVirologyLab
   layers:
   - !type:PrototypeDunGen
-    proto: ForgeHuntTinyBase
+    proto: ForgeHuntDungeonBase

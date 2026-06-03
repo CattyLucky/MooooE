@@ -39,11 +39,11 @@
   categories: [ HideSpawnMenu ]
 
 - type: ncRetrievalSourcePreset
-  id: ForgeTradeTestCargoSource
+  id: ForgeTradeContractCargoSource
   spawnCargo: true
   point:
     type: MarkerGroup
-    id: ForgeTradeTestCargoSource
+    id: ForgeTradeContractCargoSource
   fallbackToStore: true
 
 - type: ncRetrievalSourcePreset
@@ -88,10 +88,10 @@
     type: StoreUi
 
 - type: ncRetrievalDestinationPreset
-  id: ForgeTradeTestDropoffDestination
+  id: ForgeTradeContractDropoffDestination
   target:
     type: MarkerGroup
-    id: ForgeTradeTestDropoff
+    id: ForgeTradeContractDropoff
   radius: 2.0
 
 - type: ncRetrievalGuidancePreset
@@ -126,7 +126,7 @@
 
 - type: ncRetrievalRoutePreset
   id: ForgeTradeRouteCargoToTrader
-  source: ForgeTradeTestCargoSource
+  source: ForgeTradeContractCargoSource
   destination: ForgeTradeDestinationStoreUi
   claim:
     mode: StoreCargo
@@ -170,8 +170,8 @@
 
 - type: ncRetrievalRoutePreset
   id: ForgeTradeRouteCargoToDropoffProof
-  source: ForgeTradeTestCargoSource
-  destination: ForgeTradeTestDropoffDestination
+  source: ForgeTradeContractCargoSource
+  destination: ForgeTradeContractDropoffDestination
   claim:
     mode: DestinationProof
     proof: ForgeTradeDeliveryReceiptProof

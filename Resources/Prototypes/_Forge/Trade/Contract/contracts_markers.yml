@@ -36,56 +36,55 @@
     - state: red
 
 - type: entity
-  id: MarkerForgeTradeTestCargoSource
+  id: MarkerForgeTradeContractCargoSource
   parent: MarkerForgeTradeContractSpawnBase
   name: "контракт: груз"
   description: "Точка появления груза для Trade-контрактов."
   suffix: Forge, Trade, Contracts, Mapper
   components:
   - type: NcContractSpawnPoint
-    id: ForgeTradeTestCargoSource
+    id: ForgeTradeContractCargoSource
     groups:
-    - ForgeTradeTestCargoSource
-    - ForgeTradeTestCargo
+    - ForgeTradeContractCargoSource
+    - ForgeTradeContractCargo
     - ForgeTradeContractObjectiveSpawn
 
 - type: entity
-  id: MarkerForgeTradeTestDropoff
+  id: MarkerForgeTradeContractDropoff
   parent: MarkerForgeTradeContractDestinationBase
   name: "контракт: приемка"
   description: "Точка доставки груза для proof-маршрута."
   suffix: Forge, Trade, Contracts, Mapper
   components:
   - type: NcContractSpawnPoint
-    id: ForgeTradeTestDropoff
+    id: ForgeTradeContractDropoff
     groups:
-    - ForgeTradeTestDropoff
     - ForgeTradeContractDropoff
 
 - type: entity
-  id: MarkerForgeTradeTestHuntSpawn
+  id: MarkerForgeTradeContractHuntSpawn
   parent: MarkerForgeTradeContractDangerBase
   name: "контракт: охота"
   description: "Точка появления целей охотничьего Trade-контракта."
   suffix: Forge, Trade, Contracts, Mapper
   components:
   - type: NcContractSpawnPoint
-    id: ForgeTradeTestHuntSpawn
+    id: ForgeTradeContractHuntSpawn
     groups:
-    - ForgeTradeTestHuntSpawn
-    - ForgeTradeTestHunt
+    - ForgeTradeContractHuntSpawn
+    - ForgeTradeContractHunt
     - ForgeTradeContractObjectiveSpawn
 
 - type: entity
-  id: MarkerForgeTradeTestGhostSpawn
+  id: MarkerForgeTradeContractGhostSpawn
   parent: MarkerForgeTradeContractDangerBase
   name: "контракт: ghost-role"
   description: "Точка появления цели ghost-role Trade-контракта."
   suffix: Forge, Trade, Contracts, Mapper
   components:
   - type: NcContractSpawnPoint
-    id: ForgeTradeTestGhostSpawn
+    id: ForgeTradeContractGhostSpawn
     groups:
-    - ForgeTradeTestGhostSpawn
-    - ForgeTradeTestGhostRole
+    - ForgeTradeContractGhostSpawn
+    - ForgeTradeContractGhostRole
     - ForgeTradeContractObjectiveSpawn
