@@ -38,8 +38,8 @@
 - type: entity
   id: MarkerForgeTradeTestCargoSource
   parent: MarkerForgeTradeContractSpawnBase
-  name: "контракт: тестовый груз"
-  description: "Точка появления груза для тестовых Trade-контрактов."
+  name: "контракт: груз"
+  description: "Точка появления груза для Trade-контрактов."
   suffix: Forge, Trade, Contracts, Mapper
   components:
   - type: NcContractSpawnPoint
@@ -52,8 +52,8 @@
 - type: entity
   id: MarkerForgeTradeTestDropoff
   parent: MarkerForgeTradeContractDestinationBase
-  name: "контракт: тестовая приемка"
-  description: "Точка доставки груза для тестового proof-маршрута."
+  name: "контракт: приемка"
+  description: "Точка доставки груза для proof-маршрута."
   suffix: Forge, Trade, Contracts, Mapper
   components:
   - type: NcContractSpawnPoint
@@ -65,7 +65,7 @@
 - type: entity
   id: MarkerForgeTradeTestHuntSpawn
   parent: MarkerForgeTradeContractDangerBase
-  name: "контракт: тестовая охота"
+  name: "контракт: охота"
   description: "Точка появления целей охотничьего Trade-контракта."
   suffix: Forge, Trade, Contracts, Mapper
   components:
@@ -79,7 +79,7 @@
 - type: entity
   id: MarkerForgeTradeTestGhostSpawn
   parent: MarkerForgeTradeContractDangerBase
-  name: "контракт: тестовая ghost-role"
+  name: "контракт: ghost-role"
   description: "Точка появления цели ghost-role Trade-контракта."
   suffix: Forge, Trade, Contracts, Mapper
   components:

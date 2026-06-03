@@ -2,6 +2,10 @@
   id: ForgeHuntTiny
   roomPacks:
   - 0,0,17,17
+  - 20,0,37,17
+  - 20,20,37,37
+  - -20,0,-3,17
+  - -20,20,-3,37
 
 - type: dungeonConfig
   id: ForgeHuntTinyBase

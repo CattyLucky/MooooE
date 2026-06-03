@@ -99,6 +99,7 @@
                                     <BoxContainer Name="ContractsCategoryRow"
                                                   Orientation="Horizontal"
                                                   HorizontalExpand="True"
+                                                  VerticalAlignment="Center"
                                                   SeparationOverride="6"
                                                   Margin="6 4 6 4" />
                                 </ScrollContainer>

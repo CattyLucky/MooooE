@@ -64,7 +64,6 @@ public sealed class ForgeArtifactStudyPresetSystem : EntitySystem
 
         ApplyNodeComponents(uid, nodes[0]);
         component.Applied = true;
-        Dirty(uid, artifact);
 
         return true;
     }

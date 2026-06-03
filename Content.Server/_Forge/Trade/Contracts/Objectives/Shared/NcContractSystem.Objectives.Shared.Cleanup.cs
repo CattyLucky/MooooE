@@ -1,9 +1,15 @@
 using Content.Shared.Mind;
+using Robust.Shared.Player;
 
 namespace Content.Server._Forge.Trade;
 
 public sealed partial class NcContractSystem : EntitySystem
 {
+    private static readonly TimeSpan HuntDebrisPendingDeletionCheckInterval = TimeSpan.FromSeconds(5);
+    private readonly HashSet<EntityUid> _huntDebrisPendingDeletion = new();
+    private readonly List<EntityUid> _huntDebrisPendingDeletionScratch = new();
+    private TimeSpan _nextHuntDebrisPendingDeletionCheck = TimeSpan.Zero;
+
     private void CleanupObjectiveRuntime(
         EntityUid store,
         string contractId,
@@ -175,7 +181,74 @@ public sealed partial class NcContractSystem : EntitySystem
 
         state.HuntDebrisEntity = null;
 
-        if (deleteDebris && !TerminatingOrDeleted(debris))
+        if (!deleteDebris || TerminatingOrDeleted(debris))
+            return;
+
+        if (HuntDebrisHasAttachedPlayer(debris))
+        {
+            QueueHuntDebrisDeletion(debris);
+            return;
+        }
+
+        Del(debris);
+    }
+
+    private void QueueHuntDebrisDeletion(EntityUid debris)
+    {
+        if (debris == EntityUid.Invalid || TerminatingOrDeleted(debris))
+            return;
+
+        _huntDebrisPendingDeletion.Add(debris);
+    }
+
+    private void UpdatePendingHuntDebrisDeletion()
+    {
+        if (_huntDebrisPendingDeletion.Count == 0)
+            return;
+
+        _huntDebrisPendingDeletionScratch.Clear();
+        foreach (var debris in _huntDebrisPendingDeletion)
+        {
+            if (debris == EntityUid.Invalid || TerminatingOrDeleted(debris))
+            {
+                _huntDebrisPendingDeletionScratch.Add(debris);
+                continue;
+            }
+
+            if (HuntDebrisHasAttachedPlayer(debris))
+                continue;
+
             Del(debris);
+            _huntDebrisPendingDeletionScratch.Add(debris);
+        }
+
+        for (var i = 0; i < _huntDebrisPendingDeletionScratch.Count; i++)
+        {
+            _huntDebrisPendingDeletion.Remove(_huntDebrisPendingDeletionScratch[i]);
+        }
+
+        _huntDebrisPendingDeletionScratch.Clear();
+    }
+
+    private void ClearPendingHuntDebrisDeletion()
+    {
+        _huntDebrisPendingDeletion.Clear();
+        _huntDebrisPendingDeletionScratch.Clear();
+    }
+
+    private bool HuntDebrisHasAttachedPlayer(EntityUid debris)
+    {
+        var query = EntityQueryEnumerator<ActorComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out _, out var xform))
+        {
+            if (uid != EntityUid.Invalid &&
+                xform.GridUid == debris &&
+                !TerminatingOrDeleted(uid))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

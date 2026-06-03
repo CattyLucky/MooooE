@@ -164,7 +164,9 @@ public sealed partial class NcStoreMenu
             ToggleMode = true,
             ClipText = false,
             HorizontalExpand = false,
+            VerticalAlignment = VAlignment.Center,
             MinWidth = CalculateContractFilterButtonMinWidth(name, count),
+            MinHeight = 30,
             Margin = new(0, 0, 2, 0)
         };
 

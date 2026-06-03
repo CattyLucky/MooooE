@@ -159,10 +159,17 @@ public sealed partial class NcContractSystem : EntitySystem
     private void ShutdownObjectiveRuntime()
     {
         ClearAllObjectiveRuntime(false, false);
+        ClearPendingHuntDebrisDeletion();
     }
 
     public override void Update(float frameTime)
     {
+        if (_huntDebrisPendingDeletion.Count > 0 && _timing.CurTime >= _nextHuntDebrisPendingDeletionCheck)
+        {
+            _nextHuntDebrisPendingDeletionCheck = _timing.CurTime + HuntDebrisPendingDeletionCheckInterval;
+            UpdatePendingHuntDebrisDeletion();
+        }
+
         if (_objectiveRuntime.ByContract.Count == 0)
             return;
 

@@ -147,6 +147,9 @@
     id: ForgeHuntMediumDinosaurPack
     weight: 2
   - type: Hunt
+    id: ForgeHuntMediumSyndicatePatrol
+    weight: 2
+  - type: Hunt
     id: ForgeHuntHardFleshHorror
     weight: 1
   - type: Hunt
@@ -154,6 +157,9 @@
     weight: 1
   - type: Hunt
     id: ForgeHuntHardRogueAiCore
+    weight: 1
+  - type: Hunt
+    id: ForgeHuntHardSyndicateCommander
     weight: 1
 
 - type: ncContractOfferPool
@@ -289,6 +295,44 @@
   - MobRogueSiliconHunter
   - MobRogueSiliconCatcher
 
+- type: ncHuntGroup
+  id: ForgeHuntGroupSyndicatePatrol
+  name: "синдикатский патруль"
+  description: "Вооружённые агенты Синдиката, удерживающие дрейфующий объект."
+  icon: MobSyndicateNavalOperatorA
+  prototypes:
+  - MobSyndicateNavalDeckhandA
+  - MobSyndicateNavalDeckhandB
+  - MobSyndicateNavalEngineerA
+  - MobSyndicateNavalEngineerB
+  - MobSyndicateNavalMedicA
+  - MobSyndicateNavalMedicB
+  - MobSyndicateNavalOperatorA
+  - MobSyndicateNavalOperatorB
+  - MobSyndicateNavalSaboteurA
+  - MobSyndicateNavalSaboteurB
+
+- type: ncHuntGroup
+  id: ForgeHuntGroupSyndicateAssault
+  name: "синдикатская штурмовая группа"
+  description: "Тяжёлый отряд Синдиката с офицерами, штурмовиками и специалистами."
+  icon: MobSyndicateNavalCaptainA
+  prototypes:
+  - MobSyndicateNavalOperatorA
+  - MobSyndicateNavalOperatorB
+  - MobSyndicateNavalOperatorC
+  - MobSyndicateNavalOperatorD
+  - MobSyndicateNavalSecondOfficerA
+  - MobSyndicateNavalSecondOfficerB
+  - MobSyndicateNavalCaptainA
+  - MobSyndicateNavalCaptainB
+  - MobSyndicateNavalGrenadierA
+  - MobSyndicateNavalGrenadierB
+  - MobSyndicateNavalSaboteurA
+  - MobSyndicateNavalSaboteurB
+  - MobSyndicateNavalChemwarriorA
+  - MobSyndicateNavalChemwarriorB
+
 - type: ncSupplyContract
   id: ForgeFoodEasyCheeseburgers
   name: "Сырные бургеры для вахты"
@@ -303,7 +347,7 @@
     currency: Credit
     count: 10000
   - type: Pool
-    pool: ForgeExpeditionRewardBasic
+    pool: ForgeExpeditionRewardFoodBasic
     count: 1
 
 - type: ncSupplyContract
@@ -320,7 +364,7 @@
     currency: Credit
     count: 10000
   - type: Pool
-    pool: ForgeExpeditionRewardBasic
+    pool: ForgeExpeditionRewardFoodBasic
     count: 1
 
 - type: ncSupplyContract
@@ -337,7 +381,7 @@
     currency: Credit
     count: 10000
   - type: Pool
-    pool: ForgeExpeditionRewardBasic
+    pool: ForgeExpeditionRewardFoodBasic
     count: 1
 
 - type: ncSupplyContract
@@ -354,7 +398,7 @@
     currency: Credit
     count: 10000
   - type: Pool
-    pool: ForgeExpeditionRewardBasic
+    pool: ForgeExpeditionRewardFoodBasic
     count: 1
 
 - type: ncSupplyContract
@@ -371,7 +415,7 @@
     currency: Credit
     count: 30000
   - type: Pool
-    pool: ForgeExpeditionRewardAdvanced
+    pool: ForgeExpeditionRewardFoodAdvanced
     count: 1
 
 - type: ncSupplyContract
@@ -388,7 +432,7 @@
     currency: Credit
     count: 30000
   - type: Pool
-    pool: ForgeExpeditionRewardAdvanced
+    pool: ForgeExpeditionRewardFoodAdvanced
     count: 1
 
 - type: ncSupplyContract
@@ -405,7 +449,7 @@
     currency: Credit
     count: 30000
   - type: Pool
-    pool: ForgeExpeditionRewardAdvanced
+    pool: ForgeExpeditionRewardFoodAdvanced
     count: 1
 
 - type: ncSupplyContract
@@ -422,7 +466,7 @@
     currency: Credit
     count: 45000
   - type: Pool
-    pool: ForgeExpeditionRewardElite
+    pool: ForgeExpeditionRewardFoodElite
     count: 1
 
 - type: ncSupplyContract
@@ -439,7 +483,7 @@
     currency: Credit
     count: 45000
   - type: Pool
-    pool: ForgeExpeditionRewardElite
+    pool: ForgeExpeditionRewardFoodElite
     count: 1
 
 - type: ncSupplyContract
@@ -456,7 +500,7 @@
     currency: Credit
     count: 45000
   - type: Pool
-    pool: ForgeExpeditionRewardElite
+    pool: ForgeExpeditionRewardFoodElite
     count: 1
 
 - type: ncSupplyContract
@@ -475,7 +519,7 @@
     currency: Credit
     count: 10000
   - type: Pool
-    pool: ForgeExpeditionRewardBasic
+    pool: ForgeExpeditionRewardBarBasic
     count: 1
 
 - type: ncSupplyContract
@@ -494,7 +538,7 @@
     currency: Credit
     count: 10000
   - type: Pool
-    pool: ForgeExpeditionRewardBasic
+    pool: ForgeExpeditionRewardBarBasic
     count: 1
 
 - type: ncSupplyContract
@@ -513,7 +557,7 @@
     currency: Credit
     count: 10000
   - type: Pool
-    pool: ForgeExpeditionRewardBasic
+    pool: ForgeExpeditionRewardBarBasic
     count: 1
 
 - type: ncSupplyContract
@@ -532,7 +576,7 @@
     currency: Credit
     count: 10000
   - type: Pool
-    pool: ForgeExpeditionRewardBasic
+    pool: ForgeExpeditionRewardBarBasic
     count: 1
 
 - type: ncSupplyContract
@@ -551,7 +595,7 @@
     currency: Credit
     count: 30000
   - type: Pool
-    pool: ForgeExpeditionRewardAdvanced
+    pool: ForgeExpeditionRewardBarAdvanced
     count: 1
 
 - type: ncSupplyContract
@@ -570,7 +614,7 @@
     currency: Credit
     count: 30000
   - type: Pool
-    pool: ForgeExpeditionRewardAdvanced
+    pool: ForgeExpeditionRewardBarAdvanced
     count: 1
 
 - type: ncSupplyContract
@@ -589,7 +633,7 @@
     currency: Credit
     count: 30000
   - type: Pool
-    pool: ForgeExpeditionRewardAdvanced
+    pool: ForgeExpeditionRewardBarAdvanced
     count: 1
 
 - type: ncSupplyContract
@@ -608,7 +652,7 @@
     currency: Credit
     count: 45000
   - type: Pool
-    pool: ForgeExpeditionRewardElite
+    pool: ForgeExpeditionRewardBarElite
     count: 1
 
 - type: ncSupplyContract
@@ -627,7 +671,7 @@
     currency: Credit
     count: 45000
   - type: Pool
-    pool: ForgeExpeditionRewardElite
+    pool: ForgeExpeditionRewardBarElite
     count: 1
 
 - type: ncSupplyContract
@@ -646,7 +690,7 @@
     currency: Credit
     count: 45000
   - type: Pool
-    pool: ForgeExpeditionRewardElite
+    pool: ForgeExpeditionRewardBarElite
     count: 1
 
 - type: ncRetrievalContract
@@ -707,7 +751,7 @@
   icon: ForgeContractCarp
   targets:
   - group: ForgeHuntGroupCarps
-    count: 5
+    count: 8
   completion:
     mode: TrophyTurnIn
     trophy: ForgeTradeContractProofCarpTrophy
@@ -752,7 +796,7 @@
   icon: MobArgocyteSlurvaExpeditions
   targets:
   - group: ForgeHuntGroupArgocyteEasy
-    count: 6
+    count: 9
   completion:
     mode: TrophyTurnIn
     trophy: ForgeTradeContractProofHuntTrophy
@@ -785,7 +829,16 @@
   reward:
   - type: Currency
     currency: Credit
-    count: 20000
+    count: 35000
+  - type: Item
+    prototype: ResearchDisk35000
+    count: 1
+  - type: Item
+    prototype: SpawnDungeonLootMaterialsBasicFull
+    count: { min: 5, max: 8 }
+  - type: Item
+    prototype: SpawnDungeonLootMaterialsValuableFull
+    count: { min: 2, max: 4 }
   - type: Pool
     pool: ForgeExpeditionRewardBasic
     count: 1
@@ -797,7 +850,7 @@
   icon: MobDinosaurRaptorExpeditions
   targets:
   - group: ForgeHuntGroupDinosaurEasy
-    count: 6
+    count: 9
   completion:
     mode: TrophyTurnIn
     trophy: ForgeTradeContractProofHuntTrophy
@@ -842,7 +895,7 @@
   icon: MobRogueSiliconScrapAsteroid
   targets:
   - group: ForgeHuntGroupRogueScrap
-    count: 7
+    count: 10
   completion:
     mode: TrophyTurnIn
     trophy: ForgeTradeContractProofHuntTrophy
@@ -887,7 +940,7 @@
   icon: MobFleshJaredExpeditions
   targets:
   - group: ForgeHuntGroupFleshEasy
-    count: 5
+    count: 8
   completion:
     mode: TrophyTurnIn
     trophy: ForgeTradeContractProofHuntTrophy
@@ -932,7 +985,7 @@
   icon: MobArgocyteMolderExpeditions
   targets:
   - group: ForgeHuntGroupArgocyteMedium
-    count: 8
+    count: 12
   completion:
     mode: TrophyTurnIn
     trophy: ForgeTradeContractProofHuntTrophy
@@ -977,7 +1030,7 @@
   icon: MobRogueSiliconHunter
   targets:
   - group: ForgeHuntGroupRogueAdvanced
-    count: 7
+    count: 11
   completion:
     mode: TrophyTurnIn
     trophy: ForgeTradeContractProofHuntTrophy
@@ -1022,7 +1075,7 @@
   icon: MobDinosaurKentroExpeditions
   targets:
   - group: ForgeHuntGroupDinosaurMedium
-    count: 7
+    count: 11
   completion:
     mode: TrophyTurnIn
     trophy: ForgeTradeContractProofHuntTrophy
@@ -1061,13 +1114,58 @@
     count: 1
 
 - type: ncHuntContract
+  id: ForgeHuntMediumSyndicatePatrol
+  name: "Красный патруль"
+  description: "Патруль Синдиката закрепился на дрейфующем объекте и ведёт разведку маршрутов. Разбейте группу и верните метку."
+  icon: MobSyndicateNavalOperatorA
+  targets:
+  - group: ForgeHuntGroupSyndicatePatrol
+    count: 10
+  completion:
+    mode: TrophyTurnIn
+    trophy: ForgeTradeContractProofHuntTrophy
+  spawn:
+    point:
+      type: Store
+    dungeons:
+    - prototype: ForgeHuntTinyMineshaft
+      weight: 1
+    - prototype: ForgeHuntTinyHaunted
+      weight: 1
+    - prototype: ForgeHuntTinySalvageOutpost
+      weight: 1
+    - prototype: ForgeHuntTinyCaveFactory
+      weight: 1
+    - prototype: ForgeHuntTinyMedSci
+      weight: 1
+    - prototype: ForgeHuntTinySnowyLabs
+      weight: 1
+    - prototype: ForgeHuntTinyFactoryDorms
+      weight: 1
+    - prototype: ForgeHuntTinyExperiment
+      weight: 1
+    - prototype: ForgeHuntTinyLavaMercenary
+      weight: 1
+    - prototype: ForgeHuntTinyLavaBrig
+      weight: 1
+    - prototype: ForgeHuntTinyVirologyLab
+      weight: 1
+  reward:
+  - type: Currency
+    currency: Credit
+    count: 50000
+  - type: Pool
+    pool: ForgeExpeditionRewardAdvanced
+    count: 1
+
+- type: ncHuntContract
   id: ForgeHuntHardFleshHorror
   name: "Плотяной ужас"
   description: "В заражённом комплексе сформировалось опасное ядро плоти. Уничтожьте охранные формы и главную цель."
   icon: MobHorrorExpeditions
   targets:
   - group: ForgeHuntGroupFleshHard
-    count: 7
+    count: 12
   - prototype: MobHorrorExpeditions
     count: 1
   completion:
@@ -1114,7 +1212,7 @@
   icon: MobArgocyteLeviathingExpeditions
   targets:
   - group: ForgeHuntGroupArgocyteHard
-    count: 8
+    count: 13
   - prototype: MobArgocyteLeviathingExpeditions
     count: 1
   completion:
@@ -1161,8 +1259,55 @@
   icon: MobRogueSiliconTesla
   targets:
   - group: ForgeHuntGroupRogueAdvanced
-    count: 8
+    count: 12
   - prototype: MobRogueSiliconTesla
+    count: 1
+  completion:
+    mode: TrophyTurnIn
+    trophy: ForgeTradeContractProofHuntTrophy
+  spawn:
+    point:
+      type: Store
+    dungeons:
+    - prototype: ForgeHuntTinyMineshaft
+      weight: 1
+    - prototype: ForgeHuntTinyHaunted
+      weight: 1
+    - prototype: ForgeHuntTinySalvageOutpost
+      weight: 1
+    - prototype: ForgeHuntTinyCaveFactory
+      weight: 1
+    - prototype: ForgeHuntTinyMedSci
+      weight: 1
+    - prototype: ForgeHuntTinySnowyLabs
+      weight: 1
+    - prototype: ForgeHuntTinyFactoryDorms
+      weight: 1
+    - prototype: ForgeHuntTinyExperiment
+      weight: 1
+    - prototype: ForgeHuntTinyLavaMercenary
+      weight: 1
+    - prototype: ForgeHuntTinyLavaBrig
+      weight: 1
+    - prototype: ForgeHuntTinyVirologyLab
+      weight: 1
+  reward:
+  - type: Currency
+    currency: Credit
+    count: 70000
+  - type: Pool
+    pool: ForgeExpeditionRewardElite
+    count: 1
+
+- type: ncHuntContract
+  id: ForgeHuntHardSyndicateCommander
+  name: "Офицер Синдиката"
+  description: "Синдикатский офицер держит объект под охраной штурмовой группы. Уничтожьте охрану, командира и принесите метку."
+  icon: MobSyndicateNavalCommanderA
+  targets:
+  - group: ForgeHuntGroupSyndicateAssault
+    count: 12
+  - prototype: MobSyndicateNavalCommanderA
     count: 1
   completion:
     mode: TrophyTurnIn
@@ -1230,7 +1375,16 @@
   reward:
   - type: Currency
     currency: Credit
-    count: 40000
+    count: 65000
+  - type: Item
+    prototype: ResearchDisk65000
+    count: 1
+  - type: Item
+    prototype: SpawnDungeonLootMaterialsBasicFull
+    count: { min: 6, max: 10 }
+  - type: Item
+    prototype: SpawnDungeonLootMaterialsValuableFull
+    count: { min: 4, max: 7 }
   - type: Pool
     pool: ForgeExpeditionRewardAdvanced
     count: 1
@@ -1247,7 +1401,19 @@
   reward:
   - type: Currency
     currency: Credit
-    count: 60000
+    count: 100000
+  - type: Item
+    prototype: ResearchDisk100000
+    count: 1
+  - type: Item
+    prototype: SpawnDungeonLootMaterialsBasicFull
+    count: { min: 8, max: 12 }
+  - type: Item
+    prototype: SpawnDungeonLootMaterialsValuableFull
+    count: { min: 6, max: 10 }
   - type: Pool
     pool: ForgeExpeditionRewardElite
+    count: 1
+  - type: Pool
+    pool: ForgeExpeditionRewardEliteTechDisks
     count: 1

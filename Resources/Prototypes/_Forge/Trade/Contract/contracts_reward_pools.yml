@@ -39,7 +39,7 @@
     weight: 1
   - type: Currency
     currency: Credit
-    count: { min: 500, max: 900 }
+    count: { min: 2500, max: 5000 }
     weight: 2
 
 - type: ncSupplyRewardPool
@@ -99,7 +99,7 @@
     weight: 2
   - type: Currency
     currency: Credit
-    count: { min: 1200, max: 2200 }
+    count: { min: 7500, max: 15000 }
     weight: 2
 
 - type: ncSupplyRewardPool
@@ -163,7 +163,7 @@
     weight: 2
   - type: Currency
     currency: Credit
-    count: { min: 2500, max: 5000 }
+    count: { min: 15000, max: 30000 }
     weight: 2
 
 - type: ncSupplyRewardPool
@@ -323,5 +323,89 @@
     weight: 1
   - type: Item
     prototype: TechDiskOmegaGunnery
+    count: 1
+    weight: 1
+
+- type: ncSupplyRewardPool
+  id: ForgeExpeditionRewardFoodBasic
+  entries:
+  - type: Pool
+    pool: ForgeExpeditionRewardBasic
+    count: 1
+    weight: 8
+  - type: Item
+    prototype: FoodMeatDragon
+    count: 1
+    weight: 1
+  - type: Item
+    prototype: DragonEgg
+    count: 1
+    weight: 1
+
+- type: ncSupplyRewardPool
+  id: ForgeExpeditionRewardFoodAdvanced
+  entries:
+  - type: Pool
+    pool: ForgeExpeditionRewardAdvanced
+    count: 1
+    weight: 8
+  - type: Item
+    prototype: FoodMeatDragon
+    count: { min: 1, max: 2 }
+    weight: 1
+  - type: Item
+    prototype: DragonEgg
+    count: 1
+    weight: 1
+
+- type: ncSupplyRewardPool
+  id: ForgeExpeditionRewardFoodElite
+  entries:
+  - type: Pool
+    pool: ForgeExpeditionRewardElite
+    count: 1
+    weight: 8
+  - type: Item
+    prototype: FoodMeatDragon
+    count: { min: 2, max: 3 }
+    weight: 1
+  - type: Item
+    prototype: DragonEgg
+    count: { min: 1, max: 2 }
+    weight: 1
+
+- type: ncSupplyRewardPool
+  id: ForgeExpeditionRewardBarBasic
+  entries:
+  - type: Pool
+    pool: ForgeExpeditionRewardBasic
+    count: 1
+    weight: 8
+  - type: Item
+    prototype: JugOmnizine
+    count: 1
+    weight: 1
+
+- type: ncSupplyRewardPool
+  id: ForgeExpeditionRewardBarAdvanced
+  entries:
+  - type: Pool
+    pool: ForgeExpeditionRewardAdvanced
+    count: 1
+    weight: 8
+  - type: Item
+    prototype: JugOmnizine
+    count: 1
+    weight: 1
+
+- type: ncSupplyRewardPool
+  id: ForgeExpeditionRewardBarElite
+  entries:
+  - type: Pool
+    pool: ForgeExpeditionRewardElite
+    count: 1
+    weight: 8
+  - type: Item
+    prototype: JugOmnizine
     count: 1
     weight: 1
