@@ -1,0 +1,239 @@
+- type: dungeonPreset
+  id: ForgeHuntDungeonLayout
+  roomPacks:
+  - 0,0,17,17
+  - 20,0,37,17
+  - 20,20,37,37
+  - -20,0,-3,17
+  - -20,20,-3,37
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonBase
+  layers:
+  - !type:PrefabDunGen
+    presets:
+    - ForgeHuntDungeonLayout
+
+  - !type:CorridorDunGen
+    width: 3
+
+  - !type:DungeonEntranceDunGen
+    count: 1
+
+  - !type:RoomEntranceDunGen
+
+  - !type:BoundaryWallDunGen
+
+  - !type:JunctionDunGen
+    width: 1
+
+  - !type:JunctionDunGen
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonMineshaft
+  data:
+    entities:
+      Walls: WallRock
+      CornerWalls: WallRock
+    spawnGroups:
+      Entrance: NFBaseAirlock
+      Junction: NFBaseAirlock
+    tiles:
+      FallbackTile: FloorCaveDrought
+    whitelists:
+      Rooms:
+        tags:
+        - NFMineshaft
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonBase
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonHaunted
+  data:
+    entities:
+      Walls: WallRock
+      CornerWalls: WallRock
+    spawnGroups:
+      Entrance: NFBaseAirlock
+      Junction: NFBaseAirlock
+    tiles:
+      FallbackTile: FloorCaveDrought
+    whitelists:
+      Rooms:
+        tags:
+        - NFHaunted
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonBase
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonSalvageOutpost
+  data:
+    entities:
+      Walls: WallMining
+      CornerWalls: WallMining
+    spawnGroups:
+      Entrance: NFMiningAirlock
+      Junction: NFMiningAirlock
+    tiles:
+      FallbackTile: FloorDark
+    whitelists:
+      Rooms:
+        tags:
+        - NFSalvageOutpost
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonBase
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonCaveFactory
+  data:
+    entities:
+      Walls: WallSolid
+      CornerWalls: WallReinforced
+    spawnGroups:
+      Entrance: NFBaseAirlock
+      Junction: NFBaseAirlock
+    tiles:
+      FallbackTile: FloorSteel
+    whitelists:
+      Rooms:
+        tags:
+        - NFCaveFactory
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonBase
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonMedSci
+  data:
+    entities:
+      Walls: WallSolid
+      CornerWalls: WallReinforced
+    spawnGroups:
+      Entrance: NFBaseAirlock
+      Junction: NFBaseAirlock
+    tiles:
+      FallbackTile: FloorWhite
+    whitelists:
+      Rooms:
+        tags:
+        - NFSalvageExperiment
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonBase
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonSnowyLabs
+  data:
+    entities:
+      Walls: WallSilver
+      CornerWalls: WallSilver
+    spawnGroups:
+      Entrance: NFSnowyLabsEntrance
+      Junction: NFBaseAirlock
+    tiles:
+      FallbackTile: FloorSteel
+    whitelists:
+      Rooms:
+        tags:
+        - NFSnowyLabs
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonBase
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonFactoryDorms
+  data:
+    entities:
+      Walls: WallSolid
+      CornerWalls: WallReinforced
+    spawnGroups:
+      Entrance: NFBaseAirlock
+      Junction: NFBaseAirlock
+    tiles:
+      FallbackTile: FloorDark
+    whitelists:
+      Rooms:
+        tags:
+        - NFCaveFactory
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonBase
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonExperiment
+  data:
+    entities:
+      Walls: WallSolid
+      CornerWalls: WallReinforced
+    spawnGroups:
+      Entrance: NFBaseAirlock
+      Junction: NFBaseAirlock
+    tiles:
+      FallbackTile: FloorSteel
+    whitelists:
+      Rooms:
+        tags:
+        - NFSalvageExperiment
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonBase
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonLavaMercenary
+  data:
+    entities:
+      Walls: WallSolid
+      CornerWalls: WallReinforced
+    spawnGroups:
+      Entrance: NFMercenaryAirlock
+      Junction: NFMercenaryAirlock
+    tiles:
+      FallbackTile: FloorDark
+    whitelists:
+      Rooms:
+        tags:
+        - NFLavaMercenary
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonBase
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonLavaBrig
+  data:
+    entities:
+      Walls: WallSolid
+      CornerWalls: WallReinforced
+    spawnGroups:
+      Entrance: NFLavaBrigEntrance
+      Junction: NFBaseAirlock
+    tiles:
+      FallbackTile: FloorDark
+    whitelists:
+      Rooms:
+        tags:
+        - NFLavaBrig
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonBase
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonVirologyLab
+  data:
+    entities:
+      Walls: WallSolid
+      CornerWalls: WallReinforced
+    spawnGroups:
+      Entrance: NFVirologyAirlock
+      Junction: NFVirologyAirlock
+    tiles:
+      FallbackTile: FloorSteel
+    whitelists:
+      Rooms:
+        tags:
+        - NFVirologyLab
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonBase

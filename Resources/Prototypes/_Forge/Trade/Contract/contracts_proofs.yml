@@ -1,0 +1,27 @@
+- type: entity
+  parent: PaperOffice
+  id: ForgeTradeContractProofDeliveryReceipt
+  name: "экспедиционная накладная"
+  description: "Подтверждение, что контрактный груз доставлен и принят на месте."
+  categories: [ HideSpawnMenu ]
+
+- type: entity
+  parent: PaperScrap
+  id: ForgeTradeContractProofCarpTrophy
+  name: "метка космического карпа"
+  description: "Контрактная метка, снятая с последней подтвержденной цели."
+  categories: [ HideSpawnMenu ]
+
+- type: entity
+  parent: PaperScrap
+  id: ForgeTradeContractProofHuntTrophy
+  name: "контрактная трофейная метка"
+  description: "Подтверждение зачистки опасной цели на экспедиционном обломке."
+  categories: [ HideSpawnMenu ]
+
+- type: ncRetrievalProofPreset
+  id: ForgeTradeDeliveryReceiptProof
+  prototype: ForgeTradeContractProofDeliveryReceipt
+  ownership: Bearer
+  reissue: Never
+  consumeOnRewardClaim: true
