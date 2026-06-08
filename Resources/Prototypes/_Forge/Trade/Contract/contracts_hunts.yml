@@ -37,7 +37,15 @@
       weight: 1
     - prototype: ForgeHuntDungeonWreck
       weight: 1
-    - prototype: ForgeHuntDungeonVGRoidInterior
+    - prototype: ForgeHuntVGRoidScrap
+      weight: 1
+    - prototype: ForgeHuntVGRoidCave
+      weight: 1
+    - prototype: ForgeHuntVGRoidBasalt
+      weight: 1
+    - prototype: ForgeHuntVGRoidChromite
+      weight: 1
+    - prototype: ForgeHuntVGRoidSnow
       weight: 1
     - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
@@ -88,7 +96,15 @@
       weight: 1
     - prototype: ForgeHuntDungeonWreck
       weight: 1
-    - prototype: ForgeHuntDungeonVGRoidInterior
+    - prototype: ForgeHuntVGRoidScrap
+      weight: 1
+    - prototype: ForgeHuntVGRoidCave
+      weight: 1
+    - prototype: ForgeHuntVGRoidBasalt
+      weight: 1
+    - prototype: ForgeHuntVGRoidChromite
+      weight: 1
+    - prototype: ForgeHuntVGRoidSnow
       weight: 1
     - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
@@ -139,7 +155,15 @@
       weight: 1
     - prototype: ForgeHuntDungeonWreck
       weight: 1
-    - prototype: ForgeHuntDungeonVGRoidInterior
+    - prototype: ForgeHuntVGRoidScrap
+      weight: 1
+    - prototype: ForgeHuntVGRoidCave
+      weight: 1
+    - prototype: ForgeHuntVGRoidBasalt
+      weight: 1
+    - prototype: ForgeHuntVGRoidChromite
+      weight: 1
+    - prototype: ForgeHuntVGRoidSnow
       weight: 1
     - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
@@ -190,7 +214,15 @@
       weight: 1
     - prototype: ForgeHuntDungeonWreck
       weight: 1
-    - prototype: ForgeHuntDungeonVGRoidInterior
+    - prototype: ForgeHuntVGRoidScrap
+      weight: 1
+    - prototype: ForgeHuntVGRoidCave
+      weight: 1
+    - prototype: ForgeHuntVGRoidBasalt
+      weight: 1
+    - prototype: ForgeHuntVGRoidChromite
+      weight: 1
+    - prototype: ForgeHuntVGRoidSnow
       weight: 1
     - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
@@ -241,7 +273,15 @@
       weight: 1
     - prototype: ForgeHuntDungeonWreck
       weight: 1
-    - prototype: ForgeHuntDungeonVGRoidInterior
+    - prototype: ForgeHuntVGRoidScrap
+      weight: 1
+    - prototype: ForgeHuntVGRoidCave
+      weight: 1
+    - prototype: ForgeHuntVGRoidBasalt
+      weight: 1
+    - prototype: ForgeHuntVGRoidChromite
+      weight: 1
+    - prototype: ForgeHuntVGRoidSnow
       weight: 1
     - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
@@ -292,7 +332,15 @@
       weight: 1
     - prototype: ForgeHuntDungeonWreck
       weight: 1
-    - prototype: ForgeHuntDungeonVGRoidInterior
+    - prototype: ForgeHuntVGRoidScrap
+      weight: 1
+    - prototype: ForgeHuntVGRoidCave
+      weight: 1
+    - prototype: ForgeHuntVGRoidBasalt
+      weight: 1
+    - prototype: ForgeHuntVGRoidChromite
+      weight: 1
+    - prototype: ForgeHuntVGRoidSnow
       weight: 1
     - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
@@ -343,7 +391,15 @@
       weight: 1
     - prototype: ForgeHuntDungeonWreck
       weight: 1
-    - prototype: ForgeHuntDungeonVGRoidInterior
+    - prototype: ForgeHuntVGRoidScrap
+      weight: 1
+    - prototype: ForgeHuntVGRoidCave
+      weight: 1
+    - prototype: ForgeHuntVGRoidBasalt
+      weight: 1
+    - prototype: ForgeHuntVGRoidChromite
+      weight: 1
+    - prototype: ForgeHuntVGRoidSnow
       weight: 1
     - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
@@ -394,7 +450,15 @@
       weight: 1
     - prototype: ForgeHuntDungeonWreck
       weight: 1
-    - prototype: ForgeHuntDungeonVGRoidInterior
+    - prototype: ForgeHuntVGRoidScrap
+      weight: 1
+    - prototype: ForgeHuntVGRoidCave
+      weight: 1
+    - prototype: ForgeHuntVGRoidBasalt
+      weight: 1
+    - prototype: ForgeHuntVGRoidChromite
+      weight: 1
+    - prototype: ForgeHuntVGRoidSnow
       weight: 1
     - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
@@ -445,7 +509,15 @@
       weight: 1
     - prototype: ForgeHuntDungeonWreck
       weight: 1
-    - prototype: ForgeHuntDungeonVGRoidInterior
+    - prototype: ForgeHuntVGRoidScrap
+      weight: 1
+    - prototype: ForgeHuntVGRoidCave
+      weight: 1
+    - prototype: ForgeHuntVGRoidBasalt
+      weight: 1
+    - prototype: ForgeHuntVGRoidChromite
+      weight: 1
+    - prototype: ForgeHuntVGRoidSnow
       weight: 1
     - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
@@ -498,7 +570,15 @@
       weight: 1
     - prototype: ForgeHuntDungeonWreck
       weight: 1
-    - prototype: ForgeHuntDungeonVGRoidInterior
+    - prototype: ForgeHuntVGRoidScrap
+      weight: 1
+    - prototype: ForgeHuntVGRoidCave
+      weight: 1
+    - prototype: ForgeHuntVGRoidBasalt
+      weight: 1
+    - prototype: ForgeHuntVGRoidChromite
+      weight: 1
+    - prototype: ForgeHuntVGRoidSnow
       weight: 1
     - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
@@ -551,7 +631,15 @@
       weight: 1
     - prototype: ForgeHuntDungeonWreck
       weight: 1
-    - prototype: ForgeHuntDungeonVGRoidInterior
+    - prototype: ForgeHuntVGRoidScrap
+      weight: 1
+    - prototype: ForgeHuntVGRoidCave
+      weight: 1
+    - prototype: ForgeHuntVGRoidBasalt
+      weight: 1
+    - prototype: ForgeHuntVGRoidChromite
+      weight: 1
+    - prototype: ForgeHuntVGRoidSnow
       weight: 1
     - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
@@ -604,7 +692,15 @@
       weight: 1
     - prototype: ForgeHuntDungeonWreck
       weight: 1
-    - prototype: ForgeHuntDungeonVGRoidInterior
+    - prototype: ForgeHuntVGRoidScrap
+      weight: 1
+    - prototype: ForgeHuntVGRoidCave
+      weight: 1
+    - prototype: ForgeHuntVGRoidBasalt
+      weight: 1
+    - prototype: ForgeHuntVGRoidChromite
+      weight: 1
+    - prototype: ForgeHuntVGRoidSnow
       weight: 1
     - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
@@ -657,7 +753,15 @@
       weight: 1
     - prototype: ForgeHuntDungeonWreck
       weight: 1
-    - prototype: ForgeHuntDungeonVGRoidInterior
+    - prototype: ForgeHuntVGRoidScrap
+      weight: 1
+    - prototype: ForgeHuntVGRoidCave
+      weight: 1
+    - prototype: ForgeHuntVGRoidBasalt
+      weight: 1
+    - prototype: ForgeHuntVGRoidChromite
+      weight: 1
+    - prototype: ForgeHuntVGRoidSnow
       weight: 1
     - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1

@@ -134,6 +134,7 @@ public sealed partial class NcContractSystem : EntitySystem
         if (!TryPickHuntDungeonPrototype(contractId, contract.Config.HuntDungeons, out var dungeonPrototype))
             return false;
 
+        state.HuntDungeonSelfContained = IsSelfContainedHuntDungeonPrototype(dungeonPrototype);
         var dungeonConfig = _prototypes.Index<DungeonConfigPrototype>(dungeonPrototype);
         var generationMap = _map.CreateMap(out var generationMapId, runMapInit: false);
         Entity<MapGridComponent> grid;
@@ -141,6 +142,7 @@ public sealed partial class NcContractSystem : EntitySystem
         {
             grid = _mapManager.CreateGridEntity(generationMapId);
             _xform.SetMapCoordinates(grid, new MapCoordinates(Vector2.Zero, generationMapId));
+            _mapManager.DoMapInitialize(generationMapId);
         }
         catch (Exception e)
         {
@@ -513,13 +515,13 @@ public sealed partial class NcContractSystem : EntitySystem
         }
 
         var dungeons = task.GetAwaiter().GetResult();
-        if (dungeons.Count == 0 || !HasGeneratedHuntDungeonRooms(dungeons))
+        if (!HasGeneratedHuntDungeonContent(dungeons, state.HuntDungeonSelfContained))
         {
             FinalizeObjectiveTerminalOutcome(
                 key,
                 comp,
                 contract,
-                $"Dungeon generation failed for hunt contract '{key.ContractId}': generated no rooms.");
+                $"Dungeon generation failed for hunt contract '{key.ContractId}': generated no usable tiles.");
             return;
         }
 
@@ -558,7 +560,8 @@ public sealed partial class NcContractSystem : EntitySystem
             return;
         }
 
-        SpawnHuntDungeonExterior(key.ContractId, contract.Config, placedGrid.Owner, placedGrid.Comp);
+        if (!state.HuntDungeonSelfContained)
+            SpawnHuntDungeonExterior(key.ContractId, contract.Config, placedGrid.Owner, placedGrid.Comp);
 
         var spawnCoordinates = new List<EntityCoordinates>();
         spawnCoordinates.Clear();
@@ -744,12 +747,21 @@ public sealed partial class NcContractSystem : EntitySystem
         _shuttle.RemoveIFFFlag(grid, IFFFlags.Hide | IFFFlags.HideLabel | IFFFlags.HideLabelAlways);
     }
 
-    private static bool HasGeneratedHuntDungeonRooms(IReadOnlyList<Dungeon> dungeons)
+    private static bool IsSelfContainedHuntDungeonPrototype(string prototypeId)
+    {
+        return prototypeId.StartsWith("ForgeHuntVGRoid", StringComparison.Ordinal) ||
+               prototypeId.StartsWith("NFVGRoid", StringComparison.Ordinal);
+    }
+
+    private static bool HasGeneratedHuntDungeonContent(IReadOnlyList<Dungeon> dungeons, bool allowTileOnly)
     {
         for (var i = 0; i < dungeons.Count; i++)
         {
-            if (dungeons[i].Rooms.Count > 0)
+            if (dungeons[i].Rooms.Count > 0 ||
+                allowTileOnly && dungeons[i].AllTiles.Count > 0)
+            {
                 return true;
+            }
         }
 
         return false;

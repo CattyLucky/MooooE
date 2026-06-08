@@ -2,6 +2,8 @@ using Content.Server.Popups;
 using Content.Server.Storage.Components;
 using Content.Shared._Forge.Trade;
 using Content.Shared.Access.Components;
+using Content.Shared.Chemistry.Components;
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Stacks;
 using Content.Shared.Storage.Components;
 using Content.Shared.UserInterface;
@@ -83,6 +85,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         SubscribeLocalEvent<NcStoreComponent, ComponentShutdown>(OnStoreShutdown);
         SubscribeLocalEvent<ContainerManagerComponent, EntInsertedIntoContainerMessage>(OnUserEntInserted);
         SubscribeLocalEvent<ContainerManagerComponent, EntRemovedFromContainerMessage>(OnUserEntRemoved);
+        SubscribeLocalEvent<RefillableSolutionComponent, SolutionContainerChangedEvent>(OnRefillableSolutionChanged);
         SubscribeLocalEvent<StackComponent, StackCountChangedEvent>(OnStackCountChanged);
         SubscribeLocalEvent<EntParentChangedMessage>(OnWatchedEntityParentChanged);
         SubscribeLocalEvent<NcStoreComponent, ClaimContractBoundMessage>(OnClaimContract);

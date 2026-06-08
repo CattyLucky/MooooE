@@ -1,4 +1,6 @@
 using Content.Shared._Forge.Trade;
+using Content.Shared.Chemistry.Components;
+using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Stacks;
 using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
@@ -96,6 +98,19 @@ public sealed partial class StoreStructuredSystem : EntitySystem
     }
 
     private void OnStackCountChanged(EntityUid uid, StackComponent comp, ref StackCountChangedEvent args)
+    {
+        if (_storesByWatchedRoot.Count == 0)
+            return;
+
+        if (TryFindWatchedRoot(uid, out var r))
+            RefreshStoresAffectedBy(r);
+    }
+
+    private void OnRefillableSolutionChanged(
+        EntityUid uid,
+        RefillableSolutionComponent comp,
+        ref SolutionContainerChangedEvent args
+    )
     {
         if (_storesByWatchedRoot.Count == 0)
             return;

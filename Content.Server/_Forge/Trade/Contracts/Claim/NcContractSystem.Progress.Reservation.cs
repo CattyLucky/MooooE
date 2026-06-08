@@ -238,11 +238,12 @@ public sealed partial class NcContractSystem : EntitySystem
             if (TryComp(ent, out StackComponent? _))
                 continue;
 
-            if (!MatchesReagentTarget(ent, reagentId, solution, reagentAmount))
+            var units = CountReagentTargetUnits(ent, reagentId, solution, reagentAmount, need - reserved);
+            if (units <= 0)
                 continue;
 
             if (consumedNonStack.Add(ent))
-                reserved += 1;
+                reserved += units;
         }
 
         return reserved;

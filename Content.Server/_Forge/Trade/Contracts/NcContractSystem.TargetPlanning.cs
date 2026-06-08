@@ -9,6 +9,7 @@ namespace Content.Server._Forge.Trade;
 
 public sealed partial class NcContractSystem : EntitySystem
 {
+    private const string AnySolutionName = "any";
     private readonly List<(string ProtoId, PrototypeMatchMode MatchMode, int Depth)> _claimOrderedKeysScratch = new();
     private readonly Dictionary<(string ProtoId, PrototypeMatchMode MatchMode), int> _claimRequiredByKeyScratch = new();
     private readonly Dictionary<EntityUid, int> _claimVirtualStackLeftScratch = new();
@@ -92,11 +93,59 @@ public sealed partial class NcContractSystem : EntitySystem
         if (requiredAmount <= FixedPoint2.Zero)
             return false;
 
-        if (!TryComp(candidateEntity, out SolutionContainerManagerComponent? manager) ||
-            !_solutions.TryGetSolution((candidateEntity, manager), solutionName, out _, out var solution))
-            return false;
+        return CountReagentTargetUnits(candidateEntity, reagentId, solutionName, requiredAmount, 1) > 0;
+    }
 
-        return solution.GetTotalPrototypeQuantity(reagentId) >= requiredAmount;
+    private int CountReagentTargetUnits(
+        EntityUid candidateEntity,
+        string reagentId,
+        string solutionName,
+        FixedPoint2 requiredAmount,
+        int maxUnits = int.MaxValue
+    )
+    {
+        if (string.IsNullOrWhiteSpace(reagentId) ||
+            string.IsNullOrWhiteSpace(solutionName) ||
+            requiredAmount <= FixedPoint2.Zero ||
+            maxUnits <= 0)
+            return 0;
+
+        if (!TryComp(candidateEntity, out SolutionContainerManagerComponent? manager))
+            return 0;
+
+        if (IsAnySolutionName(solutionName))
+        {
+            var available = FixedPoint2.Zero;
+            foreach (var (_, solutionEnt) in _solutions.EnumerateSolutions((candidateEntity, manager), false))
+            {
+                available += solutionEnt.Comp.Solution.GetTotalPrototypeQuantity(reagentId);
+                if (CountReagentUnits(available, requiredAmount) >= maxUnits)
+                    return maxUnits;
+            }
+
+            return CountReagentUnits(available, requiredAmount);
+        }
+
+        if (!_solutions.TryGetSolution((candidateEntity, manager), solutionName, out _, out var solution))
+            return 0;
+
+        return Math.Min(
+            maxUnits,
+            CountReagentUnits(solution.GetTotalPrototypeQuantity(reagentId), requiredAmount));
+    }
+
+    private static int CountReagentUnits(FixedPoint2 available, FixedPoint2 requiredAmount)
+    {
+        if (available <= FixedPoint2.Zero || requiredAmount <= FixedPoint2.Zero)
+            return 0;
+
+        return Math.Max(0, available.Value / requiredAmount.Value);
+    }
+
+    private static bool IsAnySolutionName(string solutionName)
+    {
+        return string.Equals(solutionName, AnySolutionName, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(solutionName, "*", StringComparison.Ordinal);
     }
 
     private bool CanUseContractPlanningEntity(EntityUid root, EntityUid ent, bool worldTurnInSource)

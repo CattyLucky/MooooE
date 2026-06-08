@@ -120,6 +120,24 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
         }
 
+        if (!entry.IsStack && entry.MatchMode == PrototypeMatchMode.Reagent)
+        {
+            var available = CountReagentTargetUnits(
+                entry.Entity,
+                entry.TargetItem,
+                entry.Solution,
+                entry.ReagentAmount,
+                entry.Amount);
+
+            if (available >= entry.Amount)
+                return true;
+
+            fail = CreateClaimExecutionFailure(
+                $"Planned reagent amount mismatch: need {entry.Amount}x {entry.ReagentAmount}u of {entry.TargetItem}, " +
+                $"have {available} matching units on {ToPrettyString(entry.Entity)}.");
+            return false;
+        }
+
         if (!entry.IsStack)
             return true;
 
@@ -187,10 +205,28 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
         }
 
+        if (!entry.IsStack && entry.MatchMode == PrototypeMatchMode.Reagent)
+        {
+            var available = CountReagentTargetUnits(
+                entry.Entity,
+                entry.TargetItem,
+                entry.Solution,
+                entry.ReagentAmount,
+                entry.Amount);
+
+            if (available < entry.Amount)
+            {
+                fail = CreateClaimExecutionFailure(
+                    $"Planned reagent amount mismatch: need {entry.Amount}x {entry.ReagentAmount}u of {entry.TargetItem}, " +
+                    $"have {available} matching units on {ToPrettyString(entry.Entity)}.");
+                return false;
+            }
+        }
+
         if (!entry.IsStack)
         {
             journal.PendingDeletes.Add(entry.Entity);
-            journal.ReturnCandidates.Add(entry.Entity);
+            journal.ReturnCandidates.Add(entry);
             return true;
         }
 

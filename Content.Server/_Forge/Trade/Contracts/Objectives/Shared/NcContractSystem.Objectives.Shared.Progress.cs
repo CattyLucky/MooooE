@@ -65,6 +65,7 @@ public sealed partial class NcContractSystem : EntitySystem
         public EntityUid? HuntBodyEntity;
         public EntityUid? HuntDebrisEntity;
         public EntityCoordinates? HuntDungeonAnchorCoordinates;
+        public bool HuntDungeonSelfContained;
         public EntityUid? HuntDungeonGenerationMap;
         public readonly List<EntityUid> HuntDungeonGridEntities = new();
         public Task<List<Dungeon>>? HuntDungeonGenerationTask;

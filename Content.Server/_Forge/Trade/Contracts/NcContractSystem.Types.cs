@@ -1,4 +1,5 @@
 using Content.Shared._Forge.Trade;
+using Content.Shared.FixedPoint;
 
 namespace Content.Server._Forge.Trade;
 
@@ -10,7 +11,9 @@ public sealed partial class NcContractSystem : EntitySystem
         int Amount,
         bool IsStack,
         string TargetItem,
-        PrototypeMatchMode MatchMode);
+        PrototypeMatchMode MatchMode,
+        string Solution = "drink",
+        FixedPoint2 ReagentAmount = default);
 
     private enum ClaimFailureReason : byte
     {

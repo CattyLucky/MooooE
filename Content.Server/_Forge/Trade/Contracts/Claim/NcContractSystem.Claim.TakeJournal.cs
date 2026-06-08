@@ -1,6 +1,7 @@
 using Content.Shared._Forge.Trade;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
+using Content.Shared.FixedPoint;
 using Content.Shared.Stacks;
 
 namespace Content.Server._Forge.Trade;
@@ -36,30 +37,177 @@ public sealed partial class NcContractSystem
         if (!Exists(receiver) || !TryComp(receiver, out TransformComponent? receiverXform))
             return;
 
-        var returnCount = (int) MathF.Floor(journal.ReturnCandidates.Count * Math.Clamp(returnFraction, 0f, 1f));
-        if (returnCount <= 0)
+        var returnBudget = CalculateClaimReturnBudget(journal.ReturnCandidates, returnFraction);
+        if (returnBudget <= 0)
             return;
 
-        for (var i = 0; i < journal.ReturnCandidates.Count && returnCount > 0; i++)
+        for (var i = 0; i < journal.ReturnCandidates.Count && returnBudget > 0; i++)
         {
-            var ent = journal.ReturnCandidates[i];
-            if (!TryGetPlanningEntityPrototypeId(ent, out var prototypeId))
+            var entry = journal.ReturnCandidates[i];
+            if (entry.MatchMode == PrototypeMatchMode.Reagent)
+            {
+                returnBudget -= ReturnClaimReagentUnitsBestEffort(entry, receiver, receiverXform, returnBudget);
                 continue;
+            }
 
+            if (ReturnClaimItemBestEffort(entry.Entity, receiver, receiverXform))
+                returnBudget--;
+        }
+    }
+
+    private static int CalculateClaimReturnBudget(
+        List<ClaimTakeEntry> returnCandidates,
+        float returnFraction
+    )
+    {
+        if (returnFraction <= 0f || returnCandidates.Count == 0)
+            return 0;
+
+        var totalUnits = 0;
+        for (var i = 0; i < returnCandidates.Count; i++)
+            totalUnits = SaturatingAdd(totalUnits, Math.Max(0, returnCandidates[i].Amount));
+
+        return (int) MathF.Floor(totalUnits * Math.Clamp(returnFraction, 0f, 1f));
+    }
+
+    private bool ReturnClaimItemBestEffort(
+        EntityUid ent,
+        EntityUid receiver,
+        TransformComponent receiverXform
+    )
+    {
+        if (!TryGetPlanningEntityPrototypeId(ent, out var prototypeId))
+            return false;
+
+        try
+        {
+            var returned = Spawn(prototypeId, receiverXform.Coordinates);
+            CopySolutionsBestEffort(ent, returned);
+            EnsureComp<NcContractTurnInBlockedComponent>(returned);
+            _logic.QueuePickupToHandsOrCrateNextTick(receiver, returned);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Sawmill.Warning(
+                $"[Claim] Failed to return consumed contract item prototype '{prototypeId}' to {ToPrettyString(receiver)}: {e}");
+            return false;
+        }
+    }
+
+    private int ReturnClaimReagentUnitsBestEffort(
+        ClaimTakeEntry entry,
+        EntityUid receiver,
+        TransformComponent receiverXform,
+        int maxUnits
+    )
+    {
+        var units = Math.Min(Math.Max(0, entry.Amount), maxUnits);
+        if (units <= 0)
+            return 0;
+
+        if (!TryGetPlanningEntityPrototypeId(entry.Entity, out var prototypeId))
+            return 0;
+
+        if (!TryResolveClaimReagentReturnSolution(
+                entry.Entity,
+                entry.TargetItem,
+                entry.Solution,
+                entry.ReagentAmount,
+                out var solutionName,
+                out var maxVolume))
+            return 0;
+
+        var returnedCount = 0;
+        for (var i = 0; i < units; i++)
+        {
             try
             {
                 var returned = Spawn(prototypeId, receiverXform.Coordinates);
-                CopySolutionsBestEffort(ent, returned);
+                if (!TryFillReturnedReagentUnit(returned, solutionName, maxVolume, entry.TargetItem, entry.ReagentAmount))
+                {
+                    DeleteFinalEntityBestEffort(returned, "ClaimReturnFailed");
+                    continue;
+                }
+
                 EnsureComp<NcContractTurnInBlockedComponent>(returned);
                 _logic.QueuePickupToHandsOrCrateNextTick(receiver, returned);
-                returnCount--;
+                returnedCount++;
             }
             catch (Exception e)
             {
                 Sawmill.Warning(
-                    $"[Claim] Failed to return consumed contract item prototype '{prototypeId}' to {ToPrettyString(receiver)}: {e}");
+                    $"[Claim] Failed to return consumed reagent unit prototype '{prototypeId}' to {ToPrettyString(receiver)}: {e}");
             }
         }
+
+        return returnedCount;
+    }
+
+    private bool TryResolveClaimReagentReturnSolution(
+        EntityUid source,
+        string reagentId,
+        string solution,
+        FixedPoint2 reagentAmount,
+        out string solutionName,
+        out FixedPoint2 maxVolume
+    )
+    {
+        solutionName = string.IsNullOrWhiteSpace(solution) || IsAnySolutionName(solution)
+            ? "drink"
+            : solution;
+        maxVolume = FixedPoint2.Max(reagentAmount, FixedPoint2.New(1));
+
+        if (!TryComp(source, out SolutionContainerManagerComponent? manager))
+            return true;
+
+        if (!IsAnySolutionName(solution))
+        {
+            if (!_solutions.TryGetSolution((source, manager), solution, out _, out var sourceSolution))
+                return true;
+
+            solutionName = solution;
+            maxVolume = FixedPoint2.Max(sourceSolution.MaxVolume, reagentAmount);
+            return true;
+        }
+
+        foreach (var (name, solutionEnt) in _solutions.EnumerateSolutions((source, manager), false))
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                continue;
+
+            var sourceSolution = solutionEnt.Comp.Solution;
+            if (sourceSolution.GetTotalPrototypeQuantity(reagentId) < reagentAmount)
+                continue;
+
+            solutionName = name;
+            maxVolume = FixedPoint2.Max(sourceSolution.MaxVolume, reagentAmount);
+            return true;
+        }
+
+        return true;
+    }
+
+    private bool TryFillReturnedReagentUnit(
+        EntityUid returned,
+        string solutionName,
+        FixedPoint2 maxVolume,
+        string reagentId,
+        FixedPoint2 reagentAmount
+    )
+    {
+        if (string.IsNullOrWhiteSpace(solutionName) ||
+            string.IsNullOrWhiteSpace(reagentId) ||
+            reagentAmount <= FixedPoint2.Zero)
+            return false;
+
+        if (!_solutions.EnsureSolutionEntity((returned, null), solutionName, out var targetSolutionEnt, maxVolume) ||
+            targetSolutionEnt == null)
+            return false;
+
+        _solutions.RemoveAllSolution(targetSolutionEnt.Value);
+        _solutions.SetCapacity(targetSolutionEnt.Value, FixedPoint2.Max(maxVolume, reagentAmount));
+        return _solutions.TryAddSolution(targetSolutionEnt.Value, new Solution(reagentId, reagentAmount));
     }
 
     private void CopySolutionsBestEffort(EntityUid source, EntityUid target)
@@ -141,7 +289,7 @@ public sealed partial class NcContractSystem
     private sealed class ClaimTakeJournal
     {
         public readonly List<EntityUid> PendingDeletes = new();
-        public readonly List<EntityUid> ReturnCandidates = new();
+        public readonly List<ClaimTakeEntry> ReturnCandidates = new();
 
         public readonly List<(EntityUid Cargo, (EntityUid Store, string ContractId) Key)>
             RetrievalCargoRestores = new();

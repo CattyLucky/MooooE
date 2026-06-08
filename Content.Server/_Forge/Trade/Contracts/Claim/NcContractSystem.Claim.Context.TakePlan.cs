@@ -155,10 +155,21 @@ public sealed partial class NcContractSystem : EntitySystem
             if (TryComp(ent, out StackComponent? _))
                 continue;
 
-            if (!MatchesReagentTarget(ent, reagentId, solution, reagentAmount))
+            var units = CountReagentTargetUnits(ent, reagentId, solution, reagentAmount, need - reserved);
+            if (units <= 0)
                 continue;
 
-            reserved += AppendClaimEntityTake(root, ent, reagentId, PrototypeMatchMode.Reagent, planOut, items, i);
+            reserved += AppendClaimEntityTake(
+                root,
+                ent,
+                reagentId,
+                PrototypeMatchMode.Reagent,
+                planOut,
+                items,
+                i,
+                units,
+                solution,
+                reagentAmount);
         }
 
         return reserved;
@@ -276,11 +287,17 @@ public sealed partial class NcContractSystem : EntitySystem
         PrototypeMatchMode matchMode,
         List<ClaimTakeEntry> planOut,
         List<EntityUid> items,
-        int index
+        int index,
+        int amount = 1,
+        string solution = "drink",
+        FixedPoint2 reagentAmount = default
     )
     {
-        planOut.Add(new ClaimTakeEntry(root, ent, 1, false, targetItem, matchMode));
+        if (amount <= 0)
+            return 0;
+
+        planOut.Add(new ClaimTakeEntry(root, ent, amount, false, targetItem, matchMode, solution, reagentAmount));
         items[index] = EntityUid.Invalid;
-        return 1;
+        return amount;
     }
 }
