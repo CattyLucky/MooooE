@@ -1,7 +1,7 @@
 - type: ncRetrievalContract
   id: ForgeRetrievalEasyLostCrate
   name: "Потерянная пломба"
-  description: "Найдите меченый ящик примерно в 2000 метрах от станции и верните его в торговый автомат."
+  description: "Найдите меченый ящик примерно в 14000 метрах от станции и верните его в торговый автомат."
   icon: ForgeTradeCargoExpeditionCrate
   cargo:
   - prototype: ForgeTradeCargoExpeditionCrate
@@ -18,7 +18,7 @@
 - type: ncRetrievalContract
   id: ForgeRetrievalMediumMedicalCrate
   name: "Медицинский груз за бортом"
-  description: "Найдите меченый медицинский ящик примерно в 4000 метрах от станции и верните его в торговый автомат."
+  description: "Найдите меченый медицинский ящик примерно в 20000 метрах от станции и верните его в торговый автомат."
   icon: ForgeTradeCargoMedicalCrate
   cargo:
   - prototype: ForgeTradeCargoMedicalCrate
@@ -35,7 +35,7 @@
 - type: ncRetrievalContract
   id: ForgeRetrievalHardSecureCrate
   name: "Запертый груз"
-  description: "Найдите защищённый контрактный ящик примерно в 7000 метрах от станции и верните его в торговый автомат."
+  description: "Найдите защищённый контрактный ящик примерно в 30000 метрах от станции и верните его в торговый автомат."
   icon: ForgeTradeCargoSecureCrate
   cargo:
   - prototype: ForgeTradeCargoSecureCrate

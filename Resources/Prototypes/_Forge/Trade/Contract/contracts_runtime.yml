@@ -53,8 +53,8 @@
     type: Store
   spaceSpawn:
     enabled: true
-    minDistance: 2000
-    maxDistance: 2000
+    minDistance: 14000
+    maxDistance: 14000
     safetyRadius: 16
     placementAttempts: 24
 
@@ -65,8 +65,8 @@
     type: Store
   spaceSpawn:
     enabled: true
-    minDistance: 4000
-    maxDistance: 4000
+    minDistance: 20000
+    maxDistance: 20000
     safetyRadius: 16
     placementAttempts: 24
 
@@ -77,8 +77,8 @@
     type: Store
   spaceSpawn:
     enabled: true
-    minDistance: 7000
-    maxDistance: 7000
+    minDistance: 30000
+    maxDistance: 30000
     safetyRadius: 16
     placementAttempts: 24
 
