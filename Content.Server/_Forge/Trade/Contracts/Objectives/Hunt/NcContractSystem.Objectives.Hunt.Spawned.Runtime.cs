@@ -608,6 +608,7 @@ public sealed partial class NcContractSystem : EntitySystem
         SpawnHuntDungeonFill(key.ContractId, contract.Config, dungeons, spawnCoordinates);
 
         if (contract.Config.GivePinpointer &&
+            state.PinpointerEntities.Count == 0 &&
             state.HuntPendingPinpointerUser is { } user &&
             user != EntityUid.Invalid &&
             !TerminatingOrDeleted(user) &&
@@ -1000,7 +1001,7 @@ public sealed partial class NcContractSystem : EntitySystem
         List<EntityCoordinates> spawnCoordinates
     )
     {
-        var count = PickHuntDungeonFillCount(config, spawnCoordinates.Count, CountGeneratedHuntDungeonRooms(dungeons));
+        var count = PickHuntDungeonFillCount(config, spawnCoordinates.Count);
         if (count <= 0)
             return;
 
@@ -1032,19 +1033,14 @@ public sealed partial class NcContractSystem : EntitySystem
 
     private int PickHuntDungeonFillCount(
         ContractObjectiveConfigData config,
-        int availableCoordinates,
-        int roomCount
+        int availableCoordinates
     )
     {
         if (availableCoordinates <= 0 || config.HuntDungeonFill.Count == 0)
             return 0;
 
-        var min = Math.Max(
-            Math.Max(0, config.HuntDungeonFillCount.Min),
-            roomCount * NcContractTuning.HuntDungeonFillMinPerRoom);
-        var max = Math.Max(
-            Math.Max(min, config.HuntDungeonFillCount.Max),
-            roomCount * NcContractTuning.HuntDungeonFillMaxPerRoom);
+        var min = Math.Max(0, config.HuntDungeonFillCount.Min);
+        var max = Math.Max(min, config.HuntDungeonFillCount.Max);
         if (max <= 0)
             return 0;
 
@@ -1053,15 +1049,6 @@ public sealed partial class NcContractSystem : EntitySystem
             : _random.Next(min, max + 1);
 
         return Math.Min(count, availableCoordinates);
-    }
-
-    private static int CountGeneratedHuntDungeonRooms(IReadOnlyList<Dungeon> dungeons)
-    {
-        var count = 0;
-        for (var i = 0; i < dungeons.Count; i++)
-            count += dungeons[i].Rooms.Count;
-
-        return count;
     }
 
     private bool TryPickHuntDungeonFillPrototype(

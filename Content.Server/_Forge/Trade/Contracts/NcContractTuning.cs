@@ -25,8 +25,6 @@ internal static class NcContractTuning
     public const int HuntDungeonExteriorMaxRockCount = 320;
     public const float HuntDungeonExteriorInnerRockChance = 0.04f;
     public const float HuntDungeonExteriorRimRockChance = 0.65f;
-    public const int HuntDungeonFillMinPerRoom = 4;
-    public const int HuntDungeonFillMaxPerRoom = 7;
     public const float RetrievalSpaceSpawnDistance = 2000f;
     public const float RetrievalSpaceSpawnSafetyRadius = 16f;
     public const int RetrievalSpaceSpawnPlacementAttempts = 24;

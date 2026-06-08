@@ -102,7 +102,7 @@ public sealed partial class NcHuntSpawnData
     public List<NcHuntDungeonFillEntry> DungeonFill { get; set; } = new();
 
     [DataField("dungeonFillCount")]
-    public IntRange DungeonFillCount { get; set; } = IntRange.Create(16, 24);
+    public IntRange DungeonFillCount { get; set; } = IntRange.Fixed(0);
 
     [DataField("debrisMinDistance")]
     public float DebrisMinDistance { get; set; }

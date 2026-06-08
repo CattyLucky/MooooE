@@ -89,6 +89,9 @@ public sealed partial class NcContractSystem : EntitySystem
         if (state.HuntDungeonGenerationTask != null)
         {
             state.HuntPendingPinpointerUser = user;
+            if (contract.Config.GivePinpointer)
+                TryIssuePendingSpawnedHuntPinpointer(store, user, contractId, contract, state);
+
             return true;
         }
 
@@ -123,5 +126,25 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
 
         return TrySpawnObjectivePinpointer(user, pinpointerTarget, (store, contractId), state, contract.Config, spawnCoords);
+    }
+
+    private bool TryIssuePendingSpawnedHuntPinpointer(
+        EntityUid store,
+        EntityUid user,
+        string contractId,
+        ContractServerData contract,
+        ObjectiveRuntimeState state
+    )
+    {
+        var spawnCoords = EntityCoordinates.Invalid;
+        if (TryComp(store, out TransformComponent? storeXform))
+            spawnCoords = storeXform.Coordinates;
+        else if (TryComp(user, out TransformComponent? userXform))
+            spawnCoords = userXform.Coordinates;
+
+        if (spawnCoords == EntityCoordinates.Invalid)
+            return false;
+
+        return TrySpawnPendingObjectivePinpointer(user, (store, contractId), state, contract.Config, spawnCoords);
     }
 }

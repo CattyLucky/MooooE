@@ -33,7 +33,12 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
 
         if (!TryResolveContractPinpointerTarget(store, user, contractId, contract, state, out var pinpointerTarget))
+        {
+            if (IsSpawnedHuntContract(contract) && IsSpawnedHuntDungeonGenerationPending(state))
+                return TryIssuePendingSpawnedHuntPinpointer(store, user, contractId, contract, state);
+
             return false;
+        }
 
         EntityCoordinates spawnCoords;
         if (TryComp(store, out TransformComponent? storeXform))

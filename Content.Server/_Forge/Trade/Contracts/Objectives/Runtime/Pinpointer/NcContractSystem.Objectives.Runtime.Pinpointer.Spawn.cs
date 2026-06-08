@@ -15,6 +15,44 @@ public sealed partial class NcContractSystem : EntitySystem
         EntityCoordinates spawnCoords
     )
     {
+        return TrySpawnObjectivePinpointer(
+            user,
+            target,
+            true,
+            key,
+            state,
+            config,
+            spawnCoords);
+    }
+
+    private bool TrySpawnPendingObjectivePinpointer(
+        EntityUid user,
+        (EntityUid Store, string ContractId) key,
+        ObjectiveRuntimeState state,
+        ContractObjectiveConfigData config,
+        EntityCoordinates spawnCoords
+    )
+    {
+        return TrySpawnObjectivePinpointer(
+            user,
+            null,
+            false,
+            key,
+            state,
+            config,
+            spawnCoords);
+    }
+
+    private bool TrySpawnObjectivePinpointer(
+        EntityUid user,
+        EntityUid? target,
+        bool active,
+        (EntityUid Store, string ContractId) key,
+        ObjectiveRuntimeState state,
+        ContractObjectiveConfigData config,
+        EntityCoordinates spawnCoords
+    )
+    {
         if (!CanIssueContractPinpointer(key, state, config))
         {
             var limit = GetContractPinpointerLimit(config);
@@ -30,7 +68,7 @@ public sealed partial class NcContractSystem : EntitySystem
         if (!TrySpawnObjectivePinpointerEntity(key, pinpointerProtoId, pinpointerCoords, out var pinpointer))
             return false;
 
-        RegisterObjectivePinpointer(user, target, key, state, pinpointer);
+        RegisterObjectivePinpointer(user, target, active, key, state, pinpointer);
         return true;
     }
 
@@ -83,14 +121,15 @@ public sealed partial class NcContractSystem : EntitySystem
 
     private void RegisterObjectivePinpointer(
         EntityUid user,
-        EntityUid target,
+        EntityUid? target,
+        bool active,
         (EntityUid Store, string ContractId) key,
         ObjectiveRuntimeState state,
         EntityUid pinpointer
     )
     {
         _pinpointer.SetTarget(pinpointer, target);
-        _pinpointer.SetActive(pinpointer, true);
+        _pinpointer.SetActive(pinpointer, active);
         _pinpointerService.RegisterIssuedPinpointer(_objectiveRuntime, key, state, user, pinpointer);
         _logic.QueuePickupToHandsOrCrateNextTick(user, pinpointer);
     }
