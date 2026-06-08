@@ -4,7 +4,7 @@ namespace Content.Server._Forge.Trade;
 
 public sealed partial class NcStoreLogicSystem
 {
-    public int GetMaxBarterCountFromSnapshot(NcStoreListingDef listing, in NcInventorySnapshot snapshot)
+    public int GetMaxBarterCountFromSnapshot(EntityUid user, NcStoreListingDef listing, in NcInventorySnapshot snapshot)
     {
         if (listing.Mode != StoreMode.Barter ||
             listing.BarterCost.Count == 0 ||
@@ -19,7 +19,7 @@ public sealed partial class NcStoreLogicSystem
         for (var i = 0; i < aggregatedCosts.Count; i++)
         {
             var cost = aggregatedCosts[i];
-            if (!TryGetAffordableBarterUnitsFromSnapshot(cost, snapshot, out var possible))
+            if (!TryGetAffordableBarterUnitsFromSnapshot(user, cost, snapshot, out var possible))
                 return 0;
 
             max = Math.Min(max, possible);
@@ -40,7 +40,7 @@ public sealed partial class NcStoreLogicSystem
         BarterAvailabilityContext? context = null
     )
     {
-        var upper = GetMaxBarterCountFromSnapshot(listing, snapshot);
+        var upper = GetMaxBarterCountFromSnapshot(user, listing, snapshot);
         if (upper <= 0)
             return 0;
 

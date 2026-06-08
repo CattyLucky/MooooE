@@ -9,7 +9,7 @@
   route: ForgeTradeRouteCargoToTraderEasy
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 10000
   - type: Pool
     pool: ForgeExpeditionRewardBasic
@@ -26,7 +26,7 @@
   route: ForgeTradeRouteCargoToTraderMedium
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 30000
   - type: Pool
     pool: ForgeExpeditionRewardAdvanced
@@ -43,7 +43,7 @@
   route: ForgeTradeRouteCargoToTraderHard
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 45000
   - type: Pool
     pool: ForgeExpeditionRewardElite

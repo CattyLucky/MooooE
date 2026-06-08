@@ -56,7 +56,7 @@ public sealed partial class StackCurrencyHandler : ICurrencyHandler
                _protos.HasIndex<EntityPrototype>(proto.Spawn);
     }
 
-    public bool TryGetBalance(in NcInventorySnapshot snapshot, string currencyId, out int balance)
+    public bool TryGetBalance(EntityUid user, in NcInventorySnapshot snapshot, string currencyId, out int balance)
     {
         if (string.IsNullOrWhiteSpace(currencyId))
         {
@@ -66,6 +66,11 @@ public sealed partial class StackCurrencyHandler : ICurrencyHandler
 
         balance = snapshot.StackTypeCounts.TryGetValue(currencyId, out var b) ? b : 0;
         return true;
+    }
+
+    public bool IsVirtualCurrency(string currencyId)
+    {
+        return false;
     }
 
     public bool CanGiveCurrency(EntityUid user, string currencyId, int amount)

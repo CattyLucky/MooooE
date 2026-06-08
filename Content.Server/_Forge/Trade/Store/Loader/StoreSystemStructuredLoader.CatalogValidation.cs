@@ -1,5 +1,4 @@
 using Content.Shared._Forge.Trade;
-using Content.Shared.Stacks;
 using Content.Shared.Tag;
 using Robust.Shared.Prototypes;
 
@@ -31,14 +30,12 @@ public sealed partial class StoreSystemStructuredLoader
             return false;
         }
 
-        if (_prototypes.TryIndex<StackPrototype>(preset.Currency, out var stack) &&
-            !string.IsNullOrWhiteSpace(stack.Spawn) &&
-            _prototypes.HasIndex<EntityPrototype>(stack.Spawn))
+        if (_currency.CanHandleCurrency(preset.Currency))
             return true;
 
         Sawmill.Warning(
             $"[NcStore] {mode} preset '{presetId}' uses invalid currency '{preset.Currency}'. " +
-            "Expected a stack prototype with a valid spawn entity.");
+            "Expected a currency handled by the store currency system.");
         return false;
     }
 

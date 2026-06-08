@@ -86,7 +86,7 @@ public sealed partial class NcStoreLogicSystem
         _inventory.InvalidateInventoryCache(user);
         var snapshot = _inventory.BuildInventorySnapshot(user);
 
-        if (!TryPickCurrencyForBuy(store, listing, snapshot, out var currency, out var unitPrice, out var balance))
+        if (!TryPickCurrencyForBuy(user, store, listing, snapshot, out var currency, out var unitPrice, out var balance))
             return false;
 
         return TryBuildBuyPlan(currency, unitPrice, balance, count, listing, out plan);

@@ -9,7 +9,7 @@
     count: 4
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 10000
   - type: Pool
     pool: ForgeExpeditionRewardFoodBasic
@@ -26,7 +26,7 @@
     count: 4
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 10000
   - type: Pool
     pool: ForgeExpeditionRewardFoodBasic
@@ -43,7 +43,7 @@
     count: 4
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 10000
   - type: Pool
     pool: ForgeExpeditionRewardFoodBasic
@@ -60,7 +60,7 @@
     count: 4
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 10000
   - type: Pool
     pool: ForgeExpeditionRewardFoodBasic
@@ -77,7 +77,7 @@
     count: 2
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 30000
   - type: Pool
     pool: ForgeExpeditionRewardFoodAdvanced
@@ -94,7 +94,7 @@
     count: 4
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 30000
   - type: Pool
     pool: ForgeExpeditionRewardFoodAdvanced
@@ -111,7 +111,7 @@
     count: 4
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 30000
   - type: Pool
     pool: ForgeExpeditionRewardFoodAdvanced
@@ -128,7 +128,7 @@
     count: 4
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 45000
   - type: Pool
     pool: ForgeExpeditionRewardFoodElite
@@ -145,7 +145,7 @@
     count: 4
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 45000
   - type: Pool
     pool: ForgeExpeditionRewardFoodElite
@@ -162,7 +162,7 @@
     count: 4
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 45000
   - type: Pool
     pool: ForgeExpeditionRewardFoodElite

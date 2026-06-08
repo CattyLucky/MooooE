@@ -36,7 +36,7 @@ public sealed partial class NcStoreLogicSystem
 
             if (!string.IsNullOrWhiteSpace(cost.Currency))
             {
-                if (!_protos.HasIndex<StackPrototype>(cost.Currency))
+                if (!CanHandleCurrency(cost.Currency))
                     return false;
 
                 demands.Add(
@@ -44,6 +44,7 @@ public sealed partial class NcStoreLogicSystem
                     {
                         Currency = cost.Currency,
                         Required = required,
+                        VirtualCurrency = IsVirtualCurrency(cost.Currency),
                     });
                 continue;
             }
@@ -245,6 +246,49 @@ public sealed partial class NcStoreLogicSystem
         }
 
         return left <= 0;
+    }
+
+    private bool TryReserveVirtualBarterCurrencyDemand(
+        EntityUid root,
+        BarterCostPlan plan,
+        BarterCostDemand demand
+    )
+    {
+        if (string.IsNullOrWhiteSpace(demand.Currency) || demand.Required <= 0)
+            return false;
+
+        var alreadyReserved = 0;
+        for (var i = 0; i < plan.CurrencyReservations.Count; i++)
+        {
+            var existing = plan.CurrencyReservations[i];
+            if (existing.Currency != demand.Currency)
+                continue;
+
+            alreadyReserved = existing.Count;
+            break;
+        }
+
+        var totalRequired = (long)alreadyReserved + demand.Required;
+        if (totalRequired <= 0 || totalRequired > int.MaxValue)
+            return false;
+
+        var snapshot = _inventory.BuildInventorySnapshot(root);
+        if (!TryGetCurrencyBalance(root, snapshot, demand.Currency, out var balance) ||
+            balance < totalRequired)
+            return false;
+
+        for (var i = 0; i < plan.CurrencyReservations.Count; i++)
+        {
+            var existing = plan.CurrencyReservations[i];
+            if (existing.Currency != demand.Currency)
+                continue;
+
+            plan.CurrencyReservations[i] = new BarterCurrencyReservation(demand.Currency, (int)totalRequired);
+            return true;
+        }
+
+        plan.CurrencyReservations.Add(new BarterCurrencyReservation(demand.Currency, demand.Required));
+        return true;
     }
 
     private bool BarterItemMatchesDemand(BarterReservableItem item, BarterCostDemand demand)

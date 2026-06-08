@@ -1,5 +1,4 @@
 using Content.Shared._Forge.Trade;
-using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._Forge.Trade;
@@ -87,10 +86,10 @@ public sealed partial class StoreSystemStructuredLoader
         if (!string.IsNullOrWhiteSpace(cost.TagTarget) && !ValidateTradeTagTarget(entryId, path, cost.TagTarget))
             return false;
 
-        if (!string.IsNullOrWhiteSpace(cost.Currency) && !_prototypes.HasIndex<StackPrototype>(cost.Currency))
+        if (!string.IsNullOrWhiteSpace(cost.Currency) && !_currency.CanHandleCurrency(cost.Currency))
         {
             Sawmill.Warning(
-                $"[NcStore] Barter entry '{entryId}' {path} references missing stack currency '{cost.Currency}'.");
+                $"[NcStore] Barter entry '{entryId}' {path} references unsupported currency '{cost.Currency}'.");
             return false;
         }
 
@@ -120,10 +119,10 @@ public sealed partial class StoreSystemStructuredLoader
             return false;
         }
 
-        if (!string.IsNullOrWhiteSpace(receive.Currency) && !_prototypes.HasIndex<StackPrototype>(receive.Currency))
+        if (!string.IsNullOrWhiteSpace(receive.Currency) && !_currency.CanHandleCurrency(receive.Currency))
         {
             Sawmill.Warning(
-                $"[NcStore] Barter entry '{entryId}' {path} references missing stack currency '{receive.Currency}'.");
+                $"[NcStore] Barter entry '{entryId}' {path} references unsupported currency '{receive.Currency}'.");
             return false;
         }
 
@@ -235,10 +234,10 @@ public sealed partial class StoreSystemStructuredLoader
                 return false;
             }
 
-            if (!_prototypes.HasIndex<StackPrototype>(reward.Currency))
+            if (!_currency.CanHandleCurrency(reward.Currency))
             {
                 Sawmill.Warning(
-                    $"[NcStore] Barter entry '{entryId}' {path} references missing stack currency '{reward.Currency}'.");
+                    $"[NcStore] Barter entry '{entryId}' {path} references unsupported currency '{reward.Currency}'.");
                 return false;
             }
         }

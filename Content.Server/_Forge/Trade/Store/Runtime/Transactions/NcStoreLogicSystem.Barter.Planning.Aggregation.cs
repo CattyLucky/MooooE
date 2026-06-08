@@ -121,6 +121,7 @@ public sealed partial class NcStoreLogicSystem
     }
 
     private bool TryGetAffordableBarterUnitsFromSnapshot(
+        EntityUid user,
         NcBarterCostEntry cost,
         in NcInventorySnapshot snapshot,
         out int possible
@@ -133,7 +134,7 @@ public sealed partial class NcStoreLogicSystem
 
         if (!string.IsNullOrWhiteSpace(cost.Currency))
         {
-            var balance = snapshot.StackTypeCounts.TryGetValue(cost.Currency, out var cur) ? cur : 0;
+            var balance = TryGetCurrencyBalance(user, snapshot, cost.Currency, out var cur) ? cur : 0;
             possible = balance / cost.Count;
             return true;
         }
@@ -181,6 +182,7 @@ public sealed partial class NcStoreLogicSystem
 
     private sealed class BarterCostPlan
     {
+        public readonly List<BarterCurrencyReservation> CurrencyReservations = new();
         public readonly List<BarterCostReservation> Reservations = new();
     }
 
@@ -220,7 +222,10 @@ public sealed partial class NcStoreLogicSystem
         public string PrototypeStackType = string.Empty;
         public int Required;
         public string Tag = string.Empty;
+        public bool VirtualCurrency;
     }
+
+    private readonly record struct BarterCurrencyReservation(string Currency, int Count);
 
     private struct BarterCostReservation
     {

@@ -1,5 +1,4 @@
 using Content.Shared._Forge.Trade;
-using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._Forge.Trade;
@@ -114,11 +113,11 @@ public sealed partial class NcContractSystem : EntitySystem
                         entry.Pool))
                     return false;
 
-                if (_prototypes.HasIndex<StackPrototype>(entry.Currency))
+                if (_logic.CanHandleCurrency(entry.Currency))
                     return true;
 
                 Sawmill.Warning(
-                    $"[Contracts] Supply contract '{contractId}' {path} references missing stack currency " +
+                    $"[Contracts] Supply contract '{contractId}' {path} references unsupported currency " +
                     $"'{entry.Currency}'.");
                 return false;
 
@@ -202,11 +201,11 @@ public sealed partial class NcContractSystem : EntitySystem
                         entry.Pool))
                     return false;
 
-                if (_prototypes.HasIndex<StackPrototype>(entry.Currency))
+                if (_logic.CanHandleCurrency(entry.Currency))
                     return true;
 
                 Sawmill.Warning(
-                    $"[Contracts] Retrieval contract '{contractId}' {path} references missing stack currency " +
+                    $"[Contracts] Retrieval contract '{contractId}' {path} references unsupported currency " +
                     $"'{entry.Currency}'.");
                 return false;
 

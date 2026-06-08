@@ -1,6 +1,7 @@
 using Content.Shared._Forge.Trade;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared._NF.Bank.Events;
 using Content.Shared.Stacks;
 using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
@@ -117,6 +118,18 @@ public sealed partial class StoreStructuredSystem : EntitySystem
 
         if (TryFindWatchedRoot(uid, out var r))
             RefreshStoresAffectedBy(r);
+    }
+
+    private void OnBankBalanceChanged(BalanceChangedEvent args)
+    {
+        if (args.Session.AttachedEntity is not { } user)
+            return;
+
+        foreach (var key in _openStoreUsers)
+        {
+            if (key.User == user)
+                MarkDirty(key);
+        }
     }
 
     private void OnWatchedEntityParentChanged(ref EntParentChangedMessage args)

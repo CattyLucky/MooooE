@@ -1,5 +1,4 @@
 using Content.Shared._Forge.Trade;
-using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
@@ -33,7 +32,7 @@ public sealed partial class NcStoreLogicSystem
 
             if (!string.IsNullOrWhiteSpace(receive.Currency))
             {
-                if (!_protos.HasIndex<StackPrototype>(receive.Currency))
+                if (!CanHandleCurrency(receive.Currency))
                     return false;
 
                 AddReceivePlanEntry(plan, string.Empty, receive.Currency, amount);
@@ -193,7 +192,7 @@ public sealed partial class NcStoreLogicSystem
 
         if (reward.Type == StoreRewardType.Currency)
         {
-            if (!_protos.HasIndex<StackPrototype>(rewardId))
+            if (!CanHandleCurrency(rewardId))
                 return false;
 
             AddReceivePlanEntry(plan, string.Empty, rewardId, amount);
@@ -302,7 +301,7 @@ public sealed partial class NcStoreLogicSystem
         return reward.Type switch
         {
             StoreRewardType.Item => _protos.HasIndex<EntityPrototype>(rewardId),
-            StoreRewardType.Currency => _protos.HasIndex<StackPrototype>(rewardId),
+            StoreRewardType.Currency => CanHandleCurrency(rewardId),
             StoreRewardType.Pool => TryCreateValidBarterRewardDeck(rewardId, out _, visited, depth + 1),
             _ => false,
         };

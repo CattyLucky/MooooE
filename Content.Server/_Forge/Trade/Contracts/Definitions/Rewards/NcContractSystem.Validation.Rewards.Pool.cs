@@ -1,5 +1,4 @@
 using Content.Shared._Forge.Trade;
-using Content.Shared.Stacks;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._Forge.Trade;
@@ -117,11 +116,11 @@ public sealed partial class NcContractSystem
                         entry.Pool))
                     return false;
 
-                if (_prototypes.HasIndex<StackPrototype>(entry.Currency))
+                if (_logic.CanHandleCurrency(entry.Currency))
                     return true;
 
                 Sawmill.Warning(
-                    $"[Contracts] Supply reward pool '{poolId}' used by '{ownerId}' entry #{index} references missing stack currency " +
+                    $"[Contracts] Supply reward pool '{poolId}' used by '{ownerId}' entry #{index} references unsupported currency " +
                     $"'{entry.Currency}'.");
                 return false;
 

@@ -5,9 +5,10 @@ namespace Content.Server._Forge.Trade;
 
 internal interface IStoreCurrencyService
 {
-    bool TryGetBalance(in NcInventorySnapshot snapshot, string currencyId, out int balance);
+    bool TryGetBalance(EntityUid user, in NcInventorySnapshot snapshot, string currencyId, out int balance);
 
     bool TryPickCurrencyForBuy(
+        EntityUid user,
         NcStoreComponent store,
         NcStoreListingDef listing,
         in NcInventorySnapshot snapshot,
@@ -24,6 +25,7 @@ internal interface IStoreCurrencyService
     );
 
     bool CanHandleCurrency(string currencyId);
+    bool IsVirtualCurrency(string currencyId);
     bool CanGiveCurrency(EntityUid user, string currencyId, int amount);
     bool TryTakeCurrency(EntityUid user, string currencyId, int amount);
     bool TryGiveCurrency(EntityUid user, string currencyId, int amount);

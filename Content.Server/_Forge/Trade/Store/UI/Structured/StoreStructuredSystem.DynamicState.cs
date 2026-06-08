@@ -41,7 +41,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             var buf = scratch.GetWriteBuffer();
             buf.Clear();
 
-            PopulateDynamicBalances(comp, userSnap, buf);
+            PopulateDynamicBalances(comp, user, userSnap, buf);
             PopulateDynamicListings(comp, user, userSnap, scratch, buf);
             PopulateDynamicCratePreview(uid, comp, crateUid, tabs.HasSellTab, scanNeeds.NeedCrateScan, scratch, buf);
             PopulateDynamicContracts(uid, comp, tabs.HasContractsTab, scratch, buf);
@@ -210,8 +210,9 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             scratch.ContractProgressPreviews);
     }
 
-    private static void PopulateDynamicBalances(
+    private void PopulateDynamicBalances(
         NcStoreComponent comp,
+        EntityUid user,
         NcInventorySnapshot? userSnap,
         DynamicStateBuffer buf
     )
@@ -224,7 +225,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             if (string.IsNullOrWhiteSpace(currency))
                 continue;
 
-            buf.BalancesByCurrency[currency] = userSnap.StackTypeCounts.TryGetValue(currency, out var balance)
+            buf.BalancesByCurrency[currency] = _logic.TryGetCurrencyBalance(user, userSnap, currency, out var balance)
                 ? balance
                 : 0;
         }

@@ -23,6 +23,7 @@ public sealed partial class NcStoreLogicSystem
     }
 
     public bool TryPickCurrencyForBuy(
+        EntityUid user,
         NcStoreComponent store,
         NcStoreListingDef listing,
         in NcInventorySnapshot snapshot,
@@ -31,7 +32,7 @@ public sealed partial class NcStoreLogicSystem
         out int balance
     )
     {
-        return Currency.TryPickCurrencyForBuy(store, listing, snapshot, out currency, out unitPrice, out balance);
+        return Currency.TryPickCurrencyForBuy(user, store, listing, snapshot, out currency, out unitPrice, out balance);
     }
 
     public bool TryPickCurrencyForSell(
@@ -47,6 +48,16 @@ public sealed partial class NcStoreLogicSystem
     public bool CanHandleCurrency(string stackType)
     {
         return Currency.CanHandleCurrency(stackType);
+    }
+
+    public bool IsVirtualCurrency(string stackType)
+    {
+        return Currency.IsVirtualCurrency(stackType);
+    }
+
+    public bool TryGetCurrencyBalance(EntityUid user, in NcInventorySnapshot snapshot, string stackType, out int balance)
+    {
+        return Currency.TryGetBalance(user, snapshot, stackType, out balance);
     }
 
     public bool CanGiveCurrency(EntityUid user, string stackType, int amount)

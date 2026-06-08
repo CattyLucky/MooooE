@@ -24,7 +24,7 @@
       maxVisible: 3
       fillWeight: 1
   skipCost: 30000
-  skipCurrency: Credit
+  skipCurrency: BankCredit
 
 - type: ncContractOfferPool
   id: ForgeExpeditionFoodOrders

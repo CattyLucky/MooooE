@@ -187,7 +187,7 @@ public sealed partial class NcStoreLogicSystem
                         continue;
 
                     reason =
-                        $"Reward plan entry #{i} references missing, unsupported, or undeliverable currency stack prototype '{entry.Id}'.";
+                        $"Reward plan entry #{i} references missing, unsupported, or undeliverable currency '{entry.Id}'.";
                     return false;
 
                 case StoreRewardType.Item:

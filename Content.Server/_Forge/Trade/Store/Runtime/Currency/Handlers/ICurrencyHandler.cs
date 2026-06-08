@@ -16,7 +16,12 @@ public interface ICurrencyHandler
     ///     Attempts to extract a balance for this currency using an inventory snapshot.
     ///     For non-inventory currencies (virtual/bank), implementations may ignore the snapshot and query components.
     /// </summary>
-    bool TryGetBalance(in NcInventorySnapshot snapshot, string currencyId, out int balance);
+    bool TryGetBalance(EntityUid user, in NcInventorySnapshot snapshot, string currencyId, out int balance);
+
+    /// <summary>
+    ///     Returns true for currencies that are not represented by inventory entities.
+    /// </summary>
+    bool IsVirtualCurrency(string currencyId);
 
     /// <summary>
     ///     Attempts to take a positive amount of currency from the user.

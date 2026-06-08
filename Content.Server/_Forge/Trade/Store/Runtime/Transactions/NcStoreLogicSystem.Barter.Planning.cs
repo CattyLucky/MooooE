@@ -85,6 +85,24 @@ public sealed partial class NcStoreLogicSystem
             return false;
 
         var items = GetBarterReservableItemsForPlan(root, context);
+        var inventoryDemandCount = 0;
+
+        for (var i = 0; i < demands.Count; i++)
+        {
+            if (demands[i].VirtualCurrency)
+            {
+                if (!TryReserveVirtualBarterCurrencyDemand(root, plan, demands[i]))
+                    return false;
+
+                continue;
+            }
+
+            inventoryDemandCount++;
+        }
+
+        if (inventoryDemandCount == 0)
+            return plan.CurrencyReservations.Count > 0;
+
         if (items.Count == 0)
             return false;
 
@@ -101,11 +119,14 @@ public sealed partial class NcStoreLogicSystem
 
         for (var i = 0; i < demands.Count; i++)
         {
+            if (demands[i].VirtualCurrency)
+                continue;
+
             if (!TryReserveBarterDemand(plan, items, demands[i], context?.DemandCandidates))
                 return false;
         }
 
-        return plan.Reservations.Count > 0;
+        return plan.Reservations.Count > 0 || plan.CurrencyReservations.Count > 0;
     }
 
     public sealed class BarterAvailabilityContext

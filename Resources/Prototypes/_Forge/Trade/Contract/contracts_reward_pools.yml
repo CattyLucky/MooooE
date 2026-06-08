@@ -38,7 +38,7 @@
     count: 1
     weight: 1
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: { min: 2500, max: 5000 }
     weight: 2
 
@@ -98,7 +98,7 @@
     count: 1
     weight: 2
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: { min: 7500, max: 15000 }
     weight: 2
 
@@ -162,7 +162,7 @@
     count: 1
     weight: 2
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: { min: 15000, max: 30000 }
     weight: 2
 

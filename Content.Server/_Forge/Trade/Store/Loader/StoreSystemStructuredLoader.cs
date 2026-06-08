@@ -9,6 +9,7 @@ public sealed partial class StoreSystemStructuredLoader : EntitySystem
     private static readonly ISawmill Sawmill = Logger.GetSawmill("ncstore-loader");
 
     [Dependency] private readonly NcContractSystem _contracts = default!;
+    [Dependency] private readonly NcStoreCurrencySystem _currency = default!;
 
     private readonly HashSet<EntityUid> _contractsInitialized = new();
     private readonly HashSet<EntityUid> _loadedStores = new();

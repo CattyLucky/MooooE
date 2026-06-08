@@ -6,7 +6,7 @@ public sealed partial class NcStoreLogicSystem
 {
     private string? TryExecuteBarterCostPlan(EntityUid root, BarterCostPlan plan)
     {
-        if (plan.Reservations.Count == 0)
+        if (plan.Reservations.Count == 0 && plan.CurrencyReservations.Count == 0)
             return "barter cost plan is empty";
 
         return _transactionCoordinator.TryCommitInventoryTake(
@@ -21,6 +21,13 @@ public sealed partial class NcStoreLogicSystem
 
                     if (!_inventory.TryTakeReservedEntityUnitsFromRoot(root, reservation.Entity, reservation.Count))
                         return $"failed to consume barter cost reservation #{i}";
+                }
+
+                for (var i = 0; i < plan.CurrencyReservations.Count; i++)
+                {
+                    var reservation = plan.CurrencyReservations[i];
+                    if (!TryTakeCurrency(root, reservation.Currency, reservation.Count))
+                        return $"failed to consume barter currency '{reservation.Currency}' x{reservation.Count}";
                 }
 
                 return null;

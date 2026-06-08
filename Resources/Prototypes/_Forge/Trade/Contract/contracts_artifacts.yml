@@ -9,7 +9,7 @@
       type: Store
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 35000
   - type: Item
     prototype: ResearchDisk35000
@@ -35,7 +35,7 @@
       type: Store
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 65000
   - type: Item
     prototype: ResearchDisk65000
@@ -61,7 +61,7 @@
       type: Store
   reward:
   - type: Currency
-    currency: Credit
+    currency: BankCredit
     count: 100000
   - type: Item
     prototype: ResearchDisk100000
