@@ -33,8 +33,8 @@ public sealed partial class NcContractSystem : EntitySystem
             HuntEnabled = true,
             HuntDebris = CloneHuntDebrisEntries(proto.Spawn.Debris),
             HuntDungeons = CloneHuntDungeonEntries(proto.Spawn.Dungeons),
-            HuntDungeonFill = BuildHuntDungeonFillEntries(proto.Spawn),
-            HuntDungeonFillCount = proto.Spawn.DungeonFillCount,
+            HuntDungeonExteriorTiles = BuildHuntDungeonExteriorTileEntries(proto.Spawn),
+            HuntDungeonExteriorRocks = BuildHuntDungeonExteriorRockEntries(proto.Spawn),
             HuntDebrisMinDistance = proto.Spawn.DebrisMinDistance,
             HuntDebrisMaxDistance = proto.Spawn.DebrisMaxDistance,
             HuntDebrisSafetyRadius = proto.Spawn.DebrisSafetyRadius,
@@ -113,23 +113,23 @@ public sealed partial class NcContractSystem : EntitySystem
         return result;
     }
 
-    private List<NcHuntDungeonFillEntry> BuildHuntDungeonFillEntries(NcHuntSpawnData spawn)
+    private List<NcHuntDungeonExteriorTileEntry> BuildHuntDungeonExteriorTileEntries(NcHuntSpawnData spawn)
     {
-        var result = new List<NcHuntDungeonFillEntry>();
+        var result = new List<NcHuntDungeonExteriorTileEntry>();
 
-        if (!string.IsNullOrWhiteSpace(spawn.DungeonFillPreset) &&
-            _prototypes.TryIndex<NcHuntDungeonFillPresetPrototype>(spawn.DungeonFillPreset, out var preset))
+        if (!string.IsNullOrWhiteSpace(spawn.DungeonExteriorTilePreset) &&
+            _prototypes.TryIndex<NcHuntDungeonExteriorTilePresetPrototype>(spawn.DungeonExteriorTilePreset, out var preset))
         {
-            AppendHuntDungeonFillEntries(result, preset.Entries);
+            AppendHuntDungeonExteriorTileEntries(result, preset.Entries);
         }
 
-        AppendHuntDungeonFillEntries(result, spawn.DungeonFill);
+        AppendHuntDungeonExteriorTileEntries(result, spawn.DungeonExteriorTiles);
         return result;
     }
 
-    private static void AppendHuntDungeonFillEntries(
-        List<NcHuntDungeonFillEntry> result,
-        IReadOnlyList<NcHuntDungeonFillEntry> source
+    private static void AppendHuntDungeonExteriorTileEntries(
+        List<NcHuntDungeonExteriorTileEntry> result,
+        IReadOnlyList<NcHuntDungeonExteriorTileEntry> source
     )
     {
         for (var i = 0; i < source.Count; i++)
@@ -139,7 +139,41 @@ public sealed partial class NcContractSystem : EntitySystem
                 continue;
 
             result.Add(
-                new NcHuntDungeonFillEntry
+                new NcHuntDungeonExteriorTileEntry
+                {
+                    Prototype = entry.Prototype,
+                    Weight = entry.Weight,
+                });
+        }
+    }
+
+    private List<NcHuntDungeonExteriorRockEntry> BuildHuntDungeonExteriorRockEntries(NcHuntSpawnData spawn)
+    {
+        var result = new List<NcHuntDungeonExteriorRockEntry>();
+
+        if (!string.IsNullOrWhiteSpace(spawn.DungeonExteriorRockPreset) &&
+            _prototypes.TryIndex<NcHuntDungeonExteriorRockPresetPrototype>(spawn.DungeonExteriorRockPreset, out var preset))
+        {
+            AppendHuntDungeonExteriorRockEntries(result, preset.Entries);
+        }
+
+        AppendHuntDungeonExteriorRockEntries(result, spawn.DungeonExteriorRocks);
+        return result;
+    }
+
+    private static void AppendHuntDungeonExteriorRockEntries(
+        List<NcHuntDungeonExteriorRockEntry> result,
+        IReadOnlyList<NcHuntDungeonExteriorRockEntry> source
+    )
+    {
+        for (var i = 0; i < source.Count; i++)
+        {
+            var entry = source[i];
+            if (entry == null)
+                continue;
+
+            result.Add(
+                new NcHuntDungeonExteriorRockEntry
                 {
                     Prototype = entry.Prototype,
                     Weight = entry.Weight,

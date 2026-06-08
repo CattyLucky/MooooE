@@ -5,6 +5,7 @@ using Content.Server.Mind;
 using Content.Server.Pinpointer;
 using Content.Server.Procedural;
 using Content.Shared._Forge.Trade;
+using Content.Shared.Construction.EntitySystems;
 using Content.Shared.Damage;
 using Content.Shared.GameTicking;
 using Content.Shared.Maps;
@@ -24,6 +25,7 @@ namespace Content.Server._Forge.Trade;
 
 public sealed partial class NcContractSystem : EntitySystem
 {
+    [Dependency] private readonly AnchorableSystem _anchorable = default!;
     [Dependency] private readonly MetaDataSystem _contractMeta = default!;
     [Dependency] private readonly DungeonSystem _dungeon = default!;
     [Dependency] private readonly MindSystem _contractMind = default!;

@@ -28,8 +28,8 @@ public sealed class ContractObjectiveConfigData
     public bool HuntEnabled;
     public List<NcHuntDebrisEntry> HuntDebris { get; set; } = new();
     public List<NcHuntDungeonEntry> HuntDungeons { get; set; } = new();
-    public List<NcHuntDungeonFillEntry> HuntDungeonFill { get; set; } = new();
-    public IntRange HuntDungeonFillCount = IntRange.Fixed(0);
+    public List<NcHuntDungeonExteriorTileEntry> HuntDungeonExteriorTiles { get; set; } = new();
+    public List<NcHuntDungeonExteriorRockEntry> HuntDungeonExteriorRocks { get; set; } = new();
     public float HuntDebrisMinDistance;
     public float HuntDebrisMaxDistance;
     public float HuntDebrisSafetyRadius;

@@ -19,20 +19,12 @@ namespace Content.Server._Forge.Trade;
 
 public sealed partial class NcContractSystem : EntitySystem
 {
-    private static readonly (string Prototype, int Weight)[] HuntDungeonExteriorRocks =
+    private static readonly Vector2i[] HuntDungeonExteriorCardinalOffsets =
     {
-        ("WallRock", 46),
-        ("WallRockCoal", 10),
-        ("WallRockTin", 10),
-        ("WallRockQuartz", 8),
-        ("WallRockCopper", 6),
-        ("WallRockLithium", 5),
-        ("WallRockSilver", 4),
-        ("WallRockPlasma", 3),
-        ("WallRockGold", 3),
-        ("WallRockUranium", 2),
-        ("WallRockSalt", 2),
-        ("WallRockDiamond", 1),
+        new(0, 1),
+        new(0, -1),
+        new(1, 0),
+        new(-1, 0),
     };
 
     private List<Entity<MapGridComponent>> _huntDebrisPlacementGridScratch = new();
@@ -566,7 +558,7 @@ public sealed partial class NcContractSystem : EntitySystem
             return;
         }
 
-        SpawnHuntDungeonExterior(key.ContractId, placedGrid.Owner, placedGrid.Comp);
+        SpawnHuntDungeonExterior(key.ContractId, contract.Config, placedGrid.Owner, placedGrid.Comp);
 
         var spawnCoordinates = new List<EntityCoordinates>();
         spawnCoordinates.Clear();
@@ -599,13 +591,6 @@ public sealed partial class NcContractSystem : EntitySystem
         {
             RetargetObjectivePinpointers(key, state, pinpointerTarget);
         }
-
-        CollectHuntDungeonRoomSpawnCoordinates(dungeons, placedGrid.Owner, placedGrid.Comp, spawnCoordinates);
-        if (spawnCoordinates.Count == 0)
-            CollectHuntDebrisSpawnCoordinates(placedGrid.Owner, placedGrid.Comp, spawnCoordinates);
-
-        RemoveHuntTargetOccupiedCoordinates(state, spawnCoordinates);
-        SpawnHuntDungeonFill(key.ContractId, contract.Config, dungeons, spawnCoordinates);
 
         if (contract.Config.GivePinpointer &&
             state.PinpointerEntities.Count == 0 &&
@@ -770,12 +755,17 @@ public sealed partial class NcContractSystem : EntitySystem
         return false;
     }
 
-    private void SpawnHuntDungeonExterior(string contractId, EntityUid site, MapGridComponent grid)
+    private void SpawnHuntDungeonExterior(
+        string contractId,
+        ContractObjectiveConfigData config,
+        EntityUid site,
+        MapGridComponent grid
+    )
     {
-        if (!_prototypes.TryIndex<ContentTileDefinition>(NcContractTuning.HuntDungeonExteriorTile, out var tileDef))
+        if (config.HuntDungeonExteriorTiles.Count == 0)
         {
             Sawmill.Warning(
-                $"[Contracts] Hunt dungeon exterior for '{contractId}' skipped missing tile '{NcContractTuning.HuntDungeonExteriorTile}'.");
+                $"[Contracts] Hunt dungeon exterior for '{contractId}' skipped: no configured exterior tile prototypes exist.");
             return;
         }
 
@@ -784,44 +774,259 @@ public sealed partial class NcContractSystem : EntitySystem
             return;
 
         var padding = Math.Max(1, NcContractTuning.HuntDungeonExteriorPadding);
-        var outerLeft = bounds.Left - padding;
-        var outerRight = bounds.Right + padding;
-        var outerBottom = bounds.Bottom - padding;
-        var outerTop = bounds.Top + padding;
+        var exteriorBounds = CreateRandomizedHuntDungeonExteriorBounds(bounds, padding);
 
-        var exteriorTiles = new List<(Vector2i Index, Tile Tile)>();
+        var exteriorTileSet = new HashSet<Vector2i>();
+        BuildHuntDungeonExteriorShape(site, grid, generatedTiles, exteriorBounds, padding, exteriorTileSet);
+        if (exteriorTileSet.Count == 0)
+            return;
+
+        var exteriorTiles = new List<(Vector2i Index, Tile Tile)>(exteriorTileSet.Count);
         var rockCandidates = new List<Vector2i>();
         var tileRandom = _random.GetRandom();
 
-        for (var x = outerLeft; x <= outerRight; x++)
+        foreach (var tile in exteriorTileSet)
         {
-            for (var y = outerBottom; y <= outerTop; y++)
+            if (!TryPickHuntDungeonExteriorTile(contractId, config.HuntDungeonExteriorTiles, out var tileDef))
+                return;
+
+            exteriorTiles.Add((tile, _tile.GetVariantTile(tileDef, tileRandom)));
+
+            if (config.HuntDungeonExteriorRocks.Count > 0 &&
+                !IsNearGeneratedHuntDungeonTile(
+                    tile,
+                    generatedTiles,
+                    NcContractTuning.HuntDungeonExteriorCoreClearance) &&
+                ShouldSpawnHuntDungeonExteriorRock(tile, generatedTiles, exteriorTileSet))
             {
-                var tile = new Vector2i(x, y);
-                if (generatedTiles.Contains(tile) ||
-                    (_map.TryGetTileRef(site, grid, tile, out var existingTile) && !existingTile.Tile.IsEmpty))
-                {
-                    continue;
-                }
-
-                exteriorTiles.Add((tile, _tile.GetVariantTile(tileDef, tileRandom)));
-
-                if (!IsNearGeneratedHuntDungeonTile(
-                        tile,
-                        generatedTiles,
-                        NcContractTuning.HuntDungeonExteriorCoreClearance) &&
-                    ShouldSpawnHuntDungeonExteriorRock(tile, bounds, padding))
-                {
-                    rockCandidates.Add(tile);
-                }
+                rockCandidates.Add(tile);
             }
         }
 
-        if (exteriorTiles.Count == 0)
-            return;
-
         _map.SetTiles(site, grid, exteriorTiles);
-        SpawnHuntDungeonExteriorRocks(contractId, site, grid, rockCandidates);
+        SpawnHuntDungeonExteriorRocks(contractId, config.HuntDungeonExteriorRocks, site, grid, rockCandidates);
+    }
+
+    private Box2i CreateRandomizedHuntDungeonExteriorBounds(Box2i bounds, int padding)
+    {
+        var minPadding = Math.Clamp(
+            NcContractTuning.HuntDungeonExteriorCoreClearance + 1,
+            1,
+            padding);
+        var oppositeMax = Math.Max(minPadding + 1, padding / 2 + 1);
+
+        var left = _random.Next(minPadding, padding + 1);
+        var right = _random.Next(minPadding, padding + 1);
+        var bottom = _random.Next(minPadding, padding + 1);
+        var top = _random.Next(minPadding, padding + 1);
+
+        switch (_random.Next(4))
+        {
+            case 0:
+                left = padding;
+                right = Math.Min(right, _random.Next(minPadding, oppositeMax));
+                break;
+            case 1:
+                right = padding;
+                left = Math.Min(left, _random.Next(minPadding, oppositeMax));
+                break;
+            case 2:
+                bottom = padding;
+                top = Math.Min(top, _random.Next(minPadding, oppositeMax));
+                break;
+            default:
+                top = padding;
+                bottom = Math.Min(bottom, _random.Next(minPadding, oppositeMax));
+                break;
+        }
+
+        if (_random.Prob(0.65f))
+        {
+            var adjacentPadding = _random.Next(Math.Max(minPadding, padding / 2), padding + 1);
+            if (_random.Prob(0.5f))
+                top = Math.Max(top, adjacentPadding);
+            else
+                bottom = Math.Max(bottom, adjacentPadding);
+        }
+        else
+        {
+            var adjacentPadding = _random.Next(Math.Max(minPadding, padding / 2), padding + 1);
+            if (_random.Prob(0.5f))
+                left = Math.Max(left, adjacentPadding);
+            else
+                right = Math.Max(right, adjacentPadding);
+        }
+
+        return new Box2i(
+            bounds.Left - left,
+            bounds.Bottom - bottom,
+            bounds.Right + right,
+            bounds.Top + top);
+    }
+
+    private void BuildHuntDungeonExteriorShape(
+        EntityUid site,
+        MapGridComponent grid,
+        HashSet<Vector2i> generatedTiles,
+        Box2i exteriorBounds,
+        int padding,
+        HashSet<Vector2i> output
+    )
+    {
+        output.Clear();
+        var taken = new HashSet<Vector2i>(generatedTiles);
+        var frontier = new HashSet<Vector2i>();
+
+        foreach (var tile in generatedTiles)
+            AddHuntDungeonExteriorCandidates(tile, exteriorBounds, taken, frontier);
+
+        foreach (var tile in generatedTiles)
+            PlaceHuntDungeonExteriorCore(tile, site, grid, exteriorBounds, taken, frontier, output);
+
+        var availableTiles = CountAvailableHuntDungeonExteriorTiles(site, grid, generatedTiles, exteriorBounds);
+        var targetCount = PickHuntDungeonExteriorTileCount(output.Count, availableTiles, padding);
+        while (output.Count < targetCount && frontier.Count > 0)
+        {
+            var tile = _random.Pick(frontier);
+            PlaceHuntDungeonExteriorTile(tile, site, grid, exteriorBounds, taken, frontier, output);
+
+            for (var i = 0; i < HuntDungeonExteriorCardinalOffsets.Length; i++)
+            {
+                if (!_random.Prob(NcContractTuning.HuntDungeonExteriorBlobDrawChance))
+                    continue;
+
+                PlaceHuntDungeonExteriorTile(
+                    tile + HuntDungeonExteriorCardinalOffsets[i],
+                    site,
+                    grid,
+                    exteriorBounds,
+                    taken,
+                    frontier,
+                    output);
+            }
+        }
+    }
+
+    private void PlaceHuntDungeonExteriorCore(
+        Vector2i tile,
+        EntityUid site,
+        MapGridComponent grid,
+        Box2i exteriorBounds,
+        HashSet<Vector2i> taken,
+        HashSet<Vector2i> frontier,
+        HashSet<Vector2i> output
+    )
+    {
+        var clearance = Math.Max(0, NcContractTuning.HuntDungeonExteriorCoreClearance);
+        for (var x = -clearance; x <= clearance; x++)
+        {
+            for (var y = -clearance; y <= clearance; y++)
+            {
+                if (x == 0 && y == 0)
+                    continue;
+
+                PlaceHuntDungeonExteriorTile(
+                    new Vector2i(tile.X + x, tile.Y + y),
+                    site,
+                    grid,
+                    exteriorBounds,
+                    taken,
+                    frontier,
+                    output);
+            }
+        }
+    }
+
+    private bool PlaceHuntDungeonExteriorTile(
+        Vector2i tile,
+        EntityUid site,
+        MapGridComponent grid,
+        Box2i exteriorBounds,
+        HashSet<Vector2i> taken,
+        HashSet<Vector2i> frontier,
+        HashSet<Vector2i> output
+    )
+    {
+        frontier.Remove(tile);
+        if (!IsHuntDungeonExteriorTileInsideBounds(tile, exteriorBounds) ||
+            !IsHuntDungeonExteriorTileAvailable(site, grid, tile) ||
+            !taken.Add(tile))
+        {
+            return false;
+        }
+
+        output.Add(tile);
+        AddHuntDungeonExteriorCandidates(tile, exteriorBounds, taken, frontier);
+        return true;
+    }
+
+    private static void AddHuntDungeonExteriorCandidates(
+        Vector2i tile,
+        Box2i exteriorBounds,
+        HashSet<Vector2i> taken,
+        HashSet<Vector2i> frontier
+    )
+    {
+        for (var i = 0; i < HuntDungeonExteriorCardinalOffsets.Length; i++)
+        {
+            var neighbor = tile + HuntDungeonExteriorCardinalOffsets[i];
+            if (!IsHuntDungeonExteriorTileInsideBounds(neighbor, exteriorBounds) ||
+                taken.Contains(neighbor))
+            {
+                continue;
+            }
+
+            frontier.Add(neighbor);
+        }
+    }
+
+    private int CountAvailableHuntDungeonExteriorTiles(
+        EntityUid site,
+        MapGridComponent grid,
+        HashSet<Vector2i> generatedTiles,
+        Box2i exteriorBounds
+    )
+    {
+        var count = 0;
+        for (var x = exteriorBounds.Left; x <= exteriorBounds.Right; x++)
+        {
+            for (var y = exteriorBounds.Bottom; y <= exteriorBounds.Top; y++)
+            {
+                var tile = new Vector2i(x, y);
+                if (generatedTiles.Contains(tile) ||
+                    !IsHuntDungeonExteriorTileAvailable(site, grid, tile))
+                    continue;
+
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private int PickHuntDungeonExteriorTileCount(int guaranteedCount, int availableTiles, int padding)
+    {
+        if (availableTiles <= guaranteedCount)
+            return guaranteedCount;
+
+        var minRatio = Math.Clamp(0.50f + padding * 0.015f, 0.50f, 0.62f);
+        var maxRatio = Math.Clamp(0.72f + padding * 0.015f, minRatio, 0.88f);
+        var ratio = _random.NextFloat(minRatio, maxRatio);
+        return Math.Clamp((int) MathF.Round(availableTiles * ratio), guaranteedCount, availableTiles);
+    }
+
+    private static bool IsHuntDungeonExteriorTileInsideBounds(Vector2i tile, Box2i bounds)
+    {
+        return tile.X >= bounds.Left &&
+               tile.X <= bounds.Right &&
+               tile.Y >= bounds.Bottom &&
+               tile.Y <= bounds.Top;
+    }
+
+    private bool IsHuntDungeonExteriorTileAvailable(EntityUid site, MapGridComponent grid, Vector2i tile)
+    {
+        return !_map.TryGetTileRef(site, grid, tile, out var tileRef) ||
+               tileRef.Tile.IsEmpty;
     }
 
     private bool TryCollectHuntDungeonTileBounds(
@@ -873,22 +1078,38 @@ public sealed partial class NcContractSystem : EntitySystem
 
     private bool ShouldSpawnHuntDungeonExteriorRock(
         Vector2i tile,
-        Box2i bounds,
-        int padding
+        HashSet<Vector2i> generatedTiles,
+        HashSet<Vector2i> exteriorTiles
     )
     {
-        var outerLeft = bounds.Left - padding;
-        var outerRight = bounds.Right + padding;
-        var outerBottom = bounds.Bottom - padding;
-        var outerTop = bounds.Top + padding;
-        var edgeDistance = Math.Min(
-            Math.Min(tile.X - outerLeft, outerRight - tile.X),
-            Math.Min(tile.Y - outerBottom, outerTop - tile.Y));
-        var chance = edgeDistance < Math.Max(1, NcContractTuning.HuntDungeonExteriorRimWidth)
+        var chance = IsNearHuntDungeonExteriorBoundary(tile, generatedTiles, exteriorTiles)
             ? NcContractTuning.HuntDungeonExteriorRimRockChance
             : NcContractTuning.HuntDungeonExteriorInnerRockChance;
 
         return _random.Prob(chance);
+    }
+
+    private static bool IsNearHuntDungeonExteriorBoundary(
+        Vector2i tile,
+        HashSet<Vector2i> generatedTiles,
+        HashSet<Vector2i> exteriorTiles
+    )
+    {
+        var radius = Math.Max(1, NcContractTuning.HuntDungeonExteriorRimWidth);
+        for (var x = -radius; x <= radius; x++)
+        {
+            for (var y = -radius; y <= radius; y++)
+            {
+                if (x == 0 && y == 0)
+                    continue;
+
+                var neighbor = new Vector2i(tile.X + x, tile.Y + y);
+                if (!generatedTiles.Contains(neighbor) && !exteriorTiles.Contains(neighbor))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool IsNearGeneratedHuntDungeonTile(
@@ -910,13 +1131,77 @@ public sealed partial class NcContractSystem : EntitySystem
         return false;
     }
 
+    private bool TryPickHuntDungeonExteriorTile(
+        string contractId,
+        IReadOnlyList<NcHuntDungeonExteriorTileEntry> tiles,
+        out ContentTileDefinition tileDef
+    )
+    {
+        tileDef = default!;
+
+        var weights = tiles.Count <= 128
+            ? stackalloc int[tiles.Count]
+            : new int[tiles.Count];
+
+        long total = 0;
+        for (var i = 0; i < tiles.Count; i++)
+        {
+            var entry = tiles[i];
+            if (entry == null ||
+                entry.Weight <= 0 ||
+                !_prototypes.HasIndex<ContentTileDefinition>(entry.Prototype))
+            {
+                continue;
+            }
+
+            weights[i] = entry.Weight;
+            total += entry.Weight;
+        }
+
+        if (total > 0)
+        {
+            var roll = total <= int.MaxValue
+                ? _random.Next((int) total)
+                : (long) (_random.NextDouble() * total);
+
+            for (var i = 0; i < tiles.Count; i++)
+            {
+                var weight = weights[i];
+                if (weight <= 0)
+                    continue;
+
+                roll -= weight;
+                if (roll >= 0)
+                    continue;
+
+                var entry = tiles[i];
+                if (entry == null ||
+                    !_prototypes.TryIndex<ContentTileDefinition>(entry.Prototype, out var pickedTileDef))
+                {
+                    continue;
+                }
+
+                tileDef = pickedTileDef;
+                return true;
+            }
+        }
+
+        Sawmill.Warning(
+            $"[Contracts] Hunt dungeon exterior for '{contractId}' skipped: no configured exterior tile prototypes exist.");
+        return false;
+    }
+
     private void SpawnHuntDungeonExteriorRocks(
         string contractId,
+        IReadOnlyList<NcHuntDungeonExteriorRockEntry> rocks,
         EntityUid site,
         MapGridComponent grid,
         List<Vector2i> candidates
     )
     {
+        if (rocks.Count == 0)
+            return;
+
         var maxCount = Math.Min(candidates.Count, NcContractTuning.HuntDungeonExteriorMaxRockCount);
         var spawned = 0;
         while (spawned < maxCount && candidates.Count > 0)
@@ -925,7 +1210,7 @@ public sealed partial class NcContractSystem : EntitySystem
             var tile = candidates[candidateIndex];
             candidates.RemoveAt(candidateIndex);
 
-            if (!TryPickHuntDungeonExteriorRock(contractId, out var prototype) ||
+            if (!TryPickHuntDungeonExteriorRock(contractId, rocks, out var prototype) ||
                 !IsHuntDungeonExteriorRockCoordinateValid(site, grid, tile))
             {
                 continue;
@@ -944,17 +1229,28 @@ public sealed partial class NcContractSystem : EntitySystem
         }
     }
 
-    private bool TryPickHuntDungeonExteriorRock(string contractId, out string prototypeId)
+    private bool TryPickHuntDungeonExteriorRock(
+        string contractId,
+        IReadOnlyList<NcHuntDungeonExteriorRockEntry> rocks,
+        out string prototypeId
+    )
     {
         prototypeId = string.Empty;
 
-        Span<int> weights = stackalloc int[HuntDungeonExteriorRocks.Length];
-        var total = 0;
-        for (var i = 0; i < HuntDungeonExteriorRocks.Length; i++)
+        var weights = rocks.Count <= 128
+            ? stackalloc int[rocks.Count]
+            : new int[rocks.Count];
+
+        long total = 0;
+        for (var i = 0; i < rocks.Count; i++)
         {
-            var entry = HuntDungeonExteriorRocks[i];
-            if (entry.Weight <= 0 || !_prototypes.HasIndex<EntityPrototype>(entry.Prototype))
+            var entry = rocks[i];
+            if (entry == null ||
+                entry.Weight <= 0 ||
+                !_prototypes.HasIndex<EntityPrototype>(entry.Prototype))
+            {
                 continue;
+            }
 
             weights[i] = entry.Weight;
             total += entry.Weight;
@@ -962,8 +1258,11 @@ public sealed partial class NcContractSystem : EntitySystem
 
         if (total > 0)
         {
-            var roll = _random.Next(total);
-            for (var i = 0; i < HuntDungeonExteriorRocks.Length; i++)
+            var roll = total <= int.MaxValue
+                ? _random.Next((int) total)
+                : (long) (_random.NextDouble() * total);
+
+            for (var i = 0; i < rocks.Count; i++)
             {
                 var weight = weights[i];
                 if (weight <= 0)
@@ -973,7 +1272,11 @@ public sealed partial class NcContractSystem : EntitySystem
                 if (roll >= 0)
                     continue;
 
-                prototypeId = HuntDungeonExteriorRocks[i].Prototype;
+                var entry = rocks[i];
+                if (entry == null)
+                    continue;
+
+                prototypeId = entry.Prototype;
                 return true;
             }
         }
@@ -992,123 +1295,6 @@ public sealed partial class NcContractSystem : EntitySystem
         return _map.TryGetTileRef(site, grid, tile, out var tileRef) &&
                !tileRef.Tile.IsEmpty &&
                !_turf.IsTileBlocked(tileRef, CollisionGroup.MobMask);
-    }
-
-    private void SpawnHuntDungeonFill(
-        string contractId,
-        ContractObjectiveConfigData config,
-        IReadOnlyList<Dungeon> dungeons,
-        List<EntityCoordinates> spawnCoordinates
-    )
-    {
-        var count = PickHuntDungeonFillCount(config, spawnCoordinates.Count);
-        if (count <= 0)
-            return;
-
-        var spawned = 0;
-        while (spawned < count && spawnCoordinates.Count > 0)
-        {
-            if (!TryPickHuntDungeonFillPrototype(contractId, config.HuntDungeonFill, out var prototype))
-                return;
-
-            var coordIndex = _random.Next(spawnCoordinates.Count);
-            var coords = spawnCoordinates[coordIndex];
-            spawnCoordinates.RemoveAt(coordIndex);
-
-            if (!IsHuntDungeonFillCoordinateValid(coords))
-                continue;
-
-            try
-            {
-                Spawn(prototype, coords);
-                spawned++;
-            }
-            catch (Exception e)
-            {
-                Sawmill.Warning(
-                    $"[Contracts] Hunt dungeon fill for '{contractId}' failed to spawn '{prototype}': {e}");
-            }
-        }
-    }
-
-    private int PickHuntDungeonFillCount(
-        ContractObjectiveConfigData config,
-        int availableCoordinates
-    )
-    {
-        if (availableCoordinates <= 0 || config.HuntDungeonFill.Count == 0)
-            return 0;
-
-        var min = Math.Max(0, config.HuntDungeonFillCount.Min);
-        var max = Math.Max(min, config.HuntDungeonFillCount.Max);
-        if (max <= 0)
-            return 0;
-
-        var count = min == max
-            ? min
-            : _random.Next(min, max + 1);
-
-        return Math.Min(count, availableCoordinates);
-    }
-
-    private bool TryPickHuntDungeonFillPrototype(
-        string contractId,
-        IReadOnlyList<NcHuntDungeonFillEntry> fill,
-        out string prototypeId
-    )
-    {
-        prototypeId = string.Empty;
-
-        if (fill.Count == 0)
-            return false;
-
-        var weights = fill.Count <= 128
-            ? stackalloc int[fill.Count]
-            : new int[fill.Count];
-
-        long total = 0;
-        for (var i = 0; i < fill.Count; i++)
-        {
-            var entry = fill[i];
-            if (entry == null ||
-                entry.Weight <= 0 ||
-                !_prototypes.HasIndex<EntityPrototype>(entry.Prototype))
-            {
-                continue;
-            }
-
-            weights[i] = entry.Weight;
-            total += entry.Weight;
-        }
-
-        if (total > 0)
-        {
-            var roll = total <= int.MaxValue
-                ? _random.Next((int)total)
-                : (long)(_random.NextDouble() * total);
-
-            for (var i = 0; i < fill.Count; i++)
-            {
-                var weight = weights[i];
-                if (weight <= 0)
-                    continue;
-
-                roll -= weight;
-                if (roll >= 0)
-                    continue;
-
-                var entry = fill[i];
-                if (entry == null)
-                    continue;
-
-                prototypeId = entry.Prototype;
-                return true;
-            }
-        }
-
-        Sawmill.Warning(
-            $"[Contracts] Hunt dungeon fill for '{contractId}' skipped: no configured fill prototypes exist.");
-        return false;
     }
 
     private void ForceLoadHuntDebris(EntityUid debris)
@@ -1136,7 +1322,12 @@ public sealed partial class NcContractSystem : EntitySystem
                 if (!seen.Add(tile) ||
                     !_map.TryGetTileRef(debris, grid, tile, out var tileRef) ||
                     tileRef.Tile.IsEmpty ||
-                    _turf.IsTileBlocked(tileRef, CollisionGroup.MobMask))
+                    _turf.IsTileBlocked(tileRef, CollisionGroup.MobMask) ||
+                    !_anchorable.TileFree(
+                        (debris, grid),
+                        tile,
+                        (int) CollisionGroup.MachineLayer,
+                        (int) CollisionGroup.MachineLayer))
                 {
                     continue;
                 }
@@ -1176,58 +1367,16 @@ public sealed partial class NcContractSystem : EntitySystem
         {
             var tileRef = tile.Value;
             if (tileRef.Tile.IsEmpty ||
-                _turf.IsTileBlocked(tileRef, CollisionGroup.MobMask))
+                _turf.IsTileBlocked(tileRef, CollisionGroup.MobMask) ||
+                !_anchorable.TileFree(
+                    grid,
+                    tileRef.GridIndices,
+                    (int) CollisionGroup.MachineLayer,
+                    (int) CollisionGroup.MachineLayer))
                 continue;
 
             output.Add(_map.GridTileToLocal(grid.Owner, grid.Comp, tileRef.GridIndices));
         }
-    }
-
-    private void RemoveHuntTargetOccupiedCoordinates(
-        ObjectiveRuntimeState state,
-        List<EntityCoordinates> coordinates
-    )
-    {
-        if (coordinates.Count == 0 || state.HuntSpawnedTargets.Count == 0)
-            return;
-
-        var occupied = new HashSet<(EntityUid Grid, Vector2i Tile)>();
-        for (var i = 0; i < state.HuntSpawnedTargets.Count; i++)
-        {
-            var target = state.HuntSpawnedTargets[i];
-            if (target == EntityUid.Invalid || TerminatingOrDeleted(target))
-                continue;
-
-            var targetXform = Transform(target);
-            if (targetXform.GridUid is not { } targetGrid ||
-                !TryComp(targetGrid, out MapGridComponent? grid))
-                continue;
-
-            occupied.Add((targetGrid, _map.TileIndicesFor(targetGrid, grid, targetXform.Coordinates)));
-        }
-
-        if (occupied.Count == 0)
-            return;
-
-        for (var i = coordinates.Count - 1; i >= 0; i--)
-        {
-            var coordinatesXform = coordinates[i];
-            if (!TryComp(coordinatesXform.EntityId, out MapGridComponent? grid))
-                continue;
-
-            var tile = _map.TileIndicesFor(coordinatesXform.EntityId, grid, coordinatesXform);
-            if (occupied.Contains((coordinatesXform.EntityId, tile)))
-                coordinates.RemoveAt(i);
-        }
-    }
-
-    private bool IsHuntDungeonFillCoordinateValid(EntityCoordinates coordinates)
-    {
-        return coordinates != EntityCoordinates.Invalid &&
-               _turf.TryGetTileRef(coordinates, out var tileRef) &&
-               tileRef is { } tile &&
-               !tile.Tile.IsEmpty &&
-               !_turf.IsTileBlocked(tile, CollisionGroup.MobMask);
     }
 
     private bool TryAdvanceSpawnedHuntTargetProgress(

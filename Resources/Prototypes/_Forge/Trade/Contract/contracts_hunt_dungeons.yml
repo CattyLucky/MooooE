@@ -176,6 +176,42 @@
 
   - !type:JunctionDunGen
 
+  - !type:EntityTableDunGen
+    minCount: 25
+    maxCount: 40
+    table: !type:NestedSelector
+      tableId: SalvageScrapSpawnerCommon
+
+  - !type:EntityTableDunGen
+    minCount: 30
+    maxCount: 40
+    table: !type:NestedSelector
+      tableId: SalvageScrapSpawnerValuable
+
+  - !type:EntityTableDunGen
+    minCount: 15
+    maxCount: 25
+    table: !type:NestedSelector
+      tableId: SalvageTreasureSpawnerCommon
+
+  - !type:EntityTableDunGen
+    minCount: 15
+    maxCount: 25
+    table: !type:NestedSelector
+      tableId: SalvageEquipmentSpawnerCommon
+
+  - !type:EntityTableDunGen
+    minCount: 15
+    maxCount: 20
+    table: !type:NestedSelector
+      tableId: SalvageTreasureSpawnerValuable
+
+  - !type:EntityTableDunGen
+    minCount: 15
+    maxCount: 20
+    table: !type:NestedSelector
+      tableId: SalvageEquipmentSpawnerValuable
+
 - type: dungeonConfig
   id: ForgeHuntDungeonCompactBase
   layers:
@@ -198,6 +234,42 @@
 
   - !type:JunctionDunGen
 
+  - !type:EntityTableDunGen
+    minCount: 25
+    maxCount: 40
+    table: !type:NestedSelector
+      tableId: SalvageScrapSpawnerCommon
+
+  - !type:EntityTableDunGen
+    minCount: 30
+    maxCount: 40
+    table: !type:NestedSelector
+      tableId: SalvageScrapSpawnerValuable
+
+  - !type:EntityTableDunGen
+    minCount: 15
+    maxCount: 25
+    table: !type:NestedSelector
+      tableId: SalvageTreasureSpawnerCommon
+
+  - !type:EntityTableDunGen
+    minCount: 15
+    maxCount: 25
+    table: !type:NestedSelector
+      tableId: SalvageEquipmentSpawnerCommon
+
+  - !type:EntityTableDunGen
+    minCount: 15
+    maxCount: 20
+    table: !type:NestedSelector
+      tableId: SalvageTreasureSpawnerValuable
+
+  - !type:EntityTableDunGen
+    minCount: 15
+    maxCount: 20
+    table: !type:NestedSelector
+      tableId: SalvageEquipmentSpawnerValuable
+
 - type: dungeonConfig
   id: ForgeHuntDungeonVGRoidBase
   layers:
@@ -219,6 +291,42 @@
     width: 1
 
   - !type:JunctionDunGen
+
+  - !type:EntityTableDunGen
+    minCount: 25
+    maxCount: 40
+    table: !type:NestedSelector
+      tableId: SalvageScrapSpawnerCommon
+
+  - !type:EntityTableDunGen
+    minCount: 30
+    maxCount: 40
+    table: !type:NestedSelector
+      tableId: SalvageScrapSpawnerValuable
+
+  - !type:EntityTableDunGen
+    minCount: 15
+    maxCount: 25
+    table: !type:NestedSelector
+      tableId: SalvageTreasureSpawnerCommon
+
+  - !type:EntityTableDunGen
+    minCount: 15
+    maxCount: 25
+    table: !type:NestedSelector
+      tableId: SalvageEquipmentSpawnerCommon
+
+  - !type:EntityTableDunGen
+    minCount: 15
+    maxCount: 20
+    table: !type:NestedSelector
+      tableId: SalvageTreasureSpawnerValuable
+
+  - !type:EntityTableDunGen
+    minCount: 15
+    maxCount: 20
+    table: !type:NestedSelector
+      tableId: SalvageEquipmentSpawnerValuable
 
 - type: dungeonConfig
   id: ForgeHuntDungeonMineshaft

@@ -26,8 +26,8 @@ public sealed partial class NcContractSystem : EntitySystem
         config.GuardCount = Math.Max(0, config.GuardCount);
         NormalizeHuntDebrisConfig(config.HuntDebris);
         NormalizeHuntDungeonConfig(config.HuntDungeons);
-        NormalizeHuntDungeonFillConfig(config.HuntDungeonFill);
-        NormalizeHuntDungeonFillCount(config);
+        NormalizeHuntDungeonExteriorTileConfig(config.HuntDungeonExteriorTiles);
+        NormalizeHuntDungeonExteriorRockConfig(config.HuntDungeonExteriorRocks);
         NormalizeHuntDebrisPlacementConfig(config);
 
         NormalizeRetrievalSpawnConfig(config);
@@ -70,25 +70,32 @@ public sealed partial class NcContractSystem : EntitySystem
         }
     }
 
-    private static void NormalizeHuntDungeonFillConfig(List<NcHuntDungeonFillEntry> fill)
+    private static void NormalizeHuntDungeonExteriorTileConfig(List<NcHuntDungeonExteriorTileEntry> tiles)
     {
-        for (var i = fill.Count - 1; i >= 0; i--)
+        for (var i = tiles.Count - 1; i >= 0; i--)
         {
-            var entry = fill[i];
+            var entry = tiles[i];
             if (entry == null ||
                 string.IsNullOrWhiteSpace(entry.Prototype) ||
                 entry.Weight <= 0)
             {
-                fill.RemoveAt(i);
+                tiles.RemoveAt(i);
             }
         }
     }
 
-    private static void NormalizeHuntDungeonFillCount(ContractObjectiveConfigData config)
+    private static void NormalizeHuntDungeonExteriorRockConfig(List<NcHuntDungeonExteriorRockEntry> rocks)
     {
-        config.HuntDungeonFillCount = IntRange.Create(
-            Math.Max(0, config.HuntDungeonFillCount.Min),
-            Math.Max(0, config.HuntDungeonFillCount.Max));
+        for (var i = rocks.Count - 1; i >= 0; i--)
+        {
+            var entry = rocks[i];
+            if (entry == null ||
+                string.IsNullOrWhiteSpace(entry.Prototype) ||
+                entry.Weight <= 0)
+            {
+                rocks.RemoveAt(i);
+            }
+        }
     }
 
     private static void NormalizeHuntDebrisPlacementConfig(ContractObjectiveConfigData config)

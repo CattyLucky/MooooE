@@ -63,7 +63,7 @@ public sealed partial class NcHuntDungeonEntry
 }
 
 [DataDefinition]
-public sealed partial class NcHuntDungeonFillEntry
+public sealed partial class NcHuntDungeonExteriorTileEntry
 {
     [DataField("prototype", required: true)]
     public string Prototype { get; set; } = string.Empty;
@@ -72,13 +72,34 @@ public sealed partial class NcHuntDungeonFillEntry
     public int Weight { get; set; } = 1;
 }
 
-[Prototype("ncHuntDungeonFillPreset")]
-public sealed partial class NcHuntDungeonFillPresetPrototype : IPrototype
+[DataDefinition]
+public sealed partial class NcHuntDungeonExteriorRockEntry
 {
-    public const string Default = "ForgeHuntDungeonFillExpedition";
+    [DataField("prototype", required: true)]
+    public string Prototype { get; set; } = string.Empty;
+
+    [DataField("weight")]
+    public int Weight { get; set; } = 1;
+}
+
+[Prototype("ncHuntDungeonExteriorTilePreset")]
+public sealed partial class NcHuntDungeonExteriorTilePresetPrototype : IPrototype
+{
+    public const string Default = "ForgeHuntDungeonExteriorTilesAsteroid";
 
     [DataField("entries", required: true)]
-    public List<NcHuntDungeonFillEntry> Entries { get; private set; } = new();
+    public List<NcHuntDungeonExteriorTileEntry> Entries { get; private set; } = new();
+
+    [IdDataField] public string ID { get; private set; } = default!;
+}
+
+[Prototype("ncHuntDungeonExteriorRockPreset")]
+public sealed partial class NcHuntDungeonExteriorRockPresetPrototype : IPrototype
+{
+    public const string Default = "ForgeHuntDungeonExteriorRocksAsteroid";
+
+    [DataField("entries", required: true)]
+    public List<NcHuntDungeonExteriorRockEntry> Entries { get; private set; } = new();
 
     [IdDataField] public string ID { get; private set; } = default!;
 }
@@ -95,14 +116,17 @@ public sealed partial class NcHuntSpawnData
     [DataField("dungeons")]
     public List<NcHuntDungeonEntry> Dungeons { get; set; } = new();
 
-    [DataField("dungeonFillPreset")]
-    public string DungeonFillPreset { get; set; } = NcHuntDungeonFillPresetPrototype.Default;
+    [DataField("dungeonExteriorTilePreset")]
+    public string DungeonExteriorTilePreset { get; set; } = NcHuntDungeonExteriorTilePresetPrototype.Default;
 
-    [DataField("dungeonFill")]
-    public List<NcHuntDungeonFillEntry> DungeonFill { get; set; } = new();
+    [DataField("dungeonExteriorTiles")]
+    public List<NcHuntDungeonExteriorTileEntry> DungeonExteriorTiles { get; set; } = new();
 
-    [DataField("dungeonFillCount")]
-    public IntRange DungeonFillCount { get; set; } = IntRange.Fixed(0);
+    [DataField("dungeonExteriorRockPreset")]
+    public string DungeonExteriorRockPreset { get; set; } = NcHuntDungeonExteriorRockPresetPrototype.Default;
+
+    [DataField("dungeonExteriorRocks")]
+    public List<NcHuntDungeonExteriorRockEntry> DungeonExteriorRocks { get; set; } = new();
 
     [DataField("debrisMinDistance")]
     public float DebrisMinDistance { get; set; }

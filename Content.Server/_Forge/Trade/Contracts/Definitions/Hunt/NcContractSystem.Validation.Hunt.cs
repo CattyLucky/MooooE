@@ -1,4 +1,5 @@
 using Content.Shared._Forge.Trade;
+using Content.Shared.Maps;
 using Content.Shared.Procedural;
 using Robust.Shared.Prototypes;
 
@@ -59,10 +60,16 @@ public sealed partial class NcContractSystem : EntitySystem
 
         if (spawn.Dungeons.Count > 0)
         {
-            if (!TryValidateHuntDungeonFillPreset(contractId, spawn.DungeonFillPreset))
+            if (!TryValidateHuntDungeonExteriorTilePreset(contractId, spawn.DungeonExteriorTilePreset))
                 valid = false;
 
-            if (!TryValidateHuntDungeonFill(contractId, spawn.DungeonFill, spawn.DungeonFillCount))
+            if (!TryValidateHuntDungeonExteriorTiles(contractId, spawn.DungeonExteriorTiles))
+                valid = false;
+
+            if (!TryValidateHuntDungeonExteriorRockPreset(contractId, spawn.DungeonExteriorRockPreset))
+                valid = false;
+
+            if (!TryValidateHuntDungeonExteriorRocks(contractId, spawn.DungeonExteriorRocks))
                 valid = false;
         }
 
@@ -152,62 +159,115 @@ public sealed partial class NcContractSystem : EntitySystem
         return valid;
     }
 
-    private bool TryValidateHuntDungeonFillPreset(string contractId, string presetId)
+    private bool TryValidateHuntDungeonExteriorTilePreset(string contractId, string presetId)
     {
         if (string.IsNullOrWhiteSpace(presetId))
             return true;
 
-        if (!_prototypes.TryIndex<NcHuntDungeonFillPresetPrototype>(presetId, out var preset))
+        if (!_prototypes.TryIndex<NcHuntDungeonExteriorTilePresetPrototype>(presetId, out var preset))
         {
             Sawmill.Warning(
-                $"[Contracts] Hunt contract '{contractId}' spawn.dungeonFillPreset references missing ncHuntDungeonFillPreset '{presetId}'.");
+                $"[Contracts] Hunt contract '{contractId}' spawn.dungeonExteriorTilePreset references missing ncHuntDungeonExteriorTilePreset '{presetId}'.");
             return false;
         }
 
-        return TryValidateHuntDungeonFillEntries(
+        return TryValidateHuntDungeonExteriorTileEntries(
             contractId,
-            $"spawn.dungeonFillPreset '{presetId}'.entries",
+            $"spawn.dungeonExteriorTilePreset '{presetId}'.entries",
             preset.Entries);
     }
 
-    private bool TryValidateHuntDungeonFill(
+    private bool TryValidateHuntDungeonExteriorTiles(
         string contractId,
-        List<NcHuntDungeonFillEntry> fill,
-        IntRange count
+        List<NcHuntDungeonExteriorTileEntry> tiles
     )
     {
-        var valid = true;
-
-        if (count.Min < 0 || count.Max < 0)
-        {
-            Sawmill.Warning(
-                $"[Contracts] Hunt contract '{contractId}' spawn.dungeonFillCount must be >= 0.");
-            valid = false;
-        }
-
-        if (count.Max < count.Min)
-        {
-            Sawmill.Warning(
-                $"[Contracts] Hunt contract '{contractId}' spawn.dungeonFillCount max must be >= min.");
-            valid = false;
-        }
-
-        return TryValidateHuntDungeonFillEntries(contractId, "spawn.dungeonFill", fill) && valid;
+        return TryValidateHuntDungeonExteriorTileEntries(contractId, "spawn.dungeonExteriorTiles", tiles);
     }
 
-    private bool TryValidateHuntDungeonFillEntries(
+    private bool TryValidateHuntDungeonExteriorTileEntries(
         string contractId,
         string path,
-        List<NcHuntDungeonFillEntry> fill
+        List<NcHuntDungeonExteriorTileEntry> tiles
     )
     {
-        if (fill.Count == 0)
+        if (tiles.Count == 0)
             return true;
 
         var valid = true;
-        for (var i = 0; i < fill.Count; i++)
+        for (var i = 0; i < tiles.Count; i++)
         {
-            var entry = fill[i];
+            var entry = tiles[i];
+            if (entry == null)
+            {
+                Sawmill.Warning($"[Contracts] Hunt contract '{contractId}' {path}[{i}] is empty.");
+                valid = false;
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(entry.Prototype))
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Hunt contract '{contractId}' {path}[{i}] must define prototype.");
+                valid = false;
+            }
+            else if (!_prototypes.HasIndex<ContentTileDefinition>(entry.Prototype))
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Hunt contract '{contractId}' {path}[{i}] references missing tile prototype '{entry.Prototype}'.");
+                valid = false;
+            }
+
+            if (entry.Weight <= 0)
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Hunt contract '{contractId}' {path}[{i}] weight must be > 0.");
+                valid = false;
+            }
+        }
+
+        return valid;
+    }
+
+    private bool TryValidateHuntDungeonExteriorRockPreset(string contractId, string presetId)
+    {
+        if (string.IsNullOrWhiteSpace(presetId))
+            return true;
+
+        if (!_prototypes.TryIndex<NcHuntDungeonExteriorRockPresetPrototype>(presetId, out var preset))
+        {
+            Sawmill.Warning(
+                $"[Contracts] Hunt contract '{contractId}' spawn.dungeonExteriorRockPreset references missing ncHuntDungeonExteriorRockPreset '{presetId}'.");
+            return false;
+        }
+
+        return TryValidateHuntDungeonExteriorRockEntries(
+            contractId,
+            $"spawn.dungeonExteriorRockPreset '{presetId}'.entries",
+            preset.Entries);
+    }
+
+    private bool TryValidateHuntDungeonExteriorRocks(
+        string contractId,
+        List<NcHuntDungeonExteriorRockEntry> rocks
+    )
+    {
+        return TryValidateHuntDungeonExteriorRockEntries(contractId, "spawn.dungeonExteriorRocks", rocks);
+    }
+
+    private bool TryValidateHuntDungeonExteriorRockEntries(
+        string contractId,
+        string path,
+        List<NcHuntDungeonExteriorRockEntry> rocks
+    )
+    {
+        if (rocks.Count == 0)
+            return true;
+
+        var valid = true;
+        for (var i = 0; i < rocks.Count; i++)
+        {
+            var entry = rocks[i];
             if (entry == null)
             {
                 Sawmill.Warning($"[Contracts] Hunt contract '{contractId}' {path}[{i}] is empty.");
