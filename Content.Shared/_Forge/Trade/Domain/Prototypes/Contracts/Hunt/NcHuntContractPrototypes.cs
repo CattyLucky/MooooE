@@ -63,6 +63,16 @@ public sealed partial class NcHuntDungeonEntry
 }
 
 [DataDefinition]
+public sealed partial class NcHuntDungeonFillEntry
+{
+    [DataField("prototype", required: true)]
+    public string Prototype { get; set; } = string.Empty;
+
+    [DataField("weight")]
+    public int Weight { get; set; } = 1;
+}
+
+[DataDefinition]
 public sealed partial class NcHuntSpawnData
 {
     [DataField("point", required: true)]
@@ -73,6 +83,26 @@ public sealed partial class NcHuntSpawnData
 
     [DataField("dungeons")]
     public List<NcHuntDungeonEntry> Dungeons { get; set; } = new();
+
+    [DataField("dungeonFill")]
+    public List<NcHuntDungeonFillEntry> DungeonFill { get; set; } = new()
+    {
+        new() { Prototype = "SpawnDungeonLootOresSingle", Weight = 8 },
+        new() { Prototype = "SpawnDungeonLootMaterialsBasicSingle", Weight = 6 },
+        new() { Prototype = "SalvageSpawnerScrapCommon", Weight = 5 },
+        new() { Prototype = "SpawnDungeonLootClutterSalvage", Weight = 4 },
+        new() { Prototype = "SpawnDungeonLootClutterEngi", Weight = 4 },
+        new() { Prototype = "SpawnDungeonLootOresFull", Weight = 3 },
+        new() { Prototype = "SpawnDungeonLootMaterialsBasicFull", Weight = 3 },
+        new() { Prototype = "SpawnDungeonLootToolsSalvage", Weight = 2 },
+        new() { Prototype = "SalvageSpawnerScrapValuable", Weight = 2 },
+        new() { Prototype = "SpawnDungeonLootPartsEngi", Weight = 1 },
+        new() { Prototype = "SpawnDungeonLootLockersGeneral", Weight = 1 },
+        new() { Prototype = "SalvageSpawnerTreasure", Weight = 1 },
+    };
+
+    [DataField("dungeonFillCount")]
+    public IntRange DungeonFillCount { get; set; } = IntRange.Create(16, 24);
 
     [DataField("debrisMinDistance")]
     public float DebrisMinDistance { get; set; }

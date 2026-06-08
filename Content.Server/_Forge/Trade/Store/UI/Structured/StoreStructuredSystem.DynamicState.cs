@@ -11,23 +11,24 @@ public sealed partial class StoreStructuredSystem : EntitySystem
 
     private readonly StoreDynamicStatePublisher _dynamicStatePublisher = new();
 
-    public void UpdateDynamicState(EntityUid uid, NcStoreComponent comp, EntityUid user)
+    public void UpdateDynamicState(EntityUid uid, NcStoreComponent comp, EntityUid user, bool forceSend = false)
     {
         if (!_ui.IsUiOpen(uid, NcStoreUiKey.Key, user))
             return;
 
+        var key = new StoreUserKey(uid, user);
         var dynamicStarted = Stopwatch.GetTimestamp();
-        if (!_storesUpdatingDynamic.Add(uid))
+        if (!_storesUpdatingDynamic.Add(key))
         {
             Logger.GetSawmill("ncstore-structured")
                 .Warning(
-                    $"[StoreStructured] Re-entrant UpdateDynamicState on {ToPrettyString(uid)} skipped.");
+                    $"[StoreStructured] Re-entrant UpdateDynamicState on {ToPrettyString(uid)} for {ToPrettyString(user)} skipped.");
             return;
         }
 
         try
         {
-            var scratch = GetDynamicScratch(uid);
+            var scratch = GetDynamicScratch(uid, user);
             var crateUid = GetDynamicCrate(user);
             UpdateStoreWatch(uid, user, crateUid);
             var tabs = GetDynamicTabState(comp);
@@ -45,7 +46,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             PopulateDynamicCratePreview(uid, comp, crateUid, tabs.HasSellTab, scanNeeds.NeedCrateScan, scratch, buf);
             PopulateDynamicContracts(uid, comp, tabs.HasContractsTab, scratch, buf);
             PopulateDynamicContractSkip(uid, comp, tabs.HasContractsTab, buf);
-            PushDynamicState(uid, comp, tabs, scratch, buf);
+            PushDynamicState(uid, comp, user, tabs, scratch, buf, forceSend);
 
             var elapsed = GetElapsedMilliseconds(dynamicStarted);
             if (elapsed > SlowDynamicStateMs)
@@ -57,7 +58,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         }
         finally
         {
-            _storesUpdatingDynamic.Remove(uid);
+            _storesUpdatingDynamic.Remove(key);
         }
     }
 
@@ -193,17 +194,20 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         DynamicScratch scratch
     )
     {
+        scratch.ContractProgressPreviews.Clear();
+
         if (!tabs.HasContractsTab || !contractNeeds.HasTakenContracts)
             return;
 
-        _contracts.UpdateContractsProgress(
+        _contracts.UpdateContractsProgressForUi(
             store,
             comp,
             user,
             scratch.DeepUserItems,
             crateUid,
             crateUid != null ? scratch.DeepCrateItems : null,
-            contractNeeds.NeedStoreWorldItems);
+            contractNeeds.NeedStoreWorldItems,
+            scratch.ContractProgressPreviews);
     }
 
     private static void PopulateDynamicBalances(

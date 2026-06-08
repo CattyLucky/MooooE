@@ -7,7 +7,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
 {
     private void OnClaimContract(EntityUid uid, NcStoreComponent comp, ClaimContractBoundMessage msg)
     {
-        if (!TryGetLockedUiUser(uid, comp, out var user))
+        if (!TryGetMessageUser(uid, comp, msg, out var user))
             return;
 
         if (!_storeSystem.CanUseStore(uid, comp, user))
@@ -36,13 +36,12 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             _popups.PopupEntity(popup, uid, user);
         }
 
-        RequestDynamicRefresh(uid, comp, user);
+        RequestDynamicRefreshForAll(uid, comp, user);
     }
-
 
     private void OnTakeContract(EntityUid uid, NcStoreComponent comp, TakeContractBoundMessage msg)
     {
-        if (!TryGetLockedUiUser(uid, comp, out var user))
+        if (!TryGetMessageUser(uid, comp, msg, out var user))
             return;
 
         if (!_storeSystem.CanUseStore(uid, comp, user))
@@ -60,7 +59,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         else
             _popups.PopupEntity(Loc.GetString("nc-store-contract-take-failed"), uid, user);
 
-        RequestDynamicRefresh(uid, comp, user);
+        RequestDynamicRefreshForAll(uid, comp, user);
     }
 
     private void OnRequestContractPinpointer(
@@ -69,7 +68,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         RequestContractPinpointerBoundMessage msg
     )
     {
-        if (!TryGetLockedUiUser(uid, comp, out var user))
+        if (!TryGetMessageUser(uid, comp, msg, out var user))
             return;
 
         if (!_storeSystem.CanUseStore(uid, comp, user))
@@ -87,12 +86,12 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         else
             _popups.PopupEntity(Loc.GetString("nc-store-contract-pinpointer-issue-failed"), uid, user);
 
-        RequestDynamicRefresh(uid, comp, user);
+        RequestDynamicRefreshForAll(uid, comp, user);
     }
 
     private void OnSkipContract(EntityUid uid, NcStoreComponent comp, SkipContractBoundMessage msg)
     {
-        if (!TryGetLockedUiUser(uid, comp, out var user))
+        if (!TryGetMessageUser(uid, comp, msg, out var user))
             return;
 
         if (!_storeSystem.CanUseStore(uid, comp, user))
@@ -110,7 +109,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         else
             _popups.PopupEntity(Loc.GetString("nc-store-contract-skip-failed"), uid, user);
 
-        RequestDynamicRefresh(uid, comp, user);
+        RequestDynamicRefreshForAll(uid, comp, user);
     }
 
     private bool TryValidateContractMessageId(EntityUid store, EntityUid user, string? contractId, string action)

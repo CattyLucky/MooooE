@@ -15,13 +15,18 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         if (!hasContractsTab || comp.Contracts.Count == 0)
             return;
 
-        var signature = ComputeContractsSignature(store, comp, scratch.ContractsSignatureScratch);
+        var signature = ComputeContractsSignature(
+            store,
+            comp,
+            scratch.ContractsSignatureScratch,
+            scratch.ContractProgressPreviews);
         if (scratch.TryPopulateCachedContracts(signature, buf))
             return;
 
         foreach (var contract in comp.Contracts.Values)
         {
-            buf.Contracts.Add(MapContractToClient(store, contract));
+            scratch.ContractProgressPreviews.TryGetValue(contract.Id, out var preview);
+            buf.Contracts.Add(MapContractToClient(store, contract, preview));
         }
 
         buf.Contracts.Sort(CompareContractsForUi);
@@ -31,7 +36,8 @@ public sealed partial class StoreStructuredSystem : EntitySystem
     private int ComputeContractsSignature(
         EntityUid store,
         NcStoreComponent comp,
-        List<ContractServerData> contractsScratch
+        List<ContractServerData> contractsScratch,
+        Dictionary<string, ContractProgressPreview> previews
     )
     {
         unchecked
@@ -44,7 +50,9 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             AddHash(ref hash, contractsScratch.Count);
             for (var i = 0; i < contractsScratch.Count; i++)
             {
-                AddHash(ref hash, ComputeContractSignature(store, contractsScratch[i]));
+                var contract = contractsScratch[i];
+                previews.TryGetValue(contract.Id, out var preview);
+                AddHash(ref hash, ComputeContractSignature(store, contract, preview));
             }
 
             contractsScratch.Clear();
@@ -52,7 +60,11 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         }
     }
 
-    private int ComputeContractSignature(EntityUid store, ContractServerData contract)
+    private int ComputeContractSignature(
+        EntityUid store,
+        ContractServerData contract,
+        ContractProgressPreview? preview
+    )
     {
         unchecked
         {
@@ -64,15 +76,15 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             AddHash(ref hash, contract.Repeatable);
             AddHash(ref hash, contract.Taken);
             AddHash(ref hash, SupportsContractPinpointer(contract));
-            AddHash(ref hash, _contracts.CanPartiallyTurnInNow(store, contract.Id, contract));
+            AddHash(ref hash, preview?.PartialTurnInAvailable ?? _contracts.CanPartiallyTurnInNow(store, contract.Id, contract));
             AddHash(ref hash, contract.ExecutionKind);
-            AddHash(ref hash, contract.FlowStatus);
-            AddHash(ref hash, contract.Completed);
-            AddHash(ref hash, contract.TargetItem);
+            AddHash(ref hash, preview?.FlowStatus ?? contract.FlowStatus);
+            AddHash(ref hash, preview?.Completed ?? contract.Completed);
+            AddHash(ref hash, preview?.TargetItem ?? contract.TargetItem);
             AddHash(ref hash, contract.MatchMode);
             AddHash(ref hash, ResolveContractTurnInItem(contract));
-            AddHash(ref hash, contract.Required);
-            AddHash(ref hash, contract.Progress);
+            AddHash(ref hash, preview?.Required ?? contract.Required);
+            AddHash(ref hash, preview?.Progress ?? contract.Progress);
             AddHash(ref hash, contract.Config.RetrievalSourceHint);
             AddHash(ref hash, contract.Config.RetrievalDestinationHint);
             AddHash(ref hash, IsRetrievalRouteContract(contract));
@@ -84,8 +96,8 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             AddHash(ref hash, contract.OfferPoolName);
             AddHash(ref hash, contract.OfferPoolOrder);
             AddHash(ref hash, contract.OfferPoolColor);
-            AddRuntimeHash(ref hash, contract.Runtime);
-            AddTargetsHash(ref hash, contract.Targets);
+            AddRuntimeHash(ref hash, preview?.Runtime ?? contract.Runtime);
+            AddTargetsHash(ref hash, contract.Targets, preview);
             AddRewardsHash(ref hash, contract.Rewards);
             return hash;
         }
@@ -110,7 +122,11 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         AddHash(ref hash, runtime.StatusHint);
     }
 
-    private static void AddTargetsHash(ref int hash, List<ContractTargetServerData>? targets)
+    private static void AddTargetsHash(
+        ref int hash,
+        List<ContractTargetServerData>? targets,
+        ContractProgressPreview? preview
+    )
     {
         if (targets == null)
         {
@@ -123,10 +139,23 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         {
             var target = targets[i];
             AddHash(ref hash, target.TargetItem);
+            AddHash(ref hash, target.Solution);
+            AddHash(ref hash, target.ReagentAmount);
             AddHash(ref hash, target.Required);
-            AddHash(ref hash, target.Progress);
+            AddHash(ref hash, GetPreviewTargetProgress(preview, i, target.Progress));
             AddHash(ref hash, target.MatchMode);
         }
+    }
+
+    private static int GetPreviewTargetProgress(
+        ContractProgressPreview? preview,
+        int index,
+        int fallback
+    )
+    {
+        return preview != null && index >= 0 && index < preview.TargetProgress.Count
+            ? preview.TargetProgress[index]
+            : fallback;
     }
 
     private static void AddRewardsHash(ref int hash, List<ContractRewardData>? rewards)

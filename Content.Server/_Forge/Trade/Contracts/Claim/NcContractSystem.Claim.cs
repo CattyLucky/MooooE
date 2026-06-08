@@ -6,11 +6,12 @@ public sealed partial class NcContractSystem : EntitySystem
 {
     public bool TryClaim(EntityUid store, EntityUid user, string contractId)
     {
-        var claimKey = (store, user, contractId);
+        var claimKey = (store, contractId);
         if (!_claimInProgress.Add(claimKey))
         {
             Sawmill.Warning(
-                $"[Claim] Duplicate/re-entrant TryClaim for '{contractId}' by {ToPrettyString(user)} on {ToPrettyString(store)} rejected.");
+                $"[Claim] Duplicate/re-entrant TryClaim for '{contractId}' on {ToPrettyString(store)} rejected " +
+                $"(user={ToPrettyString(user)}).");
             return false;
         }
 

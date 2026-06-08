@@ -77,6 +77,7 @@ public sealed partial class NcContractSystem : EntitySystem
         InvalidateClaimExecutionCaches(ctx);
         RefreshProgressAfterPartialTurnIn(ctx, contractId);
         RetargetContractPinpointersAfterTurnIn(ctx.Store, contractId, ctx.Contract);
+        RaiseContractsChanged(ctx.Store);
         return true;
     }
 
@@ -333,5 +334,6 @@ public sealed partial class NcContractSystem : EntitySystem
             comp.CompletedOneTimeContracts.Add(contractId);
 
         RefillContractsForStore(store, comp, contractId);
+        RaiseContractsChanged(store);
     }
 }

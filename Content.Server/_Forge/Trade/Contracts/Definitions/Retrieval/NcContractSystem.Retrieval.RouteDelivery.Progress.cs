@@ -82,10 +82,14 @@ public sealed partial class NcContractSystem : EntitySystem
             return;
 
         UpdateRetrievalDeliveredCargoProgress(key.Store, contract, state);
+        var previousRequired = contract.Required;
+        var previousProgress = contract.Progress;
+        var previousStatus = contract.FlowStatus;
         SetTrackedDeliveryProgress(contract, GetRetrievalRouteDeliveryProgress(state));
 
         if (!contract.Completed)
         {
+            RaiseContractsChangedIfSnapshotChanged(key, contract, previousRequired, previousProgress, previousStatus);
             RetargetRetrievalPinpointersToCurrentStep(key, contract, state);
             return;
         }
@@ -96,6 +100,12 @@ public sealed partial class NcContractSystem : EntitySystem
             {
                 Sawmill.Warning(
                     $"[Contracts] Retrieval route '{key.ContractId}' completed but proof coordinates could not be resolved.");
+                RaiseContractsChangedIfSnapshotChanged(
+                    key,
+                    contract,
+                    previousRequired,
+                    previousProgress,
+                    previousStatus);
                 return;
             }
 
@@ -120,6 +130,8 @@ public sealed partial class NcContractSystem : EntitySystem
         }
         else
             CleanupObjectivePinpointers(key, state);
+
+        RaiseContractsChangedIfSnapshotChanged(key, contract, previousRequired, previousProgress, previousStatus);
     }
 
     private static int GetRetrievalRouteDeliveryProgress(ObjectiveRuntimeState state)

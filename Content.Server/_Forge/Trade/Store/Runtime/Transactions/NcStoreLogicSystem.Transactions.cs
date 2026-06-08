@@ -27,9 +27,15 @@ public sealed partial class NcStoreLogicSystem
                 user,
                 rewards,
                 "Buy",
-                () => TryTakeCurrency(user, plan.Currency, plan.TotalPrice)
-                    ? null
-                    : $"failed to take currency '{plan.Currency}' x{plan.TotalPrice}",
+                () =>
+                {
+                    if (TryValidateListingRemainingForCommit(listing, plan.Purchases, "buy") is { } remainingFail)
+                        return remainingFail;
+
+                    return TryTakeCurrency(user, plan.Currency, plan.TotalPrice)
+                        ? null
+                        : $"failed to take currency '{plan.Currency}' x{plan.TotalPrice}";
+                },
                 out var reason))
         {
             Sawmill.Warning($"[NcStore] TryBuy failed for listing '{listing.Id}': {reason}");
@@ -309,6 +315,9 @@ public sealed partial class NcStoreLogicSystem
             "Sell",
             () =>
             {
+                if (TryValidateListingRemainingForCommit(listing, amount, "sell") is { } remainingFail)
+                    return remainingFail;
+
                 if (!_inventory.TryTakeProductUnitsFromRootCached(
                         root,
                         listing.ProductEntity,
@@ -318,6 +327,21 @@ public sealed partial class NcStoreLogicSystem
 
                 return null;
             });
+    }
+
+    private static string? TryValidateListingRemainingForCommit(
+        NcStoreListingDef listing,
+        int amount,
+        string operation
+    )
+    {
+        if (listing.RemainingCount >= 0 && listing.RemainingCount < amount)
+        {
+            return
+                $"listing '{listing.Id}' has only {listing.RemainingCount} units remaining for planned {operation} x{amount}";
+        }
+
+        return null;
     }
 
     private bool LogSellFromContainer(int sold, string listingId, NcStoreComponent store, EntityUid container)

@@ -12,7 +12,7 @@ public sealed partial class NcContractSystem : EntitySystem
     private const int MaxRewardDepth = 6;
     private const int DepthInProgress = -1;
     private static readonly ISawmill Sawmill = Logger.GetSawmill("nccontracts");
-    private readonly HashSet<(EntityUid Store, EntityUid User, string ContractId)> _claimInProgress = new();
+    private readonly HashSet<(EntityUid Store, string ContractId)> _claimInProgress = new();
     [Dependency] private readonly IComponentFactory _compFactory = default!;
     private readonly Dictionary<string, int> _depthCache = new(StringComparer.Ordinal);
     [Dependency] private readonly NcStoreInventorySystem _inventory = default!;

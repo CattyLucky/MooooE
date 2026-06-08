@@ -231,9 +231,7 @@ public sealed partial class NcContractSystem : EntitySystem
             return;
 
         UpdateObjectiveContractProgress(key.Store, key.ContractId, contract);
-
-        var ev = new NcContractsChangedEvent();
-        RaiseLocalEvent(key.Store, ref ev);
+        RaiseContractsChanged(key);
     }
 
     private bool IsGhostRoleTargetCarriedByUser(EntityUid target, EntityUid user)

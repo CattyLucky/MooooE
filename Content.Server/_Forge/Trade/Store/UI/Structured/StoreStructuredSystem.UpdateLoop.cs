@@ -27,27 +27,27 @@ public sealed partial class StoreStructuredSystem
 
     private void ProcessRealtimeOpenStoreUpdates()
     {
-        if (_openStoreUids.Count == 0)
+        if (_openStoreUsers.Count == 0)
         {
             _realtimeOpenStoreCursor = 0;
             return;
         }
 
         var now = _timing.CurTime;
-        _openStoresScratch.Clear();
-        _openStoresScratch.AddRange(_openStoreUids);
+        _openStoreUsersScratch.Clear();
+        _openStoreUsersScratch.AddRange(_openStoreUsers);
 
-        if (_realtimeOpenStoreCursor >= _openStoresScratch.Count)
+        if (_realtimeOpenStoreCursor >= _openStoreUsersScratch.Count)
             _realtimeOpenStoreCursor = 0;
 
         var processed = 0;
         var inspected = 0;
-        var count = _openStoresScratch.Count;
+        var count = _openStoreUsersScratch.Count;
 
         while (inspected < count && processed < MaxRealtimeDynamicUpdatesPerTick)
         {
             var index = (_realtimeOpenStoreCursor + inspected) % count;
-            if (ProcessRealtimeOpenStoreUpdate(_openStoresScratch[index], now))
+            if (ProcessRealtimeOpenStoreUpdate(_openStoreUsersScratch[index], now))
                 processed++;
 
             inspected++;
@@ -56,88 +56,88 @@ public sealed partial class StoreStructuredSystem
         _realtimeOpenStoreCursor = (_realtimeOpenStoreCursor + Math.Max(1, inspected)) % count;
     }
 
-    private bool ProcessRealtimeOpenStoreUpdate(EntityUid uid, TimeSpan now)
+    private bool ProcessRealtimeOpenStoreUpdate(StoreUserKey key, TimeSpan now)
     {
-        if (!TryGetOpenStoreUser(uid, out var store, out var user))
+        if (!TryGetOpenStoreUser(key, out var store))
             return false;
 
-        if (EnsureCrateWatchUpToDate(uid, user))
-            MarkDirty(uid);
+        if (EnsureCrateWatchUpToDate(key.Store, key.User))
+            MarkDirty(key);
 
-        if (!_contracts.HasRealtimeContractState(store) || !TryGetDynamicScratchForUpdate(uid, now, out var scratch))
+        if (!_contracts.HasRealtimeContractState(store) || !TryGetDynamicScratchForUpdate(key, now, out var scratch))
             return false;
 
-        _dirtyStores.Remove(uid);
-        UpdateDynamicState(uid, store, user);
+        _dirtyStoreUsers.Remove(key);
+        UpdateDynamicState(key.Store, store, key.User);
         SetNextDynamicUpdateTime(scratch, now);
         return true;
     }
 
     private void ProcessDirtyStoreUpdates()
     {
-        if (_dirtyStores.Count == 0)
+        if (_dirtyStoreUsers.Count == 0)
             return;
 
         var now = _timing.CurTime;
         var processed = 0;
 
-        _dirtyStoresScratch.Clear();
-        _dirtyStoresScratch.AddRange(_dirtyStores);
+        _dirtyStoreUsersScratch.Clear();
+        _dirtyStoreUsersScratch.AddRange(_dirtyStoreUsers);
 
-        foreach (var uid in _dirtyStoresScratch)
+        foreach (var key in _dirtyStoreUsersScratch)
         {
             if (processed >= MaxDynamicUpdatesPerTick)
                 break;
 
-            if (!TryGetOpenStoreUser(uid, out var store, out var user))
+            if (!TryGetOpenStoreUser(key, out var store))
             {
-                _dirtyStores.Remove(uid);
+                _dirtyStoreUsers.Remove(key);
                 continue;
             }
 
-            if (!TryGetDynamicScratchForUpdate(uid, now, out var scratch))
+            if (!TryGetDynamicScratchForUpdate(key, now, out var scratch))
                 continue;
 
-            UpdateDynamicState(uid, store, user);
+            UpdateDynamicState(key.Store, store, key.User);
             SetNextDynamicUpdateTime(scratch, now);
-            _dirtyStores.Remove(uid);
+            _dirtyStoreUsers.Remove(key);
             processed++;
         }
     }
 
     private void ProcessOpenStoreValidityChecks()
     {
-        if (_openStoreUids.Count == 0)
+        if (_openStoreUsers.Count == 0)
             return;
 
-        _openStoresScratch.Clear();
-        _openStoresScratch.AddRange(_openStoreUids);
+        _openStoreUsersScratch.Clear();
+        _openStoreUsersScratch.AddRange(_openStoreUsers);
 
-        foreach (var uid in _openStoresScratch)
+        foreach (var key in _openStoreUsersScratch)
         {
-            ValidateOpenStore(uid);
+            ValidateOpenStore(key);
         }
     }
 
-    private bool TryGetOpenStoreUser(EntityUid uid, out NcStoreComponent store, out EntityUid user)
+    private bool TryGetOpenStoreUser(StoreUserKey key, out NcStoreComponent store)
     {
         store = default!;
-        user = default;
 
-        if (!TryComp(uid, out NcStoreComponent? foundStore) || foundStore.CurrentUser is not { } currentUser)
+        if (!TryComp(key.Store, out NcStoreComponent? foundStore) ||
+            key.User == EntityUid.Invalid ||
+            !foundStore.OpenUsers.Contains(key.User))
             return false;
 
-        if (!_ui.IsUiOpen(uid, NcStoreUiKey.Key, currentUser))
+        if (!_ui.IsUiOpen(key.Store, NcStoreUiKey.Key, key.User))
             return false;
 
         store = foundStore;
-        user = currentUser;
         return true;
     }
 
-    private bool TryGetDynamicScratchForUpdate(EntityUid uid, TimeSpan now, out DynamicScratch scratch)
+    private bool TryGetDynamicScratchForUpdate(StoreUserKey key, TimeSpan now, out DynamicScratch scratch)
     {
-        scratch = GetDynamicScratch(uid);
+        scratch = GetDynamicScratch(key.Store, key.User);
         return now >= scratch.NextDynamicAllowed;
     }
 
@@ -146,30 +146,36 @@ public sealed partial class StoreStructuredSystem
         scratch.NextDynamicAllowed = now + TimeSpan.FromSeconds(MinDynamicInterval);
     }
 
-    private void ValidateOpenStore(EntityUid uid)
+    private void ValidateOpenStore(StoreUserKey key)
     {
-        if (!TryComp(uid, out NcStoreComponent? store) || !TryComp(uid, out TransformComponent? xform))
+        if (!TryComp(key.Store, out NcStoreComponent? store) || !TryComp(key.Store, out TransformComponent? xform))
         {
-            CloseAndCleanUp(uid);
+            CloseAndCleanUp(key.Store);
             return;
         }
 
-        if (store.CurrentUser is not { } userUid)
+        if (!store.OpenUsers.Contains(key.User))
         {
-            CloseAndCleanUp(uid);
+            CloseAndCleanUp(key.Store, store, key.User);
             return;
         }
 
-        if (!IsStoreUserInRange(xform, userUid))
+        if (!_ui.IsUiOpen(key.Store, NcStoreUiKey.Key, key.User))
         {
-            CloseStoreForDetachedUser(uid, store, userUid);
+            CloseAndCleanUp(key.Store, store, key.User);
             return;
         }
 
-        if (_storeSystem.CanUseStore(uid, store, userUid))
+        if (!IsStoreUserInRange(xform, key.User))
+        {
+            CloseStoreForDetachedUser(key.Store, store, key.User);
+            return;
+        }
+
+        if (_storeSystem.CanUseStore(key.Store, store, key.User))
             return;
 
-        CloseStoreForNoAccess(uid, store, userUid);
+        CloseStoreForNoAccess(key.Store, store, key.User);
     }
 
     private bool IsStoreUserInRange(TransformComponent storeXform, EntityUid userUid)
@@ -180,43 +186,100 @@ public sealed partial class StoreStructuredSystem
 
     private void CloseStoreForDetachedUser(EntityUid uid, NcStoreComponent store, EntityUid userUid)
     {
-        CloseAndCleanUp(uid, userUid);
-        store.CurrentUser = null;
+        CloseAndCleanUp(uid, store, userUid, true);
     }
 
     private void CloseStoreForNoAccess(EntityUid uid, NcStoreComponent store, EntityUid userUid)
     {
-        CloseAndCleanUp(uid, userUid);
-        store.CurrentUser = null;
+        CloseAndCleanUp(uid, store, userUid, true);
         _popups.PopupEntity(Loc.GetString("nc-store-no-access"), uid, userUid);
     }
 
-    private void CloseAndCleanUp(EntityUid storeUid, EntityUid? user = null)
+    private void CloseAndCleanUp(EntityUid storeUid)
     {
-        if (_watchByStore.TryGetValue(storeUid, out var info))
+        _openStoreUsersScratch.Clear();
+        foreach (var key in _openStoreUsers)
         {
-            if (info.User != EntityUid.Invalid)
-                _inventory.InvalidateInventoryCache(info.User);
-
-            if (info.Crate is { } crate)
-                _inventory.InvalidateInventoryCache(crate);
+            if (key.Store == storeUid)
+                _openStoreUsersScratch.Add(key);
         }
 
-        if (user != null)
-            _ui.CloseUi(storeUid, NcStoreUiKey.Key, user.Value);
+        if (TryComp(storeUid, out NcStoreComponent? store))
+        {
+            foreach (var key in _openStoreUsersScratch)
+            {
+                CloseAndCleanUp(storeUid, store, key.User, true);
+            }
+            return;
+        }
 
-        if (_dynamicScratchByStore.TryGetValue(storeUid, out var scratch))
+        foreach (var key in _openStoreUsersScratch)
+        {
+            CloseAndCleanUpMissingStore(key, true);
+        }
+    }
+
+    private void CloseAndCleanUp(EntityUid storeUid, NcStoreComponent store, EntityUid user, bool closeUi = false)
+    {
+        var key = new StoreUserKey(storeUid, user);
+
+        if (_watchByStoreUser.TryGetValue(key, out var crate))
+        {
+            _inventory.InvalidateInventoryCache(user);
+            if (crate is { } crateUid)
+                _inventory.InvalidateInventoryCache(crateUid);
+        }
+
+        if (_dynamicScratchByStoreUser.TryGetValue(key, out var scratch))
             scratch.UpdateVisibleIds(null);
-        _openStoreUids.Remove(storeUid);
-        UnregisterStoreWatch(storeUid);
-        _dirtyStores.Remove(storeUid);
-        _storesUpdatingDynamic.Remove(storeUid);
-        _dynamicScratchByStore.Remove(storeUid);
+
+        store.OpenUsers.Remove(user);
+        _openStoreUsers.Remove(key);
+        _dirtyStoreUsers.Remove(key);
+        _storesUpdatingDynamic.Remove(key);
+        _dynamicScratchByStoreUser.Remove(key);
+        UnregisterStoreWatch(key);
+
+        if (closeUi && _ui.IsUiOpen(storeUid, NcStoreUiKey.Key, user))
+            _ui.CloseUi(storeUid, NcStoreUiKey.Key, user);
+    }
+
+    private void CloseAndCleanUpMissingStore(StoreUserKey key, bool closeUi)
+    {
+        if (_watchByStoreUser.TryGetValue(key, out var crate))
+        {
+            _inventory.InvalidateInventoryCache(key.User);
+            if (crate is { } crateUid)
+                _inventory.InvalidateInventoryCache(crateUid);
+        }
+
+        if (_dynamicScratchByStoreUser.TryGetValue(key, out var scratch))
+            scratch.UpdateVisibleIds(null);
+
+        _openStoreUsers.Remove(key);
+        _dirtyStoreUsers.Remove(key);
+        _storesUpdatingDynamic.Remove(key);
+        _dynamicScratchByStoreUser.Remove(key);
+        UnregisterStoreWatch(key);
+
+        if (closeUi && _ui.IsUiOpen(key.Store, NcStoreUiKey.Key, key.User))
+            _ui.CloseUi(key.Store, NcStoreUiKey.Key, key.User);
     }
 
     private void MarkDirty(EntityUid storeUid)
     {
-        if (storeUid != EntityUid.Invalid)
-            _dirtyStores.Add(storeUid);
+        if (storeUid == EntityUid.Invalid || !TryComp(storeUid, out NcStoreComponent? store))
+            return;
+
+        foreach (var user in store.OpenUsers)
+        {
+            MarkDirty(new StoreUserKey(storeUid, user));
+        }
+    }
+
+    private void MarkDirty(StoreUserKey key)
+    {
+        if (key.Store != EntityUid.Invalid && key.User != EntityUid.Invalid)
+            _dirtyStoreUsers.Add(key);
     }
 }

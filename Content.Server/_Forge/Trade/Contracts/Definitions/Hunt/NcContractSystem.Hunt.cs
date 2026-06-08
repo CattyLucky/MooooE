@@ -33,6 +33,8 @@ public sealed partial class NcContractSystem : EntitySystem
             HuntEnabled = true,
             HuntDebris = CloneHuntDebrisEntries(proto.Spawn.Debris),
             HuntDungeons = CloneHuntDungeonEntries(proto.Spawn.Dungeons),
+            HuntDungeonFill = CloneHuntDungeonFillEntries(proto.Spawn.DungeonFill),
+            HuntDungeonFillCount = proto.Spawn.DungeonFillCount,
             HuntDebrisMinDistance = proto.Spawn.DebrisMinDistance,
             HuntDebrisMaxDistance = proto.Spawn.DebrisMaxDistance,
             HuntDebrisSafetyRadius = proto.Spawn.DebrisSafetyRadius,
@@ -102,6 +104,28 @@ public sealed partial class NcContractSystem : EntitySystem
 
             result.Add(
                 new NcHuntDungeonEntry
+                {
+                    Prototype = entry.Prototype,
+                    Weight = entry.Weight,
+                });
+        }
+
+        return result;
+    }
+
+    private static List<NcHuntDungeonFillEntry> CloneHuntDungeonFillEntries(
+        IReadOnlyList<NcHuntDungeonFillEntry> source
+    )
+    {
+        var result = new List<NcHuntDungeonFillEntry>(source.Count);
+        for (var i = 0; i < source.Count; i++)
+        {
+            var entry = source[i];
+            if (entry == null)
+                continue;
+
+            result.Add(
+                new NcHuntDungeonFillEntry
                 {
                     Prototype = entry.Prototype,
                     Weight = entry.Weight,

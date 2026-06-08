@@ -26,6 +26,8 @@ public sealed partial class NcContractSystem : EntitySystem
         config.GuardCount = Math.Max(0, config.GuardCount);
         NormalizeHuntDebrisConfig(config.HuntDebris);
         NormalizeHuntDungeonConfig(config.HuntDungeons);
+        NormalizeHuntDungeonFillConfig(config.HuntDungeonFill);
+        NormalizeHuntDungeonFillCount(config);
         NormalizeHuntDebrisPlacementConfig(config);
 
         NormalizeRetrievalSpawnConfig(config);
@@ -66,6 +68,27 @@ public sealed partial class NcContractSystem : EntitySystem
                 dungeons.RemoveAt(i);
             }
         }
+    }
+
+    private static void NormalizeHuntDungeonFillConfig(List<NcHuntDungeonFillEntry> fill)
+    {
+        for (var i = fill.Count - 1; i >= 0; i--)
+        {
+            var entry = fill[i];
+            if (entry == null ||
+                string.IsNullOrWhiteSpace(entry.Prototype) ||
+                entry.Weight <= 0)
+            {
+                fill.RemoveAt(i);
+            }
+        }
+    }
+
+    private static void NormalizeHuntDungeonFillCount(ContractObjectiveConfigData config)
+    {
+        config.HuntDungeonFillCount = IntRange.Create(
+            Math.Max(0, config.HuntDungeonFillCount.Min),
+            Math.Max(0, config.HuntDungeonFillCount.Max));
     }
 
     private static void NormalizeHuntDebrisPlacementConfig(ContractObjectiveConfigData config)

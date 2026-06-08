@@ -5,7 +5,7 @@ namespace Content.Shared._Forge.Trade;
 
 
 [Serializable, NetSerializable,]
-public sealed class StoreDynamicState : BoundUserInterfaceState
+public sealed class StoreDynamicState : BoundUserInterfaceMessage
 {
     public StoreDynamicState(
         int revision,

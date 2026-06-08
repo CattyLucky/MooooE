@@ -61,6 +61,9 @@ public sealed partial class NcContractSystem : EntitySystem
             return;
         }
 
+        var previousRequired = contract.Required;
+        var previousProgress = contract.Progress;
+        var previousStatus = contract.FlowStatus;
         SetObjectiveStage(contract, runtime.Stage + 1);
 
         if (runtime.Stage >= stageGoal)
@@ -72,6 +75,8 @@ public sealed partial class NcContractSystem : EntitySystem
             FinalizeObjectiveCompletion(key, contract);
             return;
         }
+
+        RaiseContractsChangedIfSnapshotChanged(key, contract, previousRequired, previousProgress, previousStatus);
 
         if (TrySpawnNextHuntObjectiveTarget(key, contract, state))
             return;

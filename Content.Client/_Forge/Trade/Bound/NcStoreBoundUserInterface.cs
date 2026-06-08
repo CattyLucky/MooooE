@@ -2,13 +2,11 @@ using Content.Shared._Forge.Trade;
 using Robust.Client.Player;
 using Robust.Client.UserInterface;
 
-
 namespace Content.Client._Forge.Trade;
-
 
 public sealed class NcStoreStructuredBoundUi(EntityUid owner, Enum uiKey) : BoundUserInterface(owner, uiKey)
 {
-    private static readonly TimeSpan CatalogRetryGracePeriod = TimeSpan.FromSeconds(3);
+    private static readonly TimeSpan CatalogRefreshRetryInterval = TimeSpan.FromSeconds(0.5);
     private readonly IPlayerManager _player = IoCManager.Resolve<IPlayerManager>();
 
     private int _lastCatalogRevision = int.MinValue;
@@ -17,9 +15,25 @@ public sealed class NcStoreStructuredBoundUi(EntityUid owner, Enum uiKey) : Boun
     private NcStoreMenu? _menu;
 
     private StoreDynamicState? _pendingDynamic;
-    private DateTime? _pendingDynamicSince;
+    private DateTime? _lastCatalogRefreshRequest;
 
     private EntityUid? Actor => _player.LocalSession?.AttachedEntity;
+
+    protected override void Open()
+    {
+        var wasOpened = IsOpened;
+        base.Open();
+
+        if (wasOpened)
+            return;
+
+        EnsureMenuCreated();
+        if (_menu == null)
+            return;
+
+        _menu.Visible = false;
+        RequestUiRefresh();
+    }
 
     private void DetachMenuHandlers(NcStoreMenu menu)
     {
@@ -35,14 +49,23 @@ public sealed class NcStoreStructuredBoundUi(EntityUid owner, Enum uiKey) : Boun
         menu.OnClose -= OnMenuClosed;
     }
 
-
-    protected override void UpdateState(BoundUserInterfaceState state)
+    protected override void ReceiveMessage(BoundUserInterfaceMessage message)
     {
-        base.UpdateState(state);
+        base.ReceiveMessage(message);
 
-        if (state is not StoreDynamicState st)
-            return;
+        switch (message)
+        {
+            case StoreCatalogMessage cat:
+                ReceiveCatalog(cat);
+                break;
+            case StoreDynamicState st:
+                ReceiveDynamic(st);
+                break;
+        }
+    }
 
+    private void ReceiveDynamic(StoreDynamicState st)
+    {
         EnsureMenuCreated();
         if (_menu == null)
             return;
@@ -51,39 +74,24 @@ public sealed class NcStoreStructuredBoundUi(EntityUid owner, Enum uiKey) : Boun
         {
             _pendingDynamic = st;
             _menu.Visible = false;
-            var now = DateTime.UtcNow;
-            if (_pendingDynamicSince is { } since)
-            {
-                if (now - since >= CatalogRetryGracePeriod)
-                {
-                    SendMessage(new RequestUiRefreshMessage());
-                    _pendingDynamicSince = now;
-                }
-            }
-            else
-                _pendingDynamicSince = now;
+            RequestUiRefreshIfDue();
 
             return;
         }
 
-        if (st.Revision == _lastStateRevision)
+        if (st.Revision <= _lastStateRevision)
             return;
 
         _lastStateRevision = st.Revision;
 
-        _pendingDynamicSince = null;
+        _lastCatalogRefreshRequest = null;
 
         ApplyDynamic(st);
         _menu.Visible = true;
     }
 
-    protected override void ReceiveMessage(BoundUserInterfaceMessage message)
+    private void ReceiveCatalog(StoreCatalogMessage cat)
     {
-        base.ReceiveMessage(message);
-
-        if (message is not StoreCatalogMessage cat)
-            return;
-
         EnsureMenuCreated();
         if (_menu == null)
             return;
@@ -106,7 +114,7 @@ public sealed class NcStoreStructuredBoundUi(EntityUid owner, Enum uiKey) : Boun
             pending.CatalogRevision == _lastCatalogRevision)
         {
             _pendingDynamic = null;
-            _pendingDynamicSince = null;
+            _lastCatalogRefreshRequest = null;
             _lastStateRevision = pending.Revision;
             ApplyDynamic(pending);
             _menu.Visible = true;
@@ -143,7 +151,7 @@ public sealed class NcStoreStructuredBoundUi(EntityUid owner, Enum uiKey) : Boun
         _lastCatalogRevision = int.MinValue;
         _lastStateRevision = int.MinValue;
         _pendingDynamic = null;
-        _pendingDynamicSince = null;
+        _lastCatalogRefreshRequest = null;
 
         if (EntMan.TryGetComponent(Owner, out MetaDataComponent? meta))
             _menu.SetDisplayTitle(meta.EntityName);
@@ -176,7 +184,7 @@ public sealed class NcStoreStructuredBoundUi(EntityUid owner, Enum uiKey) : Boun
         _lastCatalogRevision = int.MinValue;
         _lastStateRevision = int.MinValue;
         _pendingDynamic = null;
-        _pendingDynamicSince = null;
+        _lastCatalogRefreshRequest = null;
     }
 
     private void OnBuy(StoreListingData data, int qty)
@@ -210,7 +218,6 @@ public sealed class NcStoreStructuredBoundUi(EntityUid owner, Enum uiKey) : Boun
 
         SendMessage(new ClaimContractBoundMessage(contractId));
     }
-
 
     private void OnContractTake(string contractId)
     {
@@ -265,8 +272,27 @@ public sealed class NcStoreStructuredBoundUi(EntityUid owner, Enum uiKey) : Boun
         _lastCatalogRevision = int.MinValue;
         _lastStateRevision = int.MinValue;
         _pendingDynamic = null;
-        _pendingDynamicSince = null;
+        _lastCatalogRefreshRequest = null;
 
         base.Dispose(disposing);
+    }
+
+    private void RequestUiRefreshIfDue()
+    {
+        var now = DateTime.UtcNow;
+        if (_lastCatalogRefreshRequest is { } last &&
+            now - last < CatalogRefreshRetryInterval)
+            return;
+
+        RequestUiRefresh(now);
+    }
+
+    private void RequestUiRefresh(DateTime? now = null)
+    {
+        if (Actor == null)
+            return;
+
+        _lastCatalogRefreshRequest = now ?? DateTime.UtcNow;
+        SendMessage(new RequestUiRefreshMessage());
     }
 }

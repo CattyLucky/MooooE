@@ -64,9 +64,15 @@ public sealed partial class NcContractSystem : EntitySystem
             contract.Completed)
             return;
 
+        var previousRequired = contract.Required;
+        var previousProgress = contract.Progress;
+        var previousStatus = contract.FlowStatus;
         SetTrackedDeliveryProgress(contract, GetTrackedDeliveryAmount(contract, target));
         if (!contract.Completed)
+        {
+            RaiseContractsChangedIfSnapshotChanged(key, contract, previousRequired, previousProgress, previousStatus);
             return;
+        }
 
         if (!TrySpawnRequiredObjectiveProofOrFail(key, comp, contract, Transform(target).Coordinates))
             return;
@@ -89,6 +95,8 @@ public sealed partial class NcContractSystem : EntitySystem
             RetargetObjectivePinpointers(key, state, proof);
         else
             CleanupObjectivePinpointers(key, state);
+
+        RaiseContractsChangedIfSnapshotChanged(key, contract, previousRequired, previousProgress, previousStatus);
     }
 
     private void HandleTrackedDeliveryTargetResolved(

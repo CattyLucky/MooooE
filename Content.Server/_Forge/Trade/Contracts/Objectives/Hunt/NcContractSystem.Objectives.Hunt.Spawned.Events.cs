@@ -60,12 +60,21 @@ public sealed partial class NcContractSystem : EntitySystem
                 state.LastKnownTargetCoordinates = killedXform.Coordinates;
 
             TryAdvanceSpawnedHuntTargetProgress(killedTarget, contract, state);
+            var previousRequired = contract.Required;
+            var previousProgress = contract.Progress;
+            var previousStatus = contract.FlowStatus;
             SetObjectiveStage(contract, CalculateSpawnedHuntTotalProgress(contract));
             if (!contract.Completed)
             {
                 if (TryFindNearestLiveSpawnedHuntTarget(key.Store, contract, state, out var liveTarget))
                 {
                     RetargetObjectivePinpointers(key, state, liveTarget);
+                    RaiseContractsChangedIfSnapshotChanged(
+                        key,
+                        contract,
+                        previousRequired,
+                        previousProgress,
+                        previousStatus);
                     continue;
                 }
 

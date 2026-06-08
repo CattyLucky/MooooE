@@ -1,23 +1,37 @@
 - type: entity
-  parent: PaperOffice
+  abstract: true
+  parent: BaseItem
+  id: ForgeTradeContractProofDiskBase
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Item
+    size: Small
+  - type: Sprite
+    layers:
+    - sprite: Objects/Misc/diskcases.rsi
+      state: icon_base
+    - sprite: Forge/Objects/Specific/Research/disciplinesdisk.rsi
+      state: nt
+  - type: StaticPrice
+    price: 0
+
+- type: entity
+  parent: ForgeTradeContractProofDiskBase
   id: ForgeTradeContractProofDeliveryReceipt
   name: "экспедиционная накладная"
   description: "Подтверждение, что контрактный груз доставлен и принят на месте."
-  categories: [ HideSpawnMenu ]
 
 - type: entity
-  parent: PaperScrap
+  parent: ForgeTradeContractProofDiskBase
   id: ForgeTradeContractProofCarpTrophy
   name: "метка космического карпа"
   description: "Контрактная метка, снятая с последней подтвержденной цели."
-  categories: [ HideSpawnMenu ]
 
 - type: entity
-  parent: PaperScrap
+  parent: ForgeTradeContractProofDiskBase
   id: ForgeTradeContractProofHuntTrophy
   name: "контрактная трофейная метка"
   description: "Подтверждение зачистки опасной цели на экспедиционном обломке."
-  categories: [ HideSpawnMenu ]
 
 - type: ncRetrievalProofPreset
   id: ForgeTradeDeliveryReceiptProof

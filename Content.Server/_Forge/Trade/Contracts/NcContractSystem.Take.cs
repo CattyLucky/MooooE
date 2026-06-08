@@ -43,6 +43,7 @@ public sealed partial class NcContractSystem : EntitySystem
         if (contract.UsesStageObjectiveProgress)
             UpdateObjectiveContractProgress(store, contractId, contract);
 
+        RaiseContractsChanged(store);
         return true;
     }
 }

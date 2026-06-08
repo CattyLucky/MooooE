@@ -83,7 +83,8 @@ public sealed partial class NcStoreLogicSystem
         if (!TryExecuteBarterReceivePlan(
                 user,
                 receivePlan,
-                () => TryExecuteBarterCostPlanPreCommit(user, costPlan)))
+                () => TryValidateListingRemainingForCommit(listing, actual, "barter") ??
+                      TryExecuteBarterCostPlanPreCommit(user, costPlan)))
             return false;
 
         if (listing.RemainingCount > 0)

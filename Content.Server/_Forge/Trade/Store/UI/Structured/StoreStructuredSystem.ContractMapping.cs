@@ -4,9 +4,13 @@ namespace Content.Server._Forge.Trade;
 
 public sealed partial class StoreStructuredSystem
 {
-    private ContractClientData MapContractToClient(EntityUid store, ContractServerData contract)
+    private ContractClientData MapContractToClient(
+        EntityUid store,
+        ContractServerData contract,
+        ContractProgressPreview? preview
+    )
     {
-        var targets = MapContractTargetsToClient(contract);
+        var targets = MapContractTargetsToClient(contract, preview);
         var rewards = CloneContractRewards(contract);
 
         return new ContractClientData(
@@ -17,16 +21,16 @@ public sealed partial class StoreStructuredSystem
             contract.Repeatable,
             contract.Taken,
             SupportsContractPinpointer(contract),
-            _contracts.CanPartiallyTurnInNow(store, contract.Id, contract),
+            preview?.PartialTurnInAvailable ?? _contracts.CanPartiallyTurnInNow(store, contract.Id, contract),
             contract.ExecutionKind,
-            CloneRuntimeContext(contract.Runtime),
-            contract.FlowStatus,
-            contract.Completed,
-            contract.TargetItem,
+            CloneRuntimeContext(preview?.Runtime ?? contract.Runtime),
+            preview?.FlowStatus ?? contract.FlowStatus,
+            preview?.Completed ?? contract.Completed,
+            preview?.TargetItem ?? contract.TargetItem,
             contract.MatchMode,
             ResolveContractTurnInItem(contract),
-            contract.Required,
-            contract.Progress,
+            preview?.Required ?? contract.Required,
+            preview?.Progress ?? contract.Progress,
             targets,
             rewards,
             contract.Config.RetrievalSourceHint,
@@ -43,7 +47,10 @@ public sealed partial class StoreStructuredSystem
         );
     }
 
-    private static List<ContractTargetClientData> MapContractTargetsToClient(ContractServerData contract)
+    private static List<ContractTargetClientData> MapContractTargetsToClient(
+        ContractServerData contract,
+        ContractProgressPreview? preview
+    )
     {
         var sourceTargets = contract.Targets;
         var targets = sourceTargets is { Count: > 0 }
@@ -52,13 +59,17 @@ public sealed partial class StoreStructuredSystem
 
         if (sourceTargets is { Count: > 0 })
         {
-            foreach (var target in sourceTargets)
+            for (var i = 0; i < sourceTargets.Count; i++)
             {
+                var target = sourceTargets[i];
                 if (target == null || string.IsNullOrWhiteSpace(target.TargetItem) || target.Required <= 0)
                     continue;
 
                 targets.Add(
-                    new ContractTargetClientData(target.TargetItem, target.Required, target.Progress)
+                    new ContractTargetClientData(
+                        target.TargetItem,
+                        target.Required,
+                        GetPreviewTargetProgress(preview, i, target.Progress))
                     {
                         MatchMode = target.MatchMode,
                         Solution = target.Solution,
@@ -69,10 +80,15 @@ public sealed partial class StoreStructuredSystem
             return targets;
         }
 
-        if (!string.IsNullOrWhiteSpace(contract.TargetItem) && contract.Required > 0)
+        var targetItem = preview?.TargetItem ?? contract.TargetItem;
+        var required = preview?.Required ?? contract.Required;
+        if (!string.IsNullOrWhiteSpace(targetItem) && required > 0)
         {
             targets.Add(
-                new ContractTargetClientData(contract.TargetItem, contract.Required, contract.Progress)
+                new ContractTargetClientData(
+                    targetItem,
+                    required,
+                    preview?.Progress ?? contract.Progress)
                 {
                     MatchMode = contract.MatchMode,
                 });

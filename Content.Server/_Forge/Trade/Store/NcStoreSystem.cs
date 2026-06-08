@@ -8,6 +8,7 @@ using Content.Shared.Movement.Pulling.Components;
 using Robust.Server.Audio;
 using Robust.Server.GameObjects;
 using Robust.Shared.Audio;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Timing;
 
 namespace Content.Server._Forge.Trade;
@@ -177,22 +178,25 @@ public sealed class NcStoreSystem : EntitySystem
     }
 
 
-    private bool TryGetLockedUiUser(EntityUid store, NcStoreComponent comp, out EntityUid user)
+    private bool TryGetUiActor(EntityUid store, NcStoreComponent comp, BoundUserInterfaceMessage msg, out EntityUid user)
     {
-        user = default;
-        if (comp.CurrentUser is not { } cur || cur == EntityUid.Invalid)
-            return false;
-        if (!_ui.IsUiOpen(store, NcStoreUiKey.Key, cur))
+        user = msg.Actor;
+        if (user == EntityUid.Invalid)
             return false;
 
-        user = cur;
+        if (!comp.OpenUsers.Contains(user))
+            return false;
+
+        if (!_ui.IsUiOpen(store, NcStoreUiKey.Key, user))
+            return false;
+
         return true;
     }
 
 
     private void OnBuyRequest(EntityUid uid, NcStoreComponent comp, StoreBuyListingBoundUiMessage msg)
     {
-        if (!TryGetLockedUiUser(uid, comp, out var actor))
+        if (!TryGetUiActor(uid, comp, msg, out var actor))
             return;
 
         if (!TryValidateUse(uid, comp, actor, out var fail))
@@ -218,12 +222,12 @@ public sealed class NcStoreSystem : EntitySystem
         }
 
         _audio.PlayPvs(TransactionSuccessSound, uid, AudioParams.Default.WithVolume(-2f));
-        _storeUi.RequestDynamicRefresh(uid, comp, actor);
+        _storeUi.RequestDynamicRefreshForAll(uid, comp, actor);
     }
 
     private void OnSellRequest(EntityUid uid, NcStoreComponent comp, StoreSellListingBoundUiMessage msg)
     {
-        if (!TryGetLockedUiUser(uid, comp, out var actor))
+        if (!TryGetUiActor(uid, comp, msg, out var actor))
             return;
 
         if (!TryValidateUse(uid, comp, actor, out var fail))
@@ -275,13 +279,13 @@ public sealed class NcStoreSystem : EntitySystem
         }
 
         _audio.PlayPvs(TransactionSuccessSound, uid, AudioParams.Default.WithVolume(-2f));
-        _storeUi.RequestDynamicRefresh(uid, comp, actor);
+        _storeUi.RequestDynamicRefreshForAll(uid, comp, actor);
     }
 
 
     private void OnBarterRequest(EntityUid uid, NcStoreComponent comp, StoreBarterListingBoundUiMessage msg)
     {
-        if (!TryGetLockedUiUser(uid, comp, out var actor))
+        if (!TryGetUiActor(uid, comp, msg, out var actor))
             return;
 
         if (!TryValidateUse(uid, comp, actor, out var fail))
@@ -309,7 +313,7 @@ public sealed class NcStoreSystem : EntitySystem
         }
 
         _audio.PlayPvs(TransactionSuccessSound, uid, AudioParams.Default.WithVolume(-2f));
-        _storeUi.RequestDynamicRefresh(uid, comp, actor);
+        _storeUi.RequestDynamicRefreshForAll(uid, comp, actor);
     }
 
 
@@ -319,7 +323,7 @@ public sealed class NcStoreSystem : EntitySystem
         StoreMassSellPulledCrateBoundUiMessage msg
     )
     {
-        if (!TryGetLockedUiUser(uid, comp, out var actor))
+        if (!TryGetUiActor(uid, comp, msg, out var actor))
             return;
 
         if (!TryValidateUse(uid, comp, actor, out var fail))
@@ -347,6 +351,6 @@ public sealed class NcStoreSystem : EntitySystem
         }
 
         _audio.PlayPvs(TransactionSuccessSound, uid, AudioParams.Default.WithVolume(-2f));
-        _storeUi.RequestDynamicRefresh(uid, comp, actor);
+        _storeUi.RequestDynamicRefreshForAll(uid, comp, actor);
     }
 }

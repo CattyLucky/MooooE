@@ -102,9 +102,11 @@ public sealed partial class NcContractSystem : EntitySystem
         runtime.AcceptTimeoutRemainingSeconds = 0;
         SyncGhostRoleSurvivalRemaining(state, runtime);
         runtime.StatusHint = Loc.GetString("nc-store-contract-ghost-role-hint-deliver");
+        SyncContractFlowStatus(contract);
         _objectiveRuntime.ByTarget[target] = key;
 
         RetargetObjectivePinpointers(key, state, target);
+        RaiseContractsChanged(key);
         return true;
     }
 }

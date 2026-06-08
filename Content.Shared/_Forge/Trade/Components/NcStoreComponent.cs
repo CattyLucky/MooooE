@@ -11,7 +11,7 @@ public readonly record struct StoreListingKey(StoreMode Mode, string ListingId);
 public sealed partial class NcStoreComponent : Component
 {
     public int CatalogRevision;
-    public EntityUid? CurrentUser;
+    public HashSet<EntityUid> OpenUsers { get; } = new();
 
     // Map-save bridge: old maps may contain these runtime caches, but stores rebuild them from Profile.
     [DataField("categories", readOnly: true)]

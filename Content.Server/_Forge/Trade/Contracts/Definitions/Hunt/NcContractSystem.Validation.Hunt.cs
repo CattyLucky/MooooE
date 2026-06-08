@@ -57,6 +57,10 @@ public sealed partial class NcContractSystem : EntitySystem
         if (!TryValidateHuntDungeons(contractId, spawn.Dungeons))
             valid = false;
 
+        if (spawn.Dungeons.Count > 0 &&
+            !TryValidateHuntDungeonFill(contractId, spawn.DungeonFill, spawn.DungeonFillCount))
+            valid = false;
+
         if (!TryValidateHuntDebrisPlacement(contractId, spawn))
             valid = false;
 
@@ -136,6 +140,65 @@ public sealed partial class NcContractSystem : EntitySystem
             {
                 Sawmill.Warning(
                     $"[Contracts] Hunt contract '{contractId}' spawn.dungeons[{i}] weight must be > 0.");
+                valid = false;
+            }
+        }
+
+        return valid;
+    }
+
+    private bool TryValidateHuntDungeonFill(
+        string contractId,
+        List<NcHuntDungeonFillEntry> fill,
+        IntRange count
+    )
+    {
+        var valid = true;
+
+        if (count.Min < 0 || count.Max < 0)
+        {
+            Sawmill.Warning(
+                $"[Contracts] Hunt contract '{contractId}' spawn.dungeonFillCount must be >= 0.");
+            valid = false;
+        }
+
+        if (count.Max < count.Min)
+        {
+            Sawmill.Warning(
+                $"[Contracts] Hunt contract '{contractId}' spawn.dungeonFillCount max must be >= min.");
+            valid = false;
+        }
+
+        if (fill.Count == 0)
+            return valid;
+
+        for (var i = 0; i < fill.Count; i++)
+        {
+            var entry = fill[i];
+            if (entry == null)
+            {
+                Sawmill.Warning($"[Contracts] Hunt contract '{contractId}' spawn.dungeonFill[{i}] is empty.");
+                valid = false;
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(entry.Prototype))
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Hunt contract '{contractId}' spawn.dungeonFill[{i}] must define prototype.");
+                valid = false;
+            }
+            else if (!_prototypes.HasIndex<EntityPrototype>(entry.Prototype))
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Hunt contract '{contractId}' spawn.dungeonFill[{i}] references missing entity prototype '{entry.Prototype}'.");
+                valid = false;
+            }
+
+            if (entry.Weight <= 0)
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Hunt contract '{contractId}' spawn.dungeonFill[{i}] weight must be > 0.");
                 valid = false;
             }
         }

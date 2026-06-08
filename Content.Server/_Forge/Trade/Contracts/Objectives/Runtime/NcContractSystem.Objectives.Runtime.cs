@@ -30,6 +30,7 @@ public sealed partial class NcContractSystem : EntitySystem
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly PinpointerSystem _pinpointer = default!;
     [Dependency] private readonly TagSystem _tags = default!;
+    [Dependency] private readonly TileSystem _tile = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
     [Dependency] private readonly SharedTransformSystem _xform = default!;

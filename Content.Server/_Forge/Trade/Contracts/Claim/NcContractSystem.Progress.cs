@@ -122,6 +122,9 @@ public sealed partial class NcContractSystem : EntitySystem
             contract,
             includeStoreWorldItems,
             ref storeNearbyItemsPrepared);
+        var contractStoreNearbyItems = includeStoreWorldItems && contract.AllowsStoreWorldTurnIn
+            ? _scratchStoreNearbyItems
+            : null;
 
         if (TryUpdateRetrievalSpawnedProgress(
                 store,
@@ -131,7 +134,7 @@ public sealed partial class NcContractSystem : EntitySystem
                 userItems,
                 crate,
                 crateItems,
-                _scratchStoreNearbyItems,
+                contractStoreNearbyItems,
                 hasCrateWork))
         {
             ApplyPartialTurnInProgress(store, contractId, contract);
@@ -145,7 +148,7 @@ public sealed partial class NcContractSystem : EntitySystem
             userItems,
             crate,
             crateItems,
-            _scratchStoreNearbyItems,
+            contractStoreNearbyItems,
             hasCrateWork);
         ApplyPartialTurnInProgress(store, contractId, contract);
     }

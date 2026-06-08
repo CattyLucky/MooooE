@@ -27,29 +27,29 @@ public sealed partial class StoreStructuredSystem : EntitySystem
     private static readonly ISawmill Sawmill = Logger.GetSawmill("ncstore-structured");
     private static readonly TimeSpan RealtimeOpenStoreUpdateInterval = TimeSpan.FromSeconds(0.25);
     private static readonly TimeSpan OpenStoreValidityCheckInterval = TimeSpan.FromSeconds(0.5);
-    private readonly HashSet<EntityUid> _affectedStoresScratch = new();
+    private readonly HashSet<StoreUserKey> _affectedStoreUsersScratch = new();
     [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly NcContractSystem _contracts = default!;
-    private readonly HashSet<EntityUid> _dirtyStores = new();
-    private readonly List<EntityUid> _dirtyStoresScratch = new();
-    private readonly Dictionary<EntityUid, DynamicScratch> _dynamicScratchByStore = new();
+    private readonly HashSet<StoreUserKey> _dirtyStoreUsers = new();
+    private readonly List<StoreUserKey> _dirtyStoreUsersScratch = new();
+    private readonly Dictionary<StoreUserKey, DynamicScratch> _dynamicScratchByStoreUser = new();
     [Dependency] private readonly NcStoreInventorySystem _inventory = default!;
     [Dependency] private readonly StoreSystemStructuredLoader _loader = default!;
     [Dependency] private readonly NcStoreLogicSystem _logic = default!;
     private readonly Dictionary<string, TimeSpan> _nextInvalidContractWarningByActor = new(StringComparer.Ordinal);
-    private readonly List<EntityUid> _openStoresScratch = new();
-    private readonly HashSet<EntityUid> _openStoreUids = new();
+    private readonly List<StoreUserKey> _openStoreUsersScratch = new();
+    private readonly HashSet<StoreUserKey> _openStoreUsers = new();
     private readonly HashSet<EntityUid> _pendingRefreshEntities = new();
     [Dependency] private readonly PopupSystem _popups = default!;
     [Dependency] private readonly IPrototypeManager _prototypes = default!;
-    private readonly Dictionary<EntityUid, HashSet<EntityUid>> _storesByWatchedRoot = new();
-    private readonly HashSet<EntityUid> _storesUpdatingDynamic = new();
+    private readonly Dictionary<EntityUid, HashSet<StoreUserKey>> _storesByWatchedRoot = new();
+    private readonly HashSet<StoreUserKey> _storesUpdatingDynamic = new();
     [Dependency] private readonly NcStoreSystem _storeSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
     private readonly List<string> _visibleListingIdsScratch = new(MaxVisibleListingIds);
     private readonly HashSet<string> _visibleListingIdsSetScratch = new(StringComparer.Ordinal);
-    private readonly Dictionary<EntityUid, (EntityUid User, EntityUid? Crate)> _watchByStore = new();
+    private readonly Dictionary<StoreUserKey, EntityUid?> _watchByStoreUser = new();
 
     [Dependency] private readonly SharedTransformSystem _xform = default!;
 
@@ -58,13 +58,16 @@ public sealed partial class StoreStructuredSystem : EntitySystem
     private TimeSpan _nextRealtimeOpenStoreUpdate = TimeSpan.Zero;
     private int _realtimeOpenStoreCursor;
 
-    private DynamicScratch GetDynamicScratch(EntityUid storeUid)
+    private readonly record struct StoreUserKey(EntityUid Store, EntityUid User);
+
+    private DynamicScratch GetDynamicScratch(EntityUid storeUid, EntityUid user)
     {
-        if (_dynamicScratchByStore.TryGetValue(storeUid, out var scratch))
+        var key = new StoreUserKey(storeUid, user);
+        if (_dynamicScratchByStoreUser.TryGetValue(key, out var scratch))
             return scratch;
 
         scratch = new DynamicScratch();
-        _dynamicScratchByStore[storeUid] = scratch;
+        _dynamicScratchByStoreUser[key] = scratch;
         return scratch;
     }
 

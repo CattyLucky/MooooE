@@ -66,6 +66,7 @@ public sealed partial class StoreStructuredSystem
 
             if (!string.Equals(a.Id, b.Id, StringComparison.Ordinal) ||
                 !string.Equals(a.Name, b.Name, StringComparison.Ordinal) ||
+                !string.Equals(a.Icon, b.Icon, StringComparison.Ordinal) ||
                 !string.Equals(a.Description, b.Description, StringComparison.Ordinal) ||
                 !string.Equals(a.OfferPoolId, b.OfferPoolId, StringComparison.Ordinal) ||
                 !string.Equals(a.OfferPoolName, b.OfferPoolName, StringComparison.Ordinal) ||
@@ -132,6 +133,8 @@ public sealed partial class StoreStructuredSystem
                 var at = a[i];
                 var bt = b[i];
                 if (!string.Equals(at.TargetItem, bt.TargetItem, StringComparison.Ordinal) ||
+                    !string.Equals(at.Solution, bt.Solution, StringComparison.Ordinal) ||
+                    at.ReagentAmount != bt.ReagentAmount ||
                     at.Required != bt.Required ||
                     at.Progress != bt.Progress ||
                     at.MatchMode != bt.MatchMode)

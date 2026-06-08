@@ -7,24 +7,17 @@ public sealed partial class StoreStructuredSystem
         EntityUid? crateUid = null;
         if (_logic.TryGetPulledClosedCrate(user, out var pulledCrate))
             crateUid = pulledCrate;
-        if (_watchByStore.TryGetValue(storeUid, out var prev))
-        {
-            if (prev.User == user && prev.Crate == crateUid)
-                return false;
-            if (prev.Crate != crateUid)
-            {
-                if (prev.Crate is { } oldCrate)
-                    _inventory.InvalidateInventoryCache(oldCrate);
-                if (crateUid is { } newCrate)
-                    _inventory.InvalidateInventoryCache(newCrate);
-            }
 
-            if (prev.User != user)
-            {
-                if (prev.User != EntityUid.Invalid)
-                    _inventory.InvalidateInventoryCache(prev.User);
-                _inventory.InvalidateInventoryCache(user);
-            }
+        var key = new StoreUserKey(storeUid, user);
+        if (_watchByStoreUser.TryGetValue(key, out var prevCrate))
+        {
+            if (prevCrate == crateUid)
+                return false;
+
+            if (prevCrate is { } oldCrate)
+                _inventory.InvalidateInventoryCache(oldCrate);
+            if (crateUid is { } newCrate)
+                _inventory.InvalidateInventoryCache(newCrate);
         }
         else
         {
@@ -37,22 +30,22 @@ public sealed partial class StoreStructuredSystem
         return true;
     }
 
-    private void AddWatchedRoot(EntityUid root, EntityUid storeUid)
+    private void AddWatchedRoot(EntityUid root, StoreUserKey key)
     {
         if (!_storesByWatchedRoot.TryGetValue(root, out var set))
         {
-            set = new HashSet<EntityUid>();
+            set = new HashSet<StoreUserKey>();
             _storesByWatchedRoot[root] = set;
         }
 
-        set.Add(storeUid);
+        set.Add(key);
     }
 
-    private void RemoveWatchedRoot(EntityUid root, EntityUid storeUid)
+    private void RemoveWatchedRoot(EntityUid root, StoreUserKey key)
     {
         if (!_storesByWatchedRoot.TryGetValue(root, out var set))
             return;
-        set.Remove(storeUid);
+        set.Remove(key);
         if (set.Count == 0)
             _storesByWatchedRoot.Remove(root);
     }
@@ -61,38 +54,37 @@ public sealed partial class StoreStructuredSystem
     {
         if (user == EntityUid.Invalid)
         {
-            UnregisterStoreWatch(storeUid);
             return;
         }
 
-        if (_watchByStore.TryGetValue(storeUid, out var prev))
+        var key = new StoreUserKey(storeUid, user);
+        if (_watchByStoreUser.TryGetValue(key, out var prevCrate))
         {
-            if (prev.User == user && prev.Crate == crate)
+            if (prevCrate == crate)
                 return;
-            if (prev.User != EntityUid.Invalid)
-                RemoveWatchedRoot(prev.User, storeUid);
-            if (prev.Crate is { } oldCrate)
-                RemoveWatchedRoot(oldCrate, storeUid);
+            if (prevCrate is { } oldCrate)
+                RemoveWatchedRoot(oldCrate, key);
         }
+        else
+            AddWatchedRoot(user, key);
 
-        _watchByStore[storeUid] = (user, crate);
-        AddWatchedRoot(user, storeUid);
+        _watchByStoreUser[key] = crate;
         _inventory.InvalidateInventoryCache(user);
         if (crate is { } c)
         {
-            AddWatchedRoot(c, storeUid);
+            AddWatchedRoot(c, key);
             _inventory.InvalidateInventoryCache(c);
         }
     }
 
-    private void UnregisterStoreWatch(EntityUid storeUid)
+    private void UnregisterStoreWatch(StoreUserKey key)
     {
-        if (!_watchByStore.TryGetValue(storeUid, out var info))
+        if (!_watchByStoreUser.TryGetValue(key, out var crate))
             return;
-        if (info.User != EntityUid.Invalid)
-            RemoveWatchedRoot(info.User, storeUid);
-        if (info.Crate is { } crate)
-            RemoveWatchedRoot(crate, storeUid);
-        _watchByStore.Remove(storeUid);
+        if (key.User != EntityUid.Invalid)
+            RemoveWatchedRoot(key.User, key);
+        if (crate is { } crateUid)
+            RemoveWatchedRoot(crateUid, key);
+        _watchByStoreUser.Remove(key);
     }
 }

@@ -13,6 +13,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
         private readonly HashSet<string> _visibleIncomingScratch = new(StringComparer.Ordinal);
         private readonly HashSet<string> _visibleListingIds = new();
         public readonly NcStoreLogicSystem.BarterAvailabilityContext BarterAvailability = new();
+        public readonly Dictionary<string, ContractProgressPreview> ContractProgressPreviews = new(StringComparer.Ordinal);
         public readonly List<ContractServerData> ContractsSignatureScratch = new();
         public readonly List<EntityUid> DeepCrateItems = new();
 

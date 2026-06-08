@@ -10,12 +10,14 @@ public sealed partial class StoreStructuredSystem : EntitySystem
     private void PushDynamicState(
         EntityUid store,
         NcStoreComponent comp,
+        EntityUid user,
         DynamicTabState tabs,
         DynamicScratch scratch,
-        DynamicStateBuffer buf
+        DynamicStateBuffer buf,
+        bool forceSend = false
     )
     {
-        _dynamicStatePublisher.PublishIfChanged(_ui, store, comp, tabs, scratch, buf);
+        _dynamicStatePublisher.PublishIfChanged(_ui, store, comp, user, tabs, scratch, buf, forceSend);
     }
 
     private bool TryFindWatchedRoot(EntityUid start, out EntityUid watchedRoot)
@@ -59,17 +61,16 @@ public sealed partial class StoreStructuredSystem : EntitySystem
 
         if (_pendingRefreshEntities.Count > 4096)
         {
-            foreach (var s in _openStoreUids)
+            foreach (var key in _openStoreUsers)
             {
-                if (_watchByStore.TryGetValue(s, out var watch))
+                if (_watchByStoreUser.TryGetValue(key, out var crate))
                 {
-                    if (watch.User != EntityUid.Invalid)
-                        _inventory.InvalidateInventoryCache(watch.User);
-                    if (watch.Crate is { } crate)
-                        _inventory.InvalidateInventoryCache(crate);
+                    _inventory.InvalidateInventoryCache(key.User);
+                    if (crate is { } crateUid)
+                        _inventory.InvalidateInventoryCache(crateUid);
                 }
 
-                MarkDirty(s);
+                MarkDirty(key);
             }
 
             _pendingRefreshEntities.Clear();
@@ -142,24 +143,24 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             return;
         }
 
-        _affectedStoresScratch.Clear();
+        _affectedStoreUsersScratch.Clear();
         foreach (var root in _pendingRefreshEntities)
         {
             if (!Exists(root))
                 continue;
-            if (_storesByWatchedRoot.TryGetValue(root, out var stores))
+            if (_storesByWatchedRoot.TryGetValue(root, out var storeUsers))
             {
-                foreach (var s in stores)
+                foreach (var key in storeUsers)
                 {
-                    _affectedStoresScratch.Add(s);
+                    _affectedStoreUsersScratch.Add(key);
                 }
             }
         }
 
         _pendingRefreshEntities.Clear();
-        foreach (var s in _affectedStoresScratch)
+        foreach (var key in _affectedStoreUsersScratch)
         {
-            MarkDirty(s);
+            MarkDirty(key);
         }
     }
 
@@ -169,12 +170,15 @@ public sealed partial class StoreStructuredSystem : EntitySystem
             UserInterfaceSystem ui,
             EntityUid store,
             NcStoreComponent comp,
+            EntityUid user,
             DynamicTabState tabs,
             DynamicScratch scratch,
-            DynamicStateBuffer buf
+            DynamicStateBuffer buf,
+            bool forceSend
         )
         {
-            if (scratch.EqualsLast(
+            if (!forceSend &&
+                scratch.EqualsLast(
                     buf,
                     comp.CatalogRevision,
                     tabs.HasBuyTab,
@@ -185,8 +189,8 @@ public sealed partial class StoreStructuredSystem : EntitySystem
 
             comp.UiRevision = unchecked(comp.UiRevision + 1);
 
-            ui.SetUiState(
-                store,
+            ui.ServerSendUiMessage(
+                (store, null),
                 NcStoreUiKey.Key,
                 new StoreDynamicState(
                     comp.UiRevision,
@@ -205,7 +209,8 @@ public sealed partial class StoreStructuredSystem : EntitySystem
                     buf.ContractSkipCurrency,
                     scratch.HasVisibleIds,
                     new List<string>(buf.ListingScopeIds)
-                )
+                ),
+                user
             );
 
             scratch.Commit(

@@ -52,7 +52,8 @@ public sealed partial class NcContractSystem : EntitySystem
         EntityUid? crate,
         IReadOnlyList<EntityUid>? crateItems,
         IReadOnlyList<EntityUid>? storeNearbyItems,
-        bool hasCrateWork
+        bool hasCrateWork,
+        bool failIfTrackedCargoLost = true
     )
     {
         if (!RequiresRetrievalSpawnedTurnIn(contract))
@@ -65,7 +66,12 @@ public sealed partial class NcContractSystem : EntitySystem
             return true;
         }
 
-        if (!TryGetRetrievalSpawnedRuntimeState(store, contractId, contract, out var state))
+        if (!TryGetRetrievalSpawnedRuntimeState(
+                store,
+                contractId,
+                contract,
+                out var state,
+                failIfTrackedCargoLost))
         {
             ResetContractProgress(contract);
             return true;
@@ -230,7 +236,8 @@ public sealed partial class NcContractSystem : EntitySystem
         EntityUid store,
         string contractId,
         ContractServerData contract,
-        out ObjectiveRuntimeState state
+        out ObjectiveRuntimeState state,
+        bool failIfTrackedCargoLost = true
     )
     {
         state = default!;
@@ -242,7 +249,7 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
 
         PruneRetrievalSpawnedEntities(state);
-        if (TryFailRetrievalSpawnedTurnInIfTrackedCargoWasLost(key, contract, state))
+        if (failIfTrackedCargoLost && TryFailRetrievalSpawnedTurnInIfTrackedCargoWasLost(key, contract, state))
             return false;
 
         return state.RetrievalSpawnedEntities.Count > 0;

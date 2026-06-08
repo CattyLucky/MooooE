@@ -7,6 +7,7 @@ public sealed partial class NcContractSystem : EntitySystem
     private void FinalizeObjectiveCompletion((EntityUid Store, string ContractId) key, ContractServerData contract)
     {
         MarkObjectiveComplete(contract);
+        RaiseContractsChanged(key);
 
         if (!_objectiveRuntime.ByContract.TryGetValue(key, out var state))
             return;
@@ -54,8 +55,6 @@ public sealed partial class NcContractSystem : EntitySystem
         CleanupObjectiveRuntime(key.Store, key.ContractId, deleteTrackedEntities, deleteGuards);
         comp.Contracts.Remove(key.ContractId);
         RefillContractsForStore(key.Store, comp, key.ContractId);
-
-        var ev = new NcContractsChangedEvent();
-        RaiseLocalEvent(key.Store, ref ev);
+        RaiseContractsChanged(key);
     }
 }
