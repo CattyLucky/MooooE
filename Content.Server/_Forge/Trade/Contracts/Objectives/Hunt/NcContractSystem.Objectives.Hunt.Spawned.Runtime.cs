@@ -8,6 +8,7 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Maps;
 using Content.Shared.Physics;
+using Content.Shared.Shuttles.Components;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Map;
@@ -120,56 +121,66 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
         }
 
+        state.HuntDungeonAnchorCoordinates = anchorCoords;
+
+        return TryQueueNextHuntDungeonGeneration(contractId, contract, state);
+    }
+
+    private bool TryQueueNextHuntDungeonGeneration(
+        string contractId,
+        ContractServerData contract,
+        ObjectiveRuntimeState state
+    )
+    {
+        if (state.HuntDungeonAnchorCoordinates == null)
+        {
+            Sawmill.Warning(
+                $"[Contracts] Hunt runtime init failed for '{contractId}': cannot resolve dungeon spawn anchor.");
+            return false;
+        }
+
         if (!TryPickHuntDungeonPrototype(contractId, contract.Config.HuntDungeons, out var dungeonPrototype))
             return false;
 
         var dungeonConfig = _prototypes.Index<DungeonConfigPrototype>(dungeonPrototype);
-        var attempts = Math.Max(1, contract.Config.HuntDebrisPlacementAttempts);
-        for (var attempt = 0; attempt < attempts; attempt++)
+        var generationMap = _map.CreateMap(out var generationMapId, runMapInit: false);
+        Entity<MapGridComponent> grid;
+        try
         {
-            if (!TryGetHuntDebrisSpawnMapCoordinates(store, contract.Config, anchorCoords, out var spawnMapCoords))
-                continue;
-
-            Entity<MapGridComponent> grid;
-            try
-            {
-                grid = _mapManager.CreateGridEntity(spawnMapCoords.MapId);
-                _xform.SetMapCoordinates(grid, spawnMapCoords);
-            }
-            catch (Exception e)
-            {
-                Sawmill.Error(
-                    $"[Contracts] Hunt runtime init failed for '{contractId}': cannot create dungeon grid: {e}");
-                return false;
-            }
-
-            try
-            {
-                state.HuntDebrisEntity = grid.Owner;
-                state.HuntDungeonGenerationTask = _dungeon.GenerateDungeonAsync(
-                    dungeonConfig,
-                    dungeonConfig.ID,
-                    grid.Owner,
-                    grid.Comp,
-                    Vector2i.Zero,
-                    _random.Next());
-                return true;
-            }
-            catch (Exception e)
-            {
-                Sawmill.Error(
-                    $"[Contracts] Hunt runtime init failed for '{contractId}': dungeon generation '{dungeonPrototype}' threw: {e}");
-
-                state.HuntDebrisEntity = null;
-                if (!TerminatingOrDeleted(grid.Owner))
-                    Del(grid.Owner);
-                return false;
-            }
+            grid = _mapManager.CreateGridEntity(generationMapId);
+            _xform.SetMapCoordinates(grid, new MapCoordinates(Vector2.Zero, generationMapId));
+        }
+        catch (Exception e)
+        {
+            Sawmill.Error(
+                $"[Contracts] Hunt runtime init failed for '{contractId}': cannot create dungeon grid: {e}");
+            _map.DeleteMap(generationMapId);
+            return false;
         }
 
-        Sawmill.Warning(
-            $"[Contracts] Hunt runtime init failed for '{contractId}': cannot find a free dungeon placement after {attempts} attempts.");
-        return false;
+        try
+        {
+            state.HuntDebrisEntity = grid.Owner;
+            state.HuntDungeonGenerationMap = generationMap;
+            state.HuntDungeonGenerationTask = _dungeon.GenerateDungeonAsync(
+                dungeonConfig,
+                dungeonConfig.ID,
+                grid.Owner,
+                grid.Comp,
+                Vector2i.Zero,
+                _random.Next());
+            return true;
+        }
+        catch (Exception e)
+        {
+            Sawmill.Error(
+                $"[Contracts] Hunt runtime init failed for '{contractId}': dungeon generation '{dungeonPrototype}' threw: {e}");
+
+            state.HuntDebrisEntity = null;
+            state.HuntDungeonGenerationMap = null;
+            _map.DeleteMap(generationMapId);
+            return false;
+        }
     }
 
     private bool TryResolveHuntTargetSpawnCoordinates(
@@ -338,7 +349,15 @@ public sealed partial class NcContractSystem : EntitySystem
     private bool IsHuntDebrisAreaClear(MapCoordinates coords, float safetyRadius)
     {
         var diameter = Math.Max(1f, safetyRadius * 2f);
-        var bounds = Box2.CenteredAround(coords.Position, new Vector2(diameter, diameter));
+        return IsHuntDebrisAreaClear(coords, new Vector2(diameter, diameter), 0f);
+    }
+
+    private bool IsHuntDebrisAreaClear(MapCoordinates coords, Vector2 size, float safetyRadius)
+    {
+        var bounds = Box2.CenteredAround(
+                coords.Position,
+                new Vector2(Math.Max(1f, size.X), Math.Max(1f, size.Y)))
+            .Enlarged(Math.Max(0f, safetyRadius));
 
         _huntDebrisPlacementGridScratch.Clear();
         _mapManager.FindGridsIntersecting(
@@ -348,6 +367,39 @@ public sealed partial class NcContractSystem : EntitySystem
             includeMap: false);
 
         return _huntDebrisPlacementGridScratch.Count == 0;
+    }
+
+    private bool TryGetHuntDungeonPlacementMapCoordinates(
+        EntityUid store,
+        ContractObjectiveConfigData config,
+        EntityCoordinates debrisCoords,
+        Box2 generatedBounds,
+        out MapCoordinates spawnCoords
+    )
+    {
+        spawnCoords = MapCoordinates.Nullspace;
+        var anchorCoords = _xform.ToMapCoordinates(debrisCoords);
+        if (anchorCoords.MapId == MapId.Nullspace)
+            return false;
+
+        var angle = _random.NextAngle();
+        var direction = angle.ToVec();
+        var minDistance = Math.Max(0f, config.HuntDebrisMinDistance);
+        var maxDistance = Math.Max(minDistance, config.HuntDebrisMaxDistance);
+        var distance = MathHelper.CloseTo(minDistance, maxDistance)
+            ? minDistance
+            : _random.NextFloat(minDistance, maxDistance);
+        var lateral = (angle + Math.PI / 2).ToVec() *
+                      _random.NextFloat(-config.HuntDebrisSafetyRadius, config.HuntDebrisSafetyRadius);
+
+        var origin = GetHuntDebrisSpawnOrigin(store, anchorCoords, direction);
+        var candidate = new MapCoordinates(origin + direction * distance + lateral, anchorCoords.MapId);
+        var placementPadding = config.HuntDebrisSafetyRadius + NcContractTuning.HuntDungeonExteriorPadding + 1f;
+        if (!IsHuntDebrisAreaClear(candidate, generatedBounds.Size, placementPadding))
+            return false;
+
+        spawnCoords = candidate;
+        return true;
     }
 
     private bool IsHuntDebrisGridPlacementClear(EntityUid debris, MapGridComponent grid, float safetyRadius)
@@ -479,10 +531,15 @@ public sealed partial class NcContractSystem : EntitySystem
             return;
         }
 
-        if (state.HuntDebrisEntity is not { } site ||
-            site == EntityUid.Invalid ||
-            TerminatingOrDeleted(site) ||
-            !TryComp(site, out MapGridComponent? grid))
+        if (state.HuntDungeonGenerationMap is not { } generationMap ||
+            generationMap == EntityUid.Invalid ||
+            TerminatingOrDeleted(generationMap) ||
+            !TryConsolidateHuntDungeonGeneration(
+                key.ContractId,
+                state,
+                generationMap,
+                out var generatedGrid,
+                out var generatedBounds))
         {
             FinalizeObjectiveTerminalOutcome(
                 key,
@@ -492,22 +549,30 @@ public sealed partial class NcContractSystem : EntitySystem
             return;
         }
 
-        SpawnHuntDungeonExterior(key.ContractId, site, grid);
-
-        if (!IsHuntDebrisGridPlacementClear(site, grid, contract.Config.HuntDebrisSafetyRadius))
+        if (!TryPlaceGeneratedHuntDungeon(
+                key.Store,
+                contract,
+                state,
+                generationMap,
+                generatedGrid,
+                generatedBounds,
+                out var placedGrid))
         {
             FinalizeObjectiveTerminalOutcome(
                 key,
                 comp,
                 contract,
-                $"Dungeon generation failed for hunt contract '{key.ContractId}': generated grid intersects another grid.");
+                $"Dungeon generation failed for hunt contract '{key.ContractId}': cannot find a free dungeon placement after {Math.Max(1, contract.Config.HuntDebrisPlacementAttempts)} attempts.");
             return;
         }
 
+        SpawnHuntDungeonExterior(key.ContractId, placedGrid.Owner, placedGrid.Comp);
+
         var spawnCoordinates = new List<EntityCoordinates>();
-        CollectHuntDungeonRoomSpawnCoordinates(dungeons, site, grid, spawnCoordinates);
+        spawnCoordinates.Clear();
+        CollectHuntDungeonRoomSpawnCoordinates(dungeons, placedGrid.Owner, placedGrid.Comp, spawnCoordinates);
         if (spawnCoordinates.Count == 0)
-            CollectHuntDebrisSpawnCoordinates(site, grid, spawnCoordinates);
+            CollectHuntDebrisSpawnCoordinates(placedGrid.Owner, placedGrid.Comp, spawnCoordinates);
 
         if (spawnCoordinates.Count == 0)
         {
@@ -529,12 +594,18 @@ public sealed partial class NcContractSystem : EntitySystem
             return;
         }
 
-        CollectHuntDungeonRoomSpawnCoordinates(dungeons, site, grid, spawnCoordinates);
-        if (spawnCoordinates.Count == 0)
-            CollectHuntDebrisSpawnCoordinates(site, grid, spawnCoordinates);
+        if (state.PinpointerEntities.Count > 0 &&
+            TryResolveSpawnedHuntPinpointerTarget(key.Store, contract, state, out var pinpointerTarget))
+        {
+            RetargetObjectivePinpointers(key, state, pinpointerTarget);
+        }
 
-        RemoveHuntTargetOccupiedCoordinates(site, grid, state, spawnCoordinates);
-        SpawnHuntDungeonFill(key.ContractId, contract.Config, spawnCoordinates);
+        CollectHuntDungeonRoomSpawnCoordinates(dungeons, placedGrid.Owner, placedGrid.Comp, spawnCoordinates);
+        if (spawnCoordinates.Count == 0)
+            CollectHuntDebrisSpawnCoordinates(placedGrid.Owner, placedGrid.Comp, spawnCoordinates);
+
+        RemoveHuntTargetOccupiedCoordinates(state, spawnCoordinates);
+        SpawnHuntDungeonFill(key.ContractId, contract.Config, dungeons, spawnCoordinates);
 
         if (contract.Config.GivePinpointer &&
             state.HuntPendingPinpointerUser is { } user &&
@@ -548,6 +619,143 @@ public sealed partial class NcContractSystem : EntitySystem
 
         state.HuntPendingPinpointerUser = null;
         UpdateObjectiveContractProgress(key.Store, key.ContractId, contract);
+    }
+
+    private bool TryConsolidateHuntDungeonGeneration(
+        string contractId,
+        ObjectiveRuntimeState state,
+        EntityUid generationMap,
+        out Entity<MapGridComponent> generatedGrid,
+        out Box2 generatedBounds
+    )
+    {
+        generatedGrid = default;
+        generatedBounds = default;
+        if (!TryComp(generationMap, out TransformComponent? mapXform) || mapXform.ChildCount == 0)
+            return false;
+
+        if (state.HuntDebrisEntity is not { } primaryGridUid ||
+            primaryGridUid == EntityUid.Invalid ||
+            !TryComp(primaryGridUid, out MapGridComponent? primaryGrid) ||
+            !TryComp(primaryGridUid, out TransformComponent? primaryXform))
+        {
+            return false;
+        }
+
+        var mergeGrids = new List<Entity<MapGridComponent>>();
+        var children = mapXform.ChildEnumerator;
+        while (children.MoveNext(out var child))
+        {
+            if (!TryComp(child, out MapGridComponent? childGrid))
+                continue;
+
+            if (child == primaryGridUid)
+                continue;
+
+            mergeGrids.Add((child, childGrid));
+        }
+
+        for (var i = 0; i < mergeGrids.Count; i++)
+        {
+            var mergeGrid = mergeGrids[i];
+            if (mergeGrid.Owner == EntityUid.Invalid || TerminatingOrDeleted(mergeGrid.Owner))
+                continue;
+
+            if (!TryComp(mergeGrid.Owner, out TransformComponent? mergeXform))
+                continue;
+
+            var mergeMatrix = Matrix3x2.Multiply(
+                _xform.GetWorldMatrix(mergeXform),
+                _xform.GetInvWorldMatrix(primaryXform));
+
+            try
+            {
+                _gridFixture.Merge(
+                    primaryGridUid,
+                    mergeGrid.Owner,
+                    mergeMatrix,
+                    primaryGrid,
+                    mergeGrid.Comp,
+                    primaryXform,
+                    mergeXform);
+            }
+            catch (Exception e)
+            {
+                Sawmill.Warning(
+                    $"[Contracts] Hunt dungeon generation for '{contractId}' failed to merge grid fragment '{ToPrettyString(mergeGrid.Owner)}': {e}");
+                return false;
+            }
+
+            if (!TryComp(primaryGridUid, out primaryGrid) ||
+                !TryComp(primaryGridUid, out primaryXform))
+            {
+                return false;
+            }
+        }
+
+        primaryGrid.CanSplit = false;
+        generatedBounds = _xform.GetWorldMatrix(primaryXform).TransformBox(primaryGrid.LocalAABB);
+        generatedGrid = (primaryGridUid, primaryGrid);
+        return true;
+    }
+
+    private bool TryPlaceGeneratedHuntDungeon(
+        EntityUid store,
+        ContractServerData contract,
+        ObjectiveRuntimeState state,
+        EntityUid generationMap,
+        Entity<MapGridComponent> generatedGrid,
+        Box2 generatedBounds,
+        out Entity<MapGridComponent> placedGrid
+    )
+    {
+        placedGrid = default;
+
+        if (state.HuntDungeonAnchorCoordinates is not { } anchorCoords)
+            return false;
+
+        var attempts = Math.Max(1, contract.Config.HuntDebrisPlacementAttempts);
+        for (var attempt = 0; attempt < attempts; attempt++)
+        {
+            if (!TryGetHuntDungeonPlacementMapCoordinates(
+                    store,
+                    contract.Config,
+                    anchorCoords,
+                    generatedBounds,
+                    out var placementCenter) ||
+                !_map.TryGetMap(placementCenter.MapId, out var targetMap))
+            {
+                continue;
+            }
+
+            var placementOffset = placementCenter.Position - generatedBounds.Center;
+            var xform = Transform(generatedGrid.Owner);
+            var position = _xform.GetWorldPosition(xform);
+            var rotation = _xform.GetWorldRotation(xform);
+            _xform.SetParent(generatedGrid.Owner, xform, targetMap.Value);
+            _xform.SetWorldPositionRotation(generatedGrid.Owner, position + placementOffset, rotation, xform);
+
+            state.HuntDungeonGridEntities.Clear();
+            state.HuntDungeonGridEntities.Add(generatedGrid.Owner);
+            state.HuntDebrisEntity = generatedGrid.Owner;
+            state.HuntDungeonGenerationMap = null;
+            placedGrid = generatedGrid;
+            ConfigureHuntDungeonRadarContact(generatedGrid.Owner);
+
+            if (TryComp(generationMap, out TransformComponent? generationMapXform))
+                _map.DeleteMap(generationMapXform.MapID);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void ConfigureHuntDungeonRadarContact(EntityUid grid)
+    {
+        _contractMeta.SetEntityName(grid, "contract hunt site");
+        _shuttle.SetIFFColor(grid, Color.FromHex("#d67e27"));
+        _shuttle.AddIFFFlag(grid, IFFFlags.HideLabel | IFFFlags.HideLabelAlways);
     }
 
     private static bool HasGeneratedHuntDungeonRooms(IReadOnlyList<Dungeon> dungeons)
@@ -812,10 +1020,11 @@ public sealed partial class NcContractSystem : EntitySystem
     private void SpawnHuntDungeonFill(
         string contractId,
         ContractObjectiveConfigData config,
+        IReadOnlyList<Dungeon> dungeons,
         List<EntityCoordinates> spawnCoordinates
     )
     {
-        var count = PickHuntDungeonFillCount(config, spawnCoordinates.Count);
+        var count = PickHuntDungeonFillCount(config, spawnCoordinates.Count, CountGeneratedHuntDungeonRooms(dungeons));
         if (count <= 0)
             return;
 
@@ -845,13 +1054,21 @@ public sealed partial class NcContractSystem : EntitySystem
         }
     }
 
-    private int PickHuntDungeonFillCount(ContractObjectiveConfigData config, int availableCoordinates)
+    private int PickHuntDungeonFillCount(
+        ContractObjectiveConfigData config,
+        int availableCoordinates,
+        int roomCount
+    )
     {
         if (availableCoordinates <= 0 || config.HuntDungeonFill.Count == 0)
             return 0;
 
-        var min = Math.Max(0, config.HuntDungeonFillCount.Min);
-        var max = Math.Max(min, config.HuntDungeonFillCount.Max);
+        var min = Math.Max(
+            Math.Max(0, config.HuntDungeonFillCount.Min),
+            roomCount * NcContractTuning.HuntDungeonFillMinPerRoom);
+        var max = Math.Max(
+            Math.Max(min, config.HuntDungeonFillCount.Max),
+            roomCount * NcContractTuning.HuntDungeonFillMaxPerRoom);
         if (max <= 0)
             return 0;
 
@@ -860,6 +1077,15 @@ public sealed partial class NcContractSystem : EntitySystem
             : _random.Next(min, max + 1);
 
         return Math.Min(count, availableCoordinates);
+    }
+
+    private static int CountGeneratedHuntDungeonRooms(IReadOnlyList<Dungeon> dungeons)
+    {
+        var count = 0;
+        for (var i = 0; i < dungeons.Count; i++)
+            count += dungeons[i].Rooms.Count;
+
+        return count;
     }
 
     private bool TryPickHuntDungeonFillPrototype(
@@ -939,7 +1165,6 @@ public sealed partial class NcContractSystem : EntitySystem
     )
     {
         output.Clear();
-
         var seen = new HashSet<Vector2i>();
         for (var i = 0; i < dungeons.Count; i++)
         {
@@ -965,8 +1190,25 @@ public sealed partial class NcContractSystem : EntitySystem
     )
     {
         output.Clear();
+        AppendHuntDebrisSpawnCoordinates((debris, grid), output);
+    }
 
-        var enumerator = _map.GetAllTilesEnumerator(debris, grid, true);
+    private void CollectHuntDebrisSpawnCoordinates(
+        IReadOnlyList<Entity<MapGridComponent>> grids,
+        List<EntityCoordinates> output
+    )
+    {
+        output.Clear();
+        for (var i = 0; i < grids.Count; i++)
+            AppendHuntDebrisSpawnCoordinates(grids[i], output);
+    }
+
+    private void AppendHuntDebrisSpawnCoordinates(
+        Entity<MapGridComponent> grid,
+        List<EntityCoordinates> output
+    )
+    {
+        var enumerator = _map.GetAllTilesEnumerator(grid.Owner, grid.Comp, true);
         while (enumerator.MoveNext(out var tile))
         {
             var tileRef = tile.Value;
@@ -974,13 +1216,11 @@ public sealed partial class NcContractSystem : EntitySystem
                 _turf.IsTileBlocked(tileRef, CollisionGroup.MobMask))
                 continue;
 
-            output.Add(_map.GridTileToLocal(debris, grid, tileRef.GridIndices));
+            output.Add(_map.GridTileToLocal(grid.Owner, grid.Comp, tileRef.GridIndices));
         }
     }
 
     private void RemoveHuntTargetOccupiedCoordinates(
-        EntityUid site,
-        MapGridComponent grid,
         ObjectiveRuntimeState state,
         List<EntityCoordinates> coordinates
     )
@@ -988,7 +1228,7 @@ public sealed partial class NcContractSystem : EntitySystem
         if (coordinates.Count == 0 || state.HuntSpawnedTargets.Count == 0)
             return;
 
-        var occupied = new HashSet<Vector2i>();
+        var occupied = new HashSet<(EntityUid Grid, Vector2i Tile)>();
         for (var i = 0; i < state.HuntSpawnedTargets.Count; i++)
         {
             var target = state.HuntSpawnedTargets[i];
@@ -996,10 +1236,11 @@ public sealed partial class NcContractSystem : EntitySystem
                 continue;
 
             var targetXform = Transform(target);
-            if (targetXform.GridUid != site)
+            if (targetXform.GridUid is not { } targetGrid ||
+                !TryComp(targetGrid, out MapGridComponent? grid))
                 continue;
 
-            occupied.Add(_map.TileIndicesFor(site, grid, targetXform.Coordinates));
+            occupied.Add((targetGrid, _map.TileIndicesFor(targetGrid, grid, targetXform.Coordinates)));
         }
 
         if (occupied.Count == 0)
@@ -1008,11 +1249,11 @@ public sealed partial class NcContractSystem : EntitySystem
         for (var i = coordinates.Count - 1; i >= 0; i--)
         {
             var coordinatesXform = coordinates[i];
-            if (coordinatesXform.EntityId != site)
+            if (!TryComp(coordinatesXform.EntityId, out MapGridComponent? grid))
                 continue;
 
-            var tile = _map.TileIndicesFor(site, grid, coordinatesXform);
-            if (occupied.Contains(tile))
+            var tile = _map.TileIndicesFor(coordinatesXform.EntityId, grid, coordinatesXform);
+            if (occupied.Contains((coordinatesXform.EntityId, tile)))
                 coordinates.RemoveAt(i);
         }
     }

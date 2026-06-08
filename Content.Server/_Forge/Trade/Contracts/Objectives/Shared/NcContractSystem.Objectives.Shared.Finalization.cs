@@ -42,19 +42,16 @@ public sealed partial class NcContractSystem : EntitySystem
         if (_objectiveRuntime.ByContract.TryGetValue(key, out var state))
             CleanupObjectivePinpointers(key, state);
 
-        FailObjectiveContract(key, comp, deleteTrackedEntities, deleteGuards);
+        FailObjectiveContract(key, deleteTrackedEntities, deleteGuards);
     }
 
     private void FailObjectiveContract(
         (EntityUid Store, string ContractId) key,
-        NcStoreComponent comp,
         bool deleteTrackedEntities,
         bool deleteGuards
     )
     {
         CleanupObjectiveRuntime(key.Store, key.ContractId, deleteTrackedEntities, deleteGuards);
-        comp.Contracts.Remove(key.ContractId);
-        RefillContractsForStore(key.Store, comp, key.ContractId);
         RaiseContractsChanged(key);
     }
 }

@@ -33,6 +33,8 @@ public sealed partial class NcContractSystem : EntitySystem
 
         DeactivateTrackedDeliveryDropoff(key, state);
 
+        CleanupHuntDungeonGenerationMap(state);
+        state.HuntDungeonAnchorCoordinates = null;
         state.HuntDungeonGenerationTask = null;
         state.HuntPendingPinpointerUser = null;
 
@@ -99,6 +101,22 @@ public sealed partial class NcContractSystem : EntitySystem
         state.GhostRoleSurvivalSucceeded = false;
         state.LastKnownTargetCoordinates = null;
         _objectiveRuntime.ByContract.Remove(key);
+    }
+
+    private void CleanupHuntDungeonGenerationMap(ObjectiveRuntimeState state)
+    {
+        if (state.HuntDungeonGenerationMap is not { } map ||
+            map == EntityUid.Invalid ||
+            TerminatingOrDeleted(map))
+        {
+            state.HuntDungeonGenerationMap = null;
+            return;
+        }
+
+        if (TryComp(map, out TransformComponent? xform))
+            _map.DeleteMap(xform.MapID);
+
+        state.HuntDungeonGenerationMap = null;
     }
 
     private void CleanupGhostRoleSurvivalObjective(ObjectiveRuntimeState state)
@@ -176,12 +194,32 @@ public sealed partial class NcContractSystem : EntitySystem
 
     private void CleanupHuntDebris(ObjectiveRuntimeState state, bool deleteDebris)
     {
-        if (state.HuntDebrisEntity is not { } debris || debris == EntityUid.Invalid)
-            return;
-
+        var debris = state.HuntDebrisEntity;
         state.HuntDebrisEntity = null;
 
-        if (!deleteDebris || TerminatingOrDeleted(debris))
+        var debrisWasTracked = false;
+        for (var i = state.HuntDungeonGridEntities.Count - 1; i >= 0; i--)
+        {
+            var grid = state.HuntDungeonGridEntities[i];
+            if (grid == debris)
+                debrisWasTracked = true;
+
+            CleanupHuntDebrisEntity(grid, deleteDebris);
+        }
+
+        state.HuntDungeonGridEntities.Clear();
+
+        if (debris is not { } debrisEntity ||
+            debrisEntity == EntityUid.Invalid ||
+            debrisWasTracked)
+            return;
+
+        CleanupHuntDebrisEntity(debrisEntity, deleteDebris);
+    }
+
+    private void CleanupHuntDebrisEntity(EntityUid debris, bool deleteDebris)
+    {
+        if (!deleteDebris || debris == EntityUid.Invalid || TerminatingOrDeleted(debris))
             return;
 
         if (HuntDebrisHasAttachedPlayer(debris))

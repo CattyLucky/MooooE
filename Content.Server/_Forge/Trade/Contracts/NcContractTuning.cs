@@ -15,7 +15,7 @@ internal static class NcContractTuning
     public const float TrackedDeliveryDropoffRange = 1.5f;
 
     public const float HuntDebrisMinSpawnDistance = 10000f;
-    public const float HuntDebrisMaxSpawnDistance = 14000f;
+    public const float HuntDebrisMaxSpawnDistance = 15000f;
     public const float HuntDebrisSpawnSafetyRadius = 48f;
     public const int HuntDebrisSpawnPlacementAttempts = 24;
     public const string HuntDungeonExteriorTile = "FloorAsteroidSand";
@@ -24,6 +24,8 @@ internal static class NcContractTuning
     public const int HuntDungeonExteriorMaxRockCount = 96;
     public const float HuntDungeonExteriorInnerRockChance = 0.08f;
     public const float HuntDungeonExteriorEdgeRockChance = 0.18f;
+    public const int HuntDungeonFillMinPerRoom = 4;
+    public const int HuntDungeonFillMaxPerRoom = 7;
     public const float RetrievalSpaceSpawnDistance = 2000f;
     public const float RetrievalSpaceSpawnSafetyRadius = 16f;
     public const int RetrievalSpaceSpawnPlacementAttempts = 24;

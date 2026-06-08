@@ -64,6 +64,9 @@ public sealed partial class NcContractSystem : EntitySystem
         public bool HuntActive;
         public EntityUid? HuntBodyEntity;
         public EntityUid? HuntDebrisEntity;
+        public EntityCoordinates? HuntDungeonAnchorCoordinates;
+        public EntityUid? HuntDungeonGenerationMap;
+        public readonly List<EntityUid> HuntDungeonGridEntities = new();
         public Task<List<Dungeon>>? HuntDungeonGenerationTask;
         public EntityUid? HuntPendingPinpointerUser;
         public bool HuntTargetWasKilled;

@@ -65,6 +65,9 @@ public sealed partial class NcContractSystem : EntitySystem
         state.TargetEntity = null;
         state.HuntBodyEntity = null;
         state.HuntDebrisEntity = null;
+        state.HuntDungeonAnchorCoordinates = null;
+        state.HuntDungeonGenerationMap = null;
+        state.HuntDungeonGridEntities.Clear();
         state.HuntSpawnedTargets.Clear();
         state.HuntTargetWasKilled = false;
         state.LastKnownTargetCoordinates = null;

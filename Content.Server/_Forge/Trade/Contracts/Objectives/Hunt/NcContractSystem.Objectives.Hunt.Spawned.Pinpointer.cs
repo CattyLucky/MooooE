@@ -1,6 +1,7 @@
 using Content.Shared._Forge.Trade;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
+using Robust.Shared.Map;
 
 namespace Content.Server._Forge.Trade;
 
@@ -118,7 +119,64 @@ public sealed partial class NcContractSystem : EntitySystem
             return true;
         }
 
+        if (TryResolveSpawnedHuntSitePinpointerTarget(store, state, out var site))
+        {
+            target = site;
+            return true;
+        }
+
+        if (IsSpawnedHuntDungeonGenerationPending(state))
+            return false;
+
         target = store;
+        return true;
+    }
+
+    private static bool IsSpawnedHuntDungeonGenerationPending(ObjectiveRuntimeState state)
+    {
+        return state.HuntDungeonGenerationTask != null ||
+               state.HuntDungeonGenerationMap is { } map && map != EntityUid.Invalid;
+    }
+
+    private bool TryResolveSpawnedHuntSitePinpointerTarget(
+        EntityUid store,
+        ObjectiveRuntimeState state,
+        out EntityUid target
+    )
+    {
+        target = EntityUid.Invalid;
+        if (!TryComp(store, out TransformComponent? storeXform))
+            return false;
+
+        var storeMap = _xform.ToMapCoordinates(storeXform.Coordinates).MapId;
+        if (TryUseSpawnedHuntSiteTarget(state.HuntDebrisEntity, storeMap, out target))
+            return true;
+
+        for (var i = 0; i < state.HuntDungeonGridEntities.Count; i++)
+        {
+            if (TryUseSpawnedHuntSiteTarget(state.HuntDungeonGridEntities[i], storeMap, out target))
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool TryUseSpawnedHuntSiteTarget(EntityUid? site, MapId storeMap, out EntityUid target)
+    {
+        target = EntityUid.Invalid;
+        if (site is not { } siteUid ||
+            siteUid == EntityUid.Invalid ||
+            TerminatingOrDeleted(siteUid) ||
+            !TryComp(siteUid, out TransformComponent? siteXform))
+        {
+            return false;
+        }
+
+        var siteMap = _xform.ToMapCoordinates(siteXform.Coordinates).MapId;
+        if (siteMap != storeMap)
+            return false;
+
+        target = siteUid;
         return true;
     }
 
