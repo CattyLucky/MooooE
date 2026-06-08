@@ -21,9 +21,10 @@ internal static class NcContractTuning
     public const string HuntDungeonExteriorTile = "FloorAsteroidSand";
     public const int HuntDungeonExteriorPadding = 7;
     public const int HuntDungeonExteriorCoreClearance = 2;
-    public const int HuntDungeonExteriorMaxRockCount = 96;
-    public const float HuntDungeonExteriorInnerRockChance = 0.08f;
-    public const float HuntDungeonExteriorEdgeRockChance = 0.18f;
+    public const int HuntDungeonExteriorRimWidth = 2;
+    public const int HuntDungeonExteriorMaxRockCount = 320;
+    public const float HuntDungeonExteriorInnerRockChance = 0.04f;
+    public const float HuntDungeonExteriorRimRockChance = 0.65f;
     public const int HuntDungeonFillMinPerRoom = 4;
     public const int HuntDungeonFillMaxPerRoom = 7;
     public const float RetrievalSpaceSpawnDistance = 2000f;

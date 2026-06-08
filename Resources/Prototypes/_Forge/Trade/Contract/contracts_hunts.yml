@@ -35,6 +35,12 @@
       weight: 1
     - prototype: ForgeHuntDungeonVirologyLab
       weight: 1
+    - prototype: ForgeHuntDungeonWreck
+      weight: 1
+    - prototype: ForgeHuntDungeonVGRoidInterior
+      weight: 1
+    - prototype: ForgeHuntDungeonSuperCompacted
+      weight: 1
   reward:
   - type: Currency
     currency: Credit
@@ -79,6 +85,12 @@
     - prototype: ForgeHuntDungeonLavaBrig
       weight: 1
     - prototype: ForgeHuntDungeonVirologyLab
+      weight: 1
+    - prototype: ForgeHuntDungeonWreck
+      weight: 1
+    - prototype: ForgeHuntDungeonVGRoidInterior
+      weight: 1
+    - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
   reward:
   - type: Currency
@@ -125,6 +137,12 @@
       weight: 1
     - prototype: ForgeHuntDungeonVirologyLab
       weight: 1
+    - prototype: ForgeHuntDungeonWreck
+      weight: 1
+    - prototype: ForgeHuntDungeonVGRoidInterior
+      weight: 1
+    - prototype: ForgeHuntDungeonSuperCompacted
+      weight: 1
   reward:
   - type: Currency
     currency: Credit
@@ -169,6 +187,12 @@
     - prototype: ForgeHuntDungeonLavaBrig
       weight: 1
     - prototype: ForgeHuntDungeonVirologyLab
+      weight: 1
+    - prototype: ForgeHuntDungeonWreck
+      weight: 1
+    - prototype: ForgeHuntDungeonVGRoidInterior
+      weight: 1
+    - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
   reward:
   - type: Currency
@@ -215,6 +239,12 @@
       weight: 1
     - prototype: ForgeHuntDungeonVirologyLab
       weight: 1
+    - prototype: ForgeHuntDungeonWreck
+      weight: 1
+    - prototype: ForgeHuntDungeonVGRoidInterior
+      weight: 1
+    - prototype: ForgeHuntDungeonSuperCompacted
+      weight: 1
   reward:
   - type: Currency
     currency: Credit
@@ -259,6 +289,12 @@
     - prototype: ForgeHuntDungeonLavaBrig
       weight: 1
     - prototype: ForgeHuntDungeonVirologyLab
+      weight: 1
+    - prototype: ForgeHuntDungeonWreck
+      weight: 1
+    - prototype: ForgeHuntDungeonVGRoidInterior
+      weight: 1
+    - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
   reward:
   - type: Currency
@@ -305,6 +341,12 @@
       weight: 1
     - prototype: ForgeHuntDungeonVirologyLab
       weight: 1
+    - prototype: ForgeHuntDungeonWreck
+      weight: 1
+    - prototype: ForgeHuntDungeonVGRoidInterior
+      weight: 1
+    - prototype: ForgeHuntDungeonSuperCompacted
+      weight: 1
   reward:
   - type: Currency
     currency: Credit
@@ -350,6 +392,12 @@
       weight: 1
     - prototype: ForgeHuntDungeonVirologyLab
       weight: 1
+    - prototype: ForgeHuntDungeonWreck
+      weight: 1
+    - prototype: ForgeHuntDungeonVGRoidInterior
+      weight: 1
+    - prototype: ForgeHuntDungeonSuperCompacted
+      weight: 1
   reward:
   - type: Currency
     currency: Credit
@@ -394,6 +442,12 @@
     - prototype: ForgeHuntDungeonLavaBrig
       weight: 1
     - prototype: ForgeHuntDungeonVirologyLab
+      weight: 1
+    - prototype: ForgeHuntDungeonWreck
+      weight: 1
+    - prototype: ForgeHuntDungeonVGRoidInterior
+      weight: 1
+    - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
   reward:
   - type: Currency
@@ -442,6 +496,12 @@
       weight: 1
     - prototype: ForgeHuntDungeonVirologyLab
       weight: 1
+    - prototype: ForgeHuntDungeonWreck
+      weight: 1
+    - prototype: ForgeHuntDungeonVGRoidInterior
+      weight: 1
+    - prototype: ForgeHuntDungeonSuperCompacted
+      weight: 1
   reward:
   - type: Currency
     currency: Credit
@@ -488,6 +548,12 @@
     - prototype: ForgeHuntDungeonLavaBrig
       weight: 1
     - prototype: ForgeHuntDungeonVirologyLab
+      weight: 1
+    - prototype: ForgeHuntDungeonWreck
+      weight: 1
+    - prototype: ForgeHuntDungeonVGRoidInterior
+      weight: 1
+    - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
   reward:
   - type: Currency
@@ -536,6 +602,12 @@
       weight: 1
     - prototype: ForgeHuntDungeonVirologyLab
       weight: 1
+    - prototype: ForgeHuntDungeonWreck
+      weight: 1
+    - prototype: ForgeHuntDungeonVGRoidInterior
+      weight: 1
+    - prototype: ForgeHuntDungeonSuperCompacted
+      weight: 1
   reward:
   - type: Currency
     currency: Credit
@@ -582,6 +654,12 @@
     - prototype: ForgeHuntDungeonLavaBrig
       weight: 1
     - prototype: ForgeHuntDungeonVirologyLab
+      weight: 1
+    - prototype: ForgeHuntDungeonWreck
+      weight: 1
+    - prototype: ForgeHuntDungeonVGRoidInterior
+      weight: 1
+    - prototype: ForgeHuntDungeonSuperCompacted
       weight: 1
   reward:
   - type: Currency

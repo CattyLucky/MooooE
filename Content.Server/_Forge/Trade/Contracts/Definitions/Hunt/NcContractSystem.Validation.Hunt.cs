@@ -57,9 +57,14 @@ public sealed partial class NcContractSystem : EntitySystem
         if (!TryValidateHuntDungeons(contractId, spawn.Dungeons))
             valid = false;
 
-        if (spawn.Dungeons.Count > 0 &&
-            !TryValidateHuntDungeonFill(contractId, spawn.DungeonFill, spawn.DungeonFillCount))
-            valid = false;
+        if (spawn.Dungeons.Count > 0)
+        {
+            if (!TryValidateHuntDungeonFillPreset(contractId, spawn.DungeonFillPreset))
+                valid = false;
+
+            if (!TryValidateHuntDungeonFill(contractId, spawn.DungeonFill, spawn.DungeonFillCount))
+                valid = false;
+        }
 
         if (!TryValidateHuntDebrisPlacement(contractId, spawn))
             valid = false;
@@ -147,6 +152,24 @@ public sealed partial class NcContractSystem : EntitySystem
         return valid;
     }
 
+    private bool TryValidateHuntDungeonFillPreset(string contractId, string presetId)
+    {
+        if (string.IsNullOrWhiteSpace(presetId))
+            return true;
+
+        if (!_prototypes.TryIndex<NcHuntDungeonFillPresetPrototype>(presetId, out var preset))
+        {
+            Sawmill.Warning(
+                $"[Contracts] Hunt contract '{contractId}' spawn.dungeonFillPreset references missing ncHuntDungeonFillPreset '{presetId}'.");
+            return false;
+        }
+
+        return TryValidateHuntDungeonFillEntries(
+            contractId,
+            $"spawn.dungeonFillPreset '{presetId}'.entries",
+            preset.Entries);
+    }
+
     private bool TryValidateHuntDungeonFill(
         string contractId,
         List<NcHuntDungeonFillEntry> fill,
@@ -169,15 +192,25 @@ public sealed partial class NcContractSystem : EntitySystem
             valid = false;
         }
 
-        if (fill.Count == 0)
-            return valid;
+        return TryValidateHuntDungeonFillEntries(contractId, "spawn.dungeonFill", fill) && valid;
+    }
 
+    private bool TryValidateHuntDungeonFillEntries(
+        string contractId,
+        string path,
+        List<NcHuntDungeonFillEntry> fill
+    )
+    {
+        if (fill.Count == 0)
+            return true;
+
+        var valid = true;
         for (var i = 0; i < fill.Count; i++)
         {
             var entry = fill[i];
             if (entry == null)
             {
-                Sawmill.Warning($"[Contracts] Hunt contract '{contractId}' spawn.dungeonFill[{i}] is empty.");
+                Sawmill.Warning($"[Contracts] Hunt contract '{contractId}' {path}[{i}] is empty.");
                 valid = false;
                 continue;
             }
@@ -185,20 +218,20 @@ public sealed partial class NcContractSystem : EntitySystem
             if (string.IsNullOrWhiteSpace(entry.Prototype))
             {
                 Sawmill.Warning(
-                    $"[Contracts] Hunt contract '{contractId}' spawn.dungeonFill[{i}] must define prototype.");
+                    $"[Contracts] Hunt contract '{contractId}' {path}[{i}] must define prototype.");
                 valid = false;
             }
             else if (!_prototypes.HasIndex<EntityPrototype>(entry.Prototype))
             {
                 Sawmill.Warning(
-                    $"[Contracts] Hunt contract '{contractId}' spawn.dungeonFill[{i}] references missing entity prototype '{entry.Prototype}'.");
+                    $"[Contracts] Hunt contract '{contractId}' {path}[{i}] references missing entity prototype '{entry.Prototype}'.");
                 valid = false;
             }
 
             if (entry.Weight <= 0)
             {
                 Sawmill.Warning(
-                    $"[Contracts] Hunt contract '{contractId}' spawn.dungeonFill[{i}] weight must be > 0.");
+                    $"[Contracts] Hunt contract '{contractId}' {path}[{i}] weight must be > 0.");
                 valid = false;
             }
         }

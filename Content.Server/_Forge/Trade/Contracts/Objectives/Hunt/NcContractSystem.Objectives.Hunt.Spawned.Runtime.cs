@@ -753,9 +753,9 @@ public sealed partial class NcContractSystem : EntitySystem
 
     private void ConfigureHuntDungeonRadarContact(EntityUid grid)
     {
-        _contractMeta.SetEntityName(grid, "contract hunt site");
+        _contractMeta.SetEntityName(grid, "Контрактный обломок");
         _shuttle.SetIFFColor(grid, Color.FromHex("#d67e27"));
-        _shuttle.AddIFFFlag(grid, IFFFlags.HideLabel | IFFFlags.HideLabelAlways);
+        _shuttle.RemoveIFFFlag(grid, IFFFlags.Hide | IFFFlags.HideLabel | IFFFlags.HideLabelAlways);
     }
 
     private static bool HasGeneratedHuntDungeonRooms(IReadOnlyList<Dungeon> dungeons)
@@ -783,19 +783,18 @@ public sealed partial class NcContractSystem : EntitySystem
             return;
 
         var padding = Math.Max(1, NcContractTuning.HuntDungeonExteriorPadding);
-        var center = new Vector2(
-            (bounds.Left + bounds.Right + 1) / 2f,
-            (bounds.Bottom + bounds.Top + 1) / 2f);
-        var radiusX = Math.Max(1f, (bounds.Right - bounds.Left + 1) / 2f + padding);
-        var radiusY = Math.Max(1f, (bounds.Top - bounds.Bottom + 1) / 2f + padding);
+        var outerLeft = bounds.Left - padding;
+        var outerRight = bounds.Right + padding;
+        var outerBottom = bounds.Bottom - padding;
+        var outerTop = bounds.Top + padding;
 
         var exteriorTiles = new List<(Vector2i Index, Tile Tile)>();
         var rockCandidates = new List<Vector2i>();
         var tileRandom = _random.GetRandom();
 
-        for (var x = bounds.Left - padding; x <= bounds.Right + padding; x++)
+        for (var x = outerLeft; x <= outerRight; x++)
         {
-            for (var y = bounds.Bottom - padding; y <= bounds.Top + padding; y++)
+            for (var y = outerBottom; y <= outerTop; y++)
             {
                 var tile = new Vector2i(x, y);
                 if (generatedTiles.Contains(tile) ||
@@ -804,16 +803,13 @@ public sealed partial class NcContractSystem : EntitySystem
                     continue;
                 }
 
-                if (!TryGetHuntDungeonExteriorDistance(tile, center, radiusX, radiusY, out var distance))
-                    continue;
-
                 exteriorTiles.Add((tile, _tile.GetVariantTile(tileDef, tileRandom)));
 
                 if (!IsNearGeneratedHuntDungeonTile(
                         tile,
                         generatedTiles,
                         NcContractTuning.HuntDungeonExteriorCoreClearance) &&
-                    ShouldSpawnHuntDungeonExteriorRock(distance))
+                    ShouldSpawnHuntDungeonExteriorRock(tile, bounds, padding))
                 {
                     rockCandidates.Add(tile);
                 }
@@ -874,41 +870,21 @@ public sealed partial class NcContractSystem : EntitySystem
         return true;
     }
 
-    private static bool TryGetHuntDungeonExteriorDistance(
+    private bool ShouldSpawnHuntDungeonExteriorRock(
         Vector2i tile,
-        Vector2 center,
-        float radiusX,
-        float radiusY,
-        out float distance
+        Box2i bounds,
+        int padding
     )
     {
-        var dx = (tile.X + 0.5f - center.X) / radiusX;
-        var dy = (tile.Y + 0.5f - center.Y) / radiusY;
-        distance = dx * dx + dy * dy;
-
-        var edgeNoise = GetHuntDungeonExteriorEdgeNoise(tile);
-        return distance <= 1f + edgeNoise;
-    }
-
-    private static float GetHuntDungeonExteriorEdgeNoise(Vector2i tile)
-    {
-        unchecked
-        {
-            var hash = tile.X * 73856093 ^ tile.Y * 19349663;
-            hash ^= hash >> 13;
-            hash *= 1274126177;
-            var normalized = (hash & 0x7fffffff) / (float) int.MaxValue;
-            return (normalized - 0.5f) * 0.24f;
-        }
-    }
-
-    private bool ShouldSpawnHuntDungeonExteriorRock(float distance)
-    {
-        if (distance < 0.36f)
-            return false;
-
-        var chance = distance > 0.72f
-            ? NcContractTuning.HuntDungeonExteriorEdgeRockChance
+        var outerLeft = bounds.Left - padding;
+        var outerRight = bounds.Right + padding;
+        var outerBottom = bounds.Bottom - padding;
+        var outerTop = bounds.Top + padding;
+        var edgeDistance = Math.Min(
+            Math.Min(tile.X - outerLeft, outerRight - tile.X),
+            Math.Min(tile.Y - outerBottom, outerTop - tile.Y));
+        var chance = edgeDistance < Math.Max(1, NcContractTuning.HuntDungeonExteriorRimWidth)
+            ? NcContractTuning.HuntDungeonExteriorRimRockChance
             : NcContractTuning.HuntDungeonExteriorInnerRockChance;
 
         return _random.Prob(chance);

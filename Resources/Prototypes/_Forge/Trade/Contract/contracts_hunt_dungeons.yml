@@ -1,11 +1,156 @@
+- type: dungeonRoomPack
+  id: ForgeHuntRoom17x5
+  size: 17,5
+  rooms:
+  - 0,0,17,5
+
+- type: dungeonRoomPack
+  id: ForgeHuntRoom13x3
+  size: 13,3
+  rooms:
+  - 0,0,13,3
+
+- type: dungeonRoomPack
+  id: ForgeHuntRoom11x5
+  size: 11,5
+  rooms:
+  - 0,0,11,5
+
+- type: dungeonRoomPack
+  id: ForgeHuntRoom11x3
+  size: 11,3
+  rooms:
+  - 0,0,11,3
+
+- type: dungeonRoomPack
+  id: ForgeHuntRoom7x7
+  size: 7,7
+  rooms:
+  - 0,0,7,7
+
+- type: dungeonRoomPack
+  id: ForgeHuntRoom7x5
+  size: 7,5
+  rooms:
+  - 0,0,7,5
+
+- type: dungeonRoomPack
+  id: ForgeHuntRoom7x3
+  size: 7,3
+  rooms:
+  - 0,0,7,3
+
+- type: dungeonRoomPack
+  id: ForgeHuntRoom5x5
+  size: 5,5
+  rooms:
+  - 0,0,5,5
+
+- type: dungeonRoomPack
+  id: ForgeHuntRoom3x7
+  size: 3,7
+  rooms:
+  - 0,0,3,7
+
+- type: dungeonRoomPack
+  id: ForgeHuntRoom3x5
+  size: 3,5
+  rooms:
+  - 0,0,3,5
+
 - type: dungeonPreset
   id: ForgeHuntDungeonLayout
   roomPacks:
-  - 0,0,17,17
-  - 20,0,37,17
-  - 20,20,37,37
-  - -20,0,-3,17
-  - -20,20,-3,37
+  - -18,-18,-1,-1
+  - 2,-18,19,-1
+  - -18,2,-1,19
+  - 2,2,19,19
+  - -37,-12,-20,-7
+  - 22,-12,39,-7
+  - -37,7,-20,12
+  - 22,7,39,12
+  - -12,22,-1,27
+  - 2,22,13,27
+  - -12,-27,-1,-22
+  - 2,-27,13,-22
+  - -37,-1,-30,6
+  - 30,-1,37,6
+
+- type: dungeonPreset
+  id: ForgeHuntDungeonLayoutWide
+  roomPacks:
+  - -39,-8,-22,9
+  - -19,-8,-2,9
+  - 3,-8,20,9
+  - 23,-8,40,9
+  - -39,13,-22,18
+  - -19,13,-2,18
+  - 3,13,14,18
+  - 17,13,28,18
+  - 31,13,38,20
+  - -39,-18,-26,-15
+  - -23,-18,-10,-15
+  - -7,-18,0,-15
+  - 3,-18,10,-15
+  - 13,-18,20,-15
+  - 23,-18,30,-15
+  - 33,-18,40,-15
+
+- type: dungeonPreset
+  id: ForgeHuntDungeonLayoutTall
+  roomPacks:
+  - -8,-39,9,-22
+  - -8,-19,9,-2
+  - -8,3,9,20
+  - -8,23,9,40
+  - 13,-39,18,-22
+  - -18,-39,-13,-22
+  - 13,-19,18,-8
+  - -18,-19,-13,-8
+  - 13,3,20,10
+  - -20,3,-13,10
+  - 13,23,18,30
+  - -18,23,-13,30
+  - 22,-8,29,-1
+  - -29,-8,-22,-1
+
+- type: dungeonPreset
+  id: ForgeHuntDungeonCompactLayout
+  roomPacks:
+  - -17,-17,-12,-12
+  - -6,-17,-1,-12
+  - 5,-17,10,-12
+  - 16,-17,21,-12
+  - -17,-6,-12,-1
+  - -6,-6,-1,-1
+  - 5,-6,10,-1
+  - 16,-6,21,-1
+  - -17,5,-12,10
+  - -6,5,-1,10
+  - 5,5,10,10
+  - 16,5,21,10
+  - -17,16,-12,21
+  - -6,16,-1,21
+  - 5,16,10,21
+  - 16,16,21,21
+
+- type: dungeonPreset
+  id: ForgeHuntDungeonVGRoidLayout
+  roomPacks:
+  - -17,-11,-6,-6
+  - -3,-11,8,-6
+  - 11,-11,22,-6
+  - -17,0,-6,5
+  - -3,0,8,5
+  - 11,0,22,5
+  - -17,11,-12,16
+  - -6,11,-1,16
+  - 5,11,10,16
+  - 16,11,21,16
+  - -17,-22,-12,-17
+  - -6,-22,-1,-17
+  - 5,-22,10,-17
+  - 16,-22,21,-17
 
 - type: dungeonConfig
   id: ForgeHuntDungeonBase
@@ -13,6 +158,52 @@
   - !type:PrefabDunGen
     presets:
     - ForgeHuntDungeonLayout
+    - ForgeHuntDungeonLayoutWide
+    - ForgeHuntDungeonLayoutTall
+
+  - !type:CorridorDunGen
+    width: 3
+
+  - !type:DungeonEntranceDunGen
+    count: 1
+
+  - !type:RoomEntranceDunGen
+
+  - !type:BoundaryWallDunGen
+
+  - !type:JunctionDunGen
+    width: 1
+
+  - !type:JunctionDunGen
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonCompactBase
+  layers:
+  - !type:PrefabDunGen
+    presets:
+    - ForgeHuntDungeonCompactLayout
+
+  - !type:CorridorDunGen
+    width: 3
+
+  - !type:DungeonEntranceDunGen
+    count: 1
+
+  - !type:RoomEntranceDunGen
+
+  - !type:BoundaryWallDunGen
+
+  - !type:JunctionDunGen
+    width: 1
+
+  - !type:JunctionDunGen
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonVGRoidBase
+  layers:
+  - !type:PrefabDunGen
+    presets:
+    - ForgeHuntDungeonVGRoidLayout
 
   - !type:CorridorDunGen
     width: 3
@@ -237,3 +428,66 @@
   layers:
   - !type:PrototypeDunGen
     proto: ForgeHuntDungeonBase
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonWreck
+  data:
+    entities:
+      Walls: WallSolid
+      CornerWalls: WallReinforced
+    spawnGroups:
+      Entrance: NFBaseAirlock
+      Junction: NFBaseAirlock
+    tiles:
+      FallbackTile: FloorSteel
+    whitelists:
+      Rooms:
+        tags:
+        - NFWreck
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonCompactBase
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonVGRoidInterior
+  data:
+    entities:
+      Walls: WallRock
+      CornerWalls: WallRock
+    spawnGroups:
+      Entrance: NFBaseAirlock
+      Junction: NFBaseAirlock
+    tiles:
+      FallbackTile: FloorAsteroidSand
+    whitelists:
+      Rooms:
+        tags:
+        - NFVGRoidInterior
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonVGRoidBase
+
+- type: dungeonConfig
+  id: ForgeHuntDungeonSuperCompacted
+  data:
+    entities:
+      Walls: WallRock
+      CornerWalls: WallRock
+    spawnGroups:
+      Entrance: NFBaseAirlock
+      Junction: NFBaseAirlock
+    tiles:
+      FallbackTile: FloorAsteroidSand
+    whitelists:
+      Rooms:
+        tags:
+        - NFSuperCompactedAndesite
+        - NFSuperCompactedAsteroid
+        - NFSuperCompactedAsteroidRock
+        - NFSuperCompactedBasalt
+        - NFSuperCompactedChromite
+        - NFSuperCompactedSand
+        - NFSuperCompactedSnow
+  layers:
+  - !type:PrototypeDunGen
+    proto: ForgeHuntDungeonCompactBase

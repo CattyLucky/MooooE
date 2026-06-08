@@ -33,7 +33,7 @@ public sealed partial class NcContractSystem : EntitySystem
             HuntEnabled = true,
             HuntDebris = CloneHuntDebrisEntries(proto.Spawn.Debris),
             HuntDungeons = CloneHuntDungeonEntries(proto.Spawn.Dungeons),
-            HuntDungeonFill = CloneHuntDungeonFillEntries(proto.Spawn.DungeonFill),
+            HuntDungeonFill = BuildHuntDungeonFillEntries(proto.Spawn),
             HuntDungeonFillCount = proto.Spawn.DungeonFillCount,
             HuntDebrisMinDistance = proto.Spawn.DebrisMinDistance,
             HuntDebrisMaxDistance = proto.Spawn.DebrisMaxDistance,
@@ -113,11 +113,25 @@ public sealed partial class NcContractSystem : EntitySystem
         return result;
     }
 
-    private static List<NcHuntDungeonFillEntry> CloneHuntDungeonFillEntries(
+    private List<NcHuntDungeonFillEntry> BuildHuntDungeonFillEntries(NcHuntSpawnData spawn)
+    {
+        var result = new List<NcHuntDungeonFillEntry>();
+
+        if (!string.IsNullOrWhiteSpace(spawn.DungeonFillPreset) &&
+            _prototypes.TryIndex<NcHuntDungeonFillPresetPrototype>(spawn.DungeonFillPreset, out var preset))
+        {
+            AppendHuntDungeonFillEntries(result, preset.Entries);
+        }
+
+        AppendHuntDungeonFillEntries(result, spawn.DungeonFill);
+        return result;
+    }
+
+    private static void AppendHuntDungeonFillEntries(
+        List<NcHuntDungeonFillEntry> result,
         IReadOnlyList<NcHuntDungeonFillEntry> source
     )
     {
-        var result = new List<NcHuntDungeonFillEntry>(source.Count);
         for (var i = 0; i < source.Count; i++)
         {
             var entry = source[i];
@@ -131,8 +145,6 @@ public sealed partial class NcContractSystem : EntitySystem
                     Weight = entry.Weight,
                 });
         }
-
-        return result;
     }
 
     private static List<ContractTargetServerData> BuildHuntTargets(NcHuntContractPrototype proto)
