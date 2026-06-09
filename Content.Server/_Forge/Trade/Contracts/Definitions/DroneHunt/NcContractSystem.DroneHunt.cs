@@ -380,7 +380,15 @@ public sealed partial class NcContractSystem : EntitySystem
         _droneHuntCorePrototypeScratch.Clear();
 
         if (found > 0)
-            return true;
+        {
+            var proofCoords = OffsetDroneHuntProofCoordinates(ResolveDroneHuntCompletionCoordinates(key.Store, state));
+            if (TrySpawnObjectiveProof(key, contract, proofCoords))
+                return true;
+
+            Sawmill.Warning(
+                $"[Contracts] Drone hunt runtime init failed for '{key.ContractId}': proof core could not be spawned.");
+            return false;
+        }
 
         Sawmill.Warning(
             $"[Contracts] Drone hunt runtime init failed for '{key.ContractId}': loaded grid has no configured AI cores.");

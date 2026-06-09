@@ -143,7 +143,7 @@ public sealed partial class NcContractSystem : EntitySystem
         if (contract.IsTrackedDeliveryObjective)
             return !UsesTrackedDeliveryDropoff(contract);
 
-        return contract.IsArtifactStudyObjective;
+        return contract.IsArtifactStudyObjective || contract.IsDroneHuntObjective;
     }
 
     private void BuildUserScopedProgressPreview(

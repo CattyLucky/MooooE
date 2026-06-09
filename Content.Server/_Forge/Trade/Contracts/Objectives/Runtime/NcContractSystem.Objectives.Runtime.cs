@@ -118,13 +118,27 @@ public sealed partial class NcContractSystem : EntitySystem
             if (_objectiveRuntime.ByContract.TryGetValue(key, out var state) &&
                 TryGetObjectiveContract(key, out _, out var contract) &&
                 contract.Taken &&
-                !contract.Runtime.Failed &&
-                TryResolveRetrievalRouteReturnPinpointerTarget(key.Store, contract, state, out var target))
+                !contract.Runtime.Failed)
             {
-                if (target == key.Store && TryGetContainedEntityRoot(args.Entity, out var proofCarrier))
-                    RetargetObjectivePinpointersForOwner(key, state, proofCarrier, target);
-                else
+                if (TryResolveRetrievalRouteReturnPinpointerTarget(key.Store, contract, state, out var target))
+                {
+                    if (target == key.Store && TryGetContainedEntityRoot(args.Entity, out var proofCarrier))
+                        RetargetObjectivePinpointersForOwner(key, state, proofCarrier, target);
+                    else
+                        RetargetObjectivePinpointers(key, state, target);
+
+                    return;
+                }
+
+                if (!contract.IsDroneHuntObjective)
+                    return;
+
+                if (TryResolveContractPinpointerTarget(key.Store, key.ContractId, contract, state, out target))
                     RetargetObjectivePinpointers(key, state, target);
+
+                if (TryGetContainedEntityRoot(args.Entity, out var carrier) &&
+                    TryResolveContractPinpointerTarget(key.Store, carrier, key.ContractId, contract, state, out target))
+                    RetargetObjectivePinpointersForOwner(key, state, carrier, target);
             }
 
             return;

@@ -1,7 +1,7 @@
 - type: ncDroneHuntContract
   id: ForgeDroneHuntLight
   name: "Лёгкий перехват дрона"
-  description: "В ближнем секторе замечен малый автономный дрон-шаттл. Перехватите цель, уничтожьте AI-ядро и верните ядро-доказательство."
+  description: "В ближнем секторе замечен малый автономный дрон-шаттл. Найдите цель, заберите контрактное ядро-доказательство и верните его торговцу."
   icon: NpcDroneAiMPulsar
   targetGroup: ForgeDroneHuntGroupCores
   completion:
@@ -29,7 +29,7 @@
 - type: ncDroneHuntContract
   id: ForgeDroneHuntMedium
   name: "Средний перехват дрона"
-  description: "Автономный T2 дрон-шаттл мешает маршрутам экспедиций. Найдите его по пеленгу, выведите из строя AI-ядро и верните доказательство."
+  description: "Автономный T2 дрон-шаттл мешает маршрутам экспедиций. Найдите его по пеленгу, заберите контрактное ядро и верните доказательство торговцу."
   icon: NpcDroneAiMedusa
   targetGroup: ForgeDroneHuntGroupCores
   completion:
@@ -57,7 +57,7 @@
 - type: ncDroneHuntContract
   id: ForgeDroneHuntHeavy
   name: "Тяжёлый перехват дрона"
-  description: "В дальнем секторе обнаружен тяжёлый T2 дрон-шаттл. Перехватите его на безопасном удалении, уничтожьте AI-ядро и доставьте ядро-доказательство."
+  description: "В дальнем секторе обнаружен тяжёлый T2 дрон-шаттл. Перехватите его на безопасном удалении, заберите контрактное ядро-доказательство и доставьте его торговцу."
   icon: NpcDroneAiQuake
   targetGroup: ForgeDroneHuntGroupCores
   completion:

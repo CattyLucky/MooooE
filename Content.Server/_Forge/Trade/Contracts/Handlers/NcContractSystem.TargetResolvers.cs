@@ -247,6 +247,18 @@ public sealed partial class NcContractSystem : EntitySystem
         {
             return system.TryResolveDroneHuntPinpointerTarget(store, state, out target);
         }
+
+        protected override bool TryResolveActiveObjectiveTargetForUser(
+            NcContractSystem system,
+            EntityUid store,
+            EntityUid user,
+            ContractServerData contract,
+            ObjectiveRuntimeState state,
+            out EntityUid target
+        )
+        {
+            return system.TryResolveDroneHuntPinpointerTargetForUser(store, user, state, out target);
+        }
     }
 
     private sealed class GhostRoleTargetResolver : ContractTargetResolverBase

@@ -50,14 +50,83 @@ public sealed partial class NcContractSystem : EntitySystem
         var previousProgress = contract.Progress;
         var previousStatus = contract.FlowStatus;
 
-        SetObjectiveStage(contract, 1);
+        if (!state.ProofSpawned)
+        {
+            var completionCoords = OffsetDroneHuntProofCoordinates(ResolveDroneHuntCompletionCoordinates(key.Store, state));
+            if (!TrySpawnRequiredObjectiveProofOrFail(key, comp, contract, completionCoords))
+                return;
+        }
 
-        var completionCoords = ResolveDroneHuntCompletionCoordinates(key.Store, state);
-        if (!TrySpawnRequiredObjectiveProofOrFail(key, comp, contract, completionCoords))
-            return;
+        if (TryGetLiveObjectiveProof(state, out var proof))
+            RetargetObjectivePinpointers(key, state, proof);
 
-        FinalizeObjectiveCompletion(key, contract);
+        SyncDroneHuntObjectiveProgress(key.Store, key.ContractId, contract);
         RaiseContractsChangedIfSnapshotChanged(key, contract, previousRequired, previousProgress, previousStatus);
+    }
+
+    private ClaimAttemptResult TryClaimDroneHuntContract(
+        EntityUid store,
+        EntityUid user,
+        string contractId,
+        NcStoreComponent comp,
+        ContractServerData contract
+    )
+    {
+        EnsureObjectiveRuntimeDefaults(contract);
+        SyncDroneHuntObjectiveProgress(store, contractId, contract);
+
+        if (contract.Runtime.Failed)
+            return ClaimAttemptResult.Fail(ClaimFailureReason.ObjectiveFailed, contract.Runtime.FailureReason);
+
+        if (!TryValidateDroneHuntProofClaim(store, user, contractId, contract, out var proofFail))
+            return proofFail;
+
+        if (!TryValidateContractRewards(user, contract.Rewards, out var rewardFail))
+            return rewardFail;
+
+        var snapshot = CaptureContractProgressSnapshot(contract);
+        MarkObjectiveComplete(contract);
+
+        if (!TryExecuteObjectiveClaimRewards(store, user, contractId, contract, out rewardFail))
+        {
+            snapshot.Restore(contract);
+            return rewardFail;
+        }
+
+        FinalizeClaim(store, comp, contractId, contract.Repeatable);
+        return ClaimAttemptResult.Ok();
+    }
+
+    private bool TryValidateDroneHuntProofClaim(
+        EntityUid store,
+        EntityUid user,
+        string contractId,
+        ContractServerData contract,
+        out ClaimAttemptResult fail
+    )
+    {
+        fail = ClaimAttemptResult.Fail(ClaimFailureReason.None);
+
+        if (!TryGetObjectiveProofPrototype(contract, out var proofPrototype))
+            return true;
+
+        var key = (store, contractId);
+        if (!_objectiveRuntime.ByContract.TryGetValue(key, out var state) ||
+            string.IsNullOrWhiteSpace(state.ProofToken))
+        {
+            fail = ClaimAttemptResult.Fail(
+                ClaimFailureReason.MissingProof,
+                $"Drone hunt contract '{contractId}' requires a proof core, but no proof token is registered.");
+            return false;
+        }
+
+        if (TryFindObjectiveProofEntity(store, user, key, contract, state, proofPrototype, out _))
+            return true;
+
+        fail = ClaimAttemptResult.Fail(
+            ClaimFailureReason.MissingProof,
+            $"Drone hunt contract '{contractId}' requires its proof core to be brought back to the store.");
+        return false;
     }
 
     private void OnContractDroneCoreLost(
@@ -79,7 +148,7 @@ public sealed partial class NcContractSystem : EntitySystem
             contract.ExecutionKind != ContractExecutionKind.DroneHuntObjective)
             return;
 
-        if (HasLiveDroneHuntCoreTarget(state))
+        if (HasLiveDroneHuntCoreTarget(state) || HasLiveObjectiveProof(state))
             return;
 
         FinalizeObjectiveTerminalOutcome(
@@ -113,7 +182,8 @@ public sealed partial class NcContractSystem : EntitySystem
         if (contract.Taken &&
             !contract.Runtime.Failed &&
             state.DroneHuntActive &&
-            !HasLiveDroneHuntCoreTarget(state))
+            !HasLiveDroneHuntCoreTarget(state) &&
+            !HasLiveObjectiveProof(state))
         {
             if (TryGetObjectiveContract(key, out var comp, out var liveContract))
             {
@@ -130,6 +200,75 @@ public sealed partial class NcContractSystem : EntitySystem
         SyncObjectiveProgressFromRuntime(contract);
         ResetContractTargetProgress(contract);
         SyncContractFlowStatus(contract);
+    }
+
+    private void RefreshDroneHuntObjectiveProgressFromProofScan(
+        EntityUid store,
+        string contractId,
+        ContractServerData contract,
+        IReadOnlyList<EntityUid> userItems,
+        IReadOnlyList<EntityUid>? crateItems
+    )
+    {
+        SyncDroneHuntObjectiveProgress(store, contractId, contract);
+
+        if (!contract.Taken || contract.Runtime.Failed)
+            return;
+
+        var key = (store, contractId);
+        if (!_objectiveRuntime.ByContract.TryGetValue(key, out var state))
+            return;
+
+        var progress = HasDroneHuntProofInProgressSources(store, key, contract, state, userItems, crateItems)
+            ? contract.Runtime.StageGoal
+            : 0;
+
+        SetObjectiveStage(contract, progress);
+        ResetContractTargetProgress(contract);
+        SyncContractFlowStatus(contract);
+    }
+
+    private bool HasDroneHuntProofInProgressSources(
+        EntityUid store,
+        (EntityUid Store, string ContractId) key,
+        ContractServerData contract,
+        ObjectiveRuntimeState state,
+        IReadOnlyList<EntityUid> userItems,
+        IReadOnlyList<EntityUid>? crateItems
+    )
+    {
+        if (!TryGetObjectiveProofPrototype(contract, out var proofPrototype))
+            return true;
+
+        if (string.IsNullOrWhiteSpace(state.ProofToken))
+            return false;
+
+        if (ContainsMatchingDroneHuntProof(userItems, key, state, proofPrototype))
+            return true;
+
+        if (ContainsMatchingDroneHuntProof(crateItems, key, state, proofPrototype))
+            return true;
+
+        return TryFindNearbyStoreObjectiveProof(store, key, state, proofPrototype, out _);
+    }
+
+    private bool ContainsMatchingDroneHuntProof(
+        IReadOnlyList<EntityUid>? items,
+        (EntityUid Store, string ContractId) key,
+        ObjectiveRuntimeState state,
+        string proofPrototype
+    )
+    {
+        if (items == null)
+            return false;
+
+        for (var i = 0; i < items.Count; i++)
+        {
+            if (IsMatchingObjectiveProof(items[i], key, state, proofPrototype, out _))
+                return true;
+        }
+
+        return false;
     }
 
     private void PruneLostDroneHuntCoreTargets(ObjectiveRuntimeState state)
@@ -156,6 +295,25 @@ public sealed partial class NcContractSystem : EntitySystem
         return false;
     }
 
+    private bool HasLiveObjectiveProof(ObjectiveRuntimeState state)
+    {
+        return TryGetLiveObjectiveProof(state, out _);
+    }
+
+    private bool TryGetLiveObjectiveProof(ObjectiveRuntimeState state, out EntityUid proof)
+    {
+        if (state.ProofEntity is { } existing &&
+            existing != EntityUid.Invalid &&
+            !TerminatingOrDeleted(existing))
+        {
+            proof = existing;
+            return true;
+        }
+
+        proof = EntityUid.Invalid;
+        return false;
+    }
+
     private EntityCoordinates ResolveDroneHuntCompletionCoordinates(EntityUid store, ObjectiveRuntimeState state)
     {
         if (state.LastKnownTargetCoordinates is { } targetCoords && targetCoords != EntityCoordinates.Invalid)
@@ -167,7 +325,44 @@ public sealed partial class NcContractSystem : EntitySystem
         return EntityCoordinates.Invalid;
     }
 
+    private EntityCoordinates OffsetDroneHuntProofCoordinates(EntityCoordinates coords)
+    {
+        return coords == EntityCoordinates.Invalid
+            ? coords
+            : coords.Offset(_random.NextVector2(0.35f));
+    }
+
     private bool TryResolveDroneHuntPinpointerTarget(
+        EntityUid store,
+        ObjectiveRuntimeState state,
+        out EntityUid target
+    )
+    {
+        if (TryGetLiveObjectiveProof(state, out target))
+            return true;
+
+        return TryResolveDroneHuntCorePinpointerTarget(store, state, out target);
+    }
+
+    private bool TryResolveDroneHuntPinpointerTargetForUser(
+        EntityUid store,
+        EntityUid user,
+        ObjectiveRuntimeState state,
+        out EntityUid target
+    )
+    {
+        if (TryGetLiveObjectiveProof(state, out var proof))
+        {
+            target = TryGetContainedEntityRoot(proof, out var proofCarrier) && proofCarrier == user
+                ? store
+                : proof;
+            return true;
+        }
+
+        return TryResolveDroneHuntCorePinpointerTarget(store, state, out target);
+    }
+
+    private bool TryResolveDroneHuntCorePinpointerTarget(
         EntityUid store,
         ObjectiveRuntimeState state,
         out EntityUid target

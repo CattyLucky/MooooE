@@ -380,7 +380,7 @@ public sealed partial class NcContractSystem : EntitySystem
             ContractServerData contract
         )
         {
-            return system.TryClaimObjectiveContract(store, user, contractId, comp, contract);
+            return system.TryClaimDroneHuntContract(store, user, contractId, comp, contract);
         }
 
         public override bool TryInitializeRuntimeOnTake(
@@ -403,7 +403,7 @@ public sealed partial class NcContractSystem : EntitySystem
             IReadOnlyList<EntityUid>? crateItems
         )
         {
-            system.SyncDroneHuntObjectiveProgress(store, contractId, contract);
+            system.RefreshDroneHuntObjectiveProgressFromProofScan(store, contractId, contract, userItems, crateItems);
             return true;
         }
 
@@ -415,6 +415,18 @@ public sealed partial class NcContractSystem : EntitySystem
         )
         {
             system.SyncDroneHuntObjectiveProgress(store, contractId, contract);
+        }
+
+        public override void AnalyzeProgressRequirements(
+            ContractServerData contract,
+            ref bool needsUserItems,
+            ref bool needsCrateItems,
+            ref bool needsStoreWorldItems
+        )
+        {
+            needsUserItems = true;
+            needsCrateItems = true;
+            needsStoreWorldItems = true;
         }
     }
 
