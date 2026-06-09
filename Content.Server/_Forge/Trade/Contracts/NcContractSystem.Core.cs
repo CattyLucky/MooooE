@@ -1,5 +1,6 @@
 using Content.Shared._Forge.Trade;
 using Content.Shared.Chemistry.EntitySystems;
+using Robust.Shared.ContentPack;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
@@ -38,6 +39,7 @@ public sealed partial class NcContractSystem : EntitySystem
     private readonly Stack<List<int>> _progressTargetIndexPool = new();
     private readonly Dictionary<EntityUid, int> _progressVirtualStackLeftScratch = new();
     [Dependency] private readonly IPrototypeManager _prototypes = default!;
+    [Dependency] private readonly IResourceManager _resources = default!;
     private readonly Dictionary<QuasiKey, double> _quasiPhase = new();
     [Dependency] private readonly IRobustRandom _random = default!;
     private readonly List<EntityUid> _scratchCrateItems = new();

@@ -16,6 +16,7 @@ public sealed partial class NcContractSystem : EntitySystem
         RegisterDefinitionHandler(new SupplyContractDefinitionHandler());
         RegisterDefinitionHandler(new RetrievalContractDefinitionHandler());
         RegisterDefinitionHandler(new HuntContractDefinitionHandler());
+        RegisterDefinitionHandler(new DroneHuntContractDefinitionHandler());
         RegisterDefinitionHandler(new GhostRoleContractDefinitionHandler());
         RegisterDefinitionHandler(new ArtifactStudyContractDefinitionHandler());
         RegisterAdditionalDefinitionHandlers();
@@ -181,6 +182,41 @@ public sealed partial class NcContractSystem : EntitySystem
         {
             return candidate.Hunt != null
                 ? system.CreateHuntContractData(store, candidate.Hunt)
+                : CreateInvalidContractData(candidate);
+        }
+    }
+
+    private sealed class DroneHuntContractDefinitionHandler : IContractDefinitionHandler
+    {
+        public NcContractOfferType OfferType => NcContractOfferType.DroneHunt;
+        public ContractPoolCandidateKind CandidateKind => ContractPoolCandidateKind.DroneHunt;
+
+        public bool TryCreateCandidate(
+            NcContractSystem system,
+            NcContractOfferPoolPrototype pool,
+            NcContractOfferEntry entry,
+            ContractPoolCandidate candidate
+        )
+        {
+            if (!system._prototypes.TryIndex<NcDroneHuntContractPrototype>(entry.Id, out var droneHunt) ||
+                !system.TryValidateDroneHuntContractForPool(pool.ID, droneHunt))
+                return false;
+
+            candidate.Kind = CandidateKind;
+            candidate.Id = droneHunt.ID;
+            candidate.Repeatable = droneHunt.Repeatable;
+            candidate.DroneHunt = droneHunt;
+            return true;
+        }
+
+        public ContractServerData CreateContract(
+            NcContractSystem system,
+            EntityUid store,
+            ContractPoolCandidate candidate
+        )
+        {
+            return candidate.DroneHunt != null
+                ? system.CreateDroneHuntContractData(store, candidate.DroneHunt)
                 : CreateInvalidContractData(candidate);
         }
     }

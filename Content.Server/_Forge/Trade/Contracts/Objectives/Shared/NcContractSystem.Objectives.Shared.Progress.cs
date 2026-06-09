@@ -40,6 +40,8 @@ public sealed partial class NcContractSystem : EntitySystem
     internal sealed class ObjectiveRuntimeState
     {
         public readonly List<EntityUid> GuardEntities = new();
+        public readonly List<EntityUid> DroneHuntCoreTargets = new();
+        public readonly List<EntityUid> DroneHuntGridEntities = new();
         public readonly List<EntityUid> HuntSpawnedTargets = new();
         public readonly HashSet<EntityUid> PinpointerEntities = new();
         public readonly HashSet<EntityUid> RetrievalDeliveredEntities = new();
@@ -51,6 +53,7 @@ public sealed partial class NcContractSystem : EntitySystem
         public int ArtifactStudyNodeTotal;
         public int ArtifactStudyTriggered;
         public bool DeliveryDropoffCompleted;
+        public bool DroneHuntActive;
         public MapCoordinates? DeliveryDropoffCoordinates;
         public EntityUid? DeliveryDropoffEntity;
         public TimeSpan? GhostRoleAcceptDeadline;

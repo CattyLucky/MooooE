@@ -39,6 +39,7 @@ public sealed partial class NcContractSystem : EntitySystem
         state.HuntPendingPinpointerUser = null;
 
         CleanupRetrievalSpawnedEntities(state, deleteTrackedEntities);
+        CleanupDroneHuntRuntime(state, deleteTrackedEntities);
         CleanupSpawnedHuntBodyTarget(state, deleteTrackedEntities);
         CleanupHuntSpawnedTargets(state, deleteTrackedEntities);
         CleanupHuntDebris(state, deleteTrackedEntities);
@@ -87,6 +88,7 @@ public sealed partial class NcContractSystem : EntitySystem
         _objectiveRuntime.ActiveGhostRoleObjectives.Remove(key);
 
         state.RetrievalDeliveredEntities.Clear();
+        state.DroneHuntActive = false;
         state.RetrievalAcceptedCargoCount = 0;
         state.RetrievalLastAcceptedCargoCoordinates = null;
         state.RetrievalRouteDeliveryCompleted = false;
@@ -101,6 +103,34 @@ public sealed partial class NcContractSystem : EntitySystem
         state.GhostRoleSurvivalSucceeded = false;
         state.LastKnownTargetCoordinates = null;
         _objectiveRuntime.ByContract.Remove(key);
+    }
+
+    private void CleanupDroneHuntRuntime(ObjectiveRuntimeState state, bool deleteTrackedEntities)
+    {
+        if (state.DroneHuntCoreTargets.Count > 0)
+        {
+            for (var i = state.DroneHuntCoreTargets.Count - 1; i >= 0; i--)
+            {
+                var core = state.DroneHuntCoreTargets[i];
+                _objectiveRuntime.ByDroneCore.Remove(core);
+
+                if (deleteTrackedEntities && core != EntityUid.Invalid && !TerminatingOrDeleted(core))
+                    Del(core);
+            }
+
+            state.DroneHuntCoreTargets.Clear();
+        }
+
+        if (state.DroneHuntGridEntities.Count == 0)
+            return;
+
+        for (var i = state.DroneHuntGridEntities.Count - 1; i >= 0; i--)
+        {
+            var grid = state.DroneHuntGridEntities[i];
+            CleanupHuntDebrisEntity(grid, deleteTrackedEntities);
+        }
+
+        state.DroneHuntGridEntities.Clear();
     }
 
     private void CleanupHuntDungeonGenerationMap(ObjectiveRuntimeState state)

@@ -7,6 +7,7 @@ public static class ContractExecutionKinds
         kind switch
         {
             ContractExecutionKind.HuntObjective => ContractObjectiveType.Hunt,
+            ContractExecutionKind.DroneHuntObjective => ContractObjectiveType.Hunt,
             ContractExecutionKind.GhostRoleObjective => ContractObjectiveType.GhostRole,
             ContractExecutionKind.ArtifactStudyObjective => ContractObjectiveType.ArtifactStudy,
             _ => ContractObjectiveType.Delivery
@@ -16,6 +17,7 @@ public static class ContractExecutionKinds
 
     public static bool UsesStageProgress(ContractExecutionKind kind) =>
         kind is ContractExecutionKind.HuntObjective
+            or ContractExecutionKind.DroneHuntObjective
             or ContractExecutionKind.GhostRoleObjective
             or ContractExecutionKind.ArtifactStudyObjective;
 }

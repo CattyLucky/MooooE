@@ -7,6 +7,7 @@ using Content.Server.Procedural;
 using Content.Shared._Forge.Trade;
 using Content.Shared.Construction.EntitySystems;
 using Content.Shared.Damage;
+using Content.Shared.Destructible;
 using Content.Shared.GameTicking;
 using Content.Shared.Maps;
 using Content.Shared.Mobs;
@@ -49,6 +50,7 @@ public sealed partial class NcContractSystem : EntitySystem
     private void InitializeObjectiveRuntime()
     {
         SubscribeLocalEvent<EntityTerminatingEvent>(OnObjectiveTrackedEntityTerminating);
+        SubscribeLocalEvent<NcContractDroneCoreComponent, DestructionEventArgs>(OnContractDroneCoreDestroyed);
         SubscribeLocalEvent<MobStateChangedEvent>(OnObjectiveTrackedMobStateChanged);
         SubscribeLocalEvent<NcContractGhostRoleSpawnerComponent, GhostRoleGetRequirementsEvent>(
             OnContractGhostRoleGetRequirements);

@@ -34,6 +34,13 @@ public sealed class ContractObjectiveConfigData
     public float HuntDebrisMaxDistance;
     public float HuntDebrisSafetyRadius;
     public int HuntDebrisPlacementAttempts;
+    public bool DroneHuntEnabled;
+    public List<NcDroneHuntGridEntry> DroneHuntGrids { get; set; } = new();
+    public List<string> DroneHuntCorePrototypes { get; set; } = new();
+    public float DroneHuntMinDistance;
+    public float DroneHuntMaxDistance;
+    public float DroneHuntSafetyRadius;
+    public int DroneHuntPlacementAttempts;
     public bool PreserveTargetOnComplete;
     public NcRetrievalClaimMode RetrievalClaimMode;
     public bool RetrievalConsumeCargo;

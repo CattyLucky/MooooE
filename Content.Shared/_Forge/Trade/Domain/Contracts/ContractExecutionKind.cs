@@ -8,9 +8,10 @@ namespace Content.Shared._Forge.Trade;
 public enum ContractExecutionKind : byte
 {
     InventoryDelivery = 0,
-    TrackedDeliveryObjective,
-    RetrievalRouteDelivery,
-    HuntObjective,
-    GhostRoleObjective,
-    ArtifactStudyObjective
+    TrackedDeliveryObjective = 1,
+    RetrievalRouteDelivery = 2,
+    HuntObjective = 3,
+    GhostRoleObjective = 4,
+    ArtifactStudyObjective = 5,
+    DroneHuntObjective = 6
 }

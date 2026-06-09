@@ -27,6 +27,7 @@ public sealed class ContractServerData
     public bool IsHuntObjective => ExecutionKind == ContractExecutionKind.HuntObjective;
     public bool IsGhostRoleObjective => ExecutionKind == ContractExecutionKind.GhostRoleObjective;
     public bool IsArtifactStudyObjective => ExecutionKind == ContractExecutionKind.ArtifactStudyObjective;
+    public bool IsDroneHuntObjective => ExecutionKind == ContractExecutionKind.DroneHuntObjective;
 
     public bool HasInventoryDeliverySpawnSupport =>
         IsInventoryDelivery && !string.IsNullOrWhiteSpace(Config.DeliverySpawnPrototype);

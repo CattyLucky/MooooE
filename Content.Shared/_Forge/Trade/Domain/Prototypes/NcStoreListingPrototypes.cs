@@ -204,7 +204,8 @@ public enum NcContractOfferType : byte
     Retrieval = 1,
     Hunt = 2,
     GhostRole = 3,
-    ArtifactStudy = 4
+    ArtifactStudy = 4,
+    DroneHunt = 5
 }
 
 /// <summary>

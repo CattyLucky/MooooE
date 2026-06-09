@@ -13,6 +13,7 @@ public sealed partial class NcContractSystem : EntitySystem
         RegisterObjectiveHandler(new TrackedDeliveryObjectiveHandler());
         RegisterObjectiveHandler(new RetrievalRouteDeliveryObjectiveHandler());
         RegisterObjectiveHandler(new HuntObjectiveHandler());
+        RegisterObjectiveHandler(new DroneHuntObjectiveHandler());
         RegisterObjectiveHandler(new GhostRoleObjectiveHandler());
         RegisterObjectiveHandler(new ArtifactStudyObjectiveHandler());
         RegisterAdditionalObjectiveHandlers();
@@ -363,6 +364,57 @@ public sealed partial class NcContractSystem : EntitySystem
         )
         {
             system.HandleHuntObjectiveTargetResolved(key, comp, contract);
+        }
+    }
+
+    private sealed class DroneHuntObjectiveHandler : ContractObjectiveHandlerBase
+    {
+        public override ContractExecutionKind Kind => ContractExecutionKind.DroneHuntObjective;
+
+        public override ClaimAttemptResult TryClaim(
+            NcContractSystem system,
+            EntityUid store,
+            EntityUid user,
+            string contractId,
+            NcStoreComponent comp,
+            ContractServerData contract
+        )
+        {
+            return system.TryClaimObjectiveContract(store, user, contractId, comp, contract);
+        }
+
+        public override bool TryInitializeRuntimeOnTake(
+            NcContractSystem system,
+            EntityUid store,
+            EntityUid user,
+            string contractId,
+            ContractServerData contract
+        )
+        {
+            return system.TryInitializeDroneHuntObjectiveRuntimeOnTake(store, user, contractId, contract);
+        }
+
+        public override bool TryUpdateProgress(
+            NcContractSystem system,
+            EntityUid store,
+            string contractId,
+            ContractServerData contract,
+            IReadOnlyList<EntityUid> userItems,
+            IReadOnlyList<EntityUid>? crateItems
+        )
+        {
+            system.SyncDroneHuntObjectiveProgress(store, contractId, contract);
+            return true;
+        }
+
+        public override void RefreshObjectiveProgress(
+            NcContractSystem system,
+            EntityUid store,
+            string contractId,
+            ContractServerData contract
+        )
+        {
+            system.SyncDroneHuntObjectiveProgress(store, contractId, contract);
         }
     }
 

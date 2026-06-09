@@ -11,6 +11,7 @@ public sealed partial class NcContractSystem
         public HashSet<(EntityUid Store, string ContractId)> ActiveRetrievalRouteDeliveries { get; } = new();
         public HashSet<(EntityUid Store, string ContractId)> ActiveTrackedDeliveryDropoffObjectives { get; } = new();
         public Dictionary<EntityUid, (EntityUid Store, string ContractId)> ByGuard { get; } = new();
+        public Dictionary<EntityUid, (EntityUid Store, string ContractId)> ByDroneCore { get; } = new();
         public Dictionary<EntityUid, (EntityUid Store, string ContractId)> ByPinpointer { get; } = new();
         public Dictionary<EntityUid, (EntityUid Store, string ContractId)> ByProof { get; } = new();
         public Dictionary<EntityUid, (EntityUid Store, string ContractId)> ByRetrievalCargo { get; } = new();
@@ -27,6 +28,7 @@ public sealed partial class NcContractSystem
             ByPinpointer.Clear();
             PinpointerOwners.Clear();
             ByGuard.Clear();
+            ByDroneCore.Clear();
             ByProof.Clear();
             ByRetrievalCargo.Clear();
             ActiveTrackedDeliveryDropoffObjectives.Clear();

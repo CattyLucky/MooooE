@@ -62,6 +62,7 @@ public sealed partial class NcContractSystem : EntitySystem
         Hunt = 3,
         GhostRole = 4,
         ArtifactStudy = 5,
+        DroneHunt = 6,
     }
 
     private sealed class ContractPoolCandidate
@@ -69,6 +70,7 @@ public sealed partial class NcContractSystem : EntitySystem
         public NcArtifactStudyContractPrototype? ArtifactStudy;
         public NcGhostRoleContractPrototype? GhostRole;
         public NcHuntContractPrototype? Hunt;
+        public NcDroneHuntContractPrototype? DroneHunt;
         public string Id = string.Empty;
         public ContractPoolCandidateKind Kind;
         public string OfferPoolColor = string.Empty;

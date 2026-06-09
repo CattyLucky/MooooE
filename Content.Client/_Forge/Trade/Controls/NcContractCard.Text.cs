@@ -126,6 +126,9 @@ public sealed partial class NcContractCard
     {
         if (ContractExecutionKinds.ToObjectiveType(c.ExecutionKind) == ContractObjectiveType.Hunt)
         {
+            if (c.ExecutionKind == ContractExecutionKind.DroneHuntObjective)
+                return Loc.GetString("nc-store-contract-drone-hunt-turn-in-header");
+
             return c.HuntCompletionMode switch
             {
                 NcHuntCompletionMode.BodyTurnIn => Loc.GetString("nc-store-contract-hunt-body-turn-in-header"),
@@ -147,6 +150,13 @@ public sealed partial class NcContractCard
 
         if (ContractExecutionKinds.ToObjectiveType(c.ExecutionKind) == ContractObjectiveType.Hunt)
         {
+            if (c.ExecutionKind == ContractExecutionKind.DroneHuntObjective)
+            {
+                return Loc.GetString(
+                    "nc-store-contract-drone-hunt-turn-in-note",
+                    ("item", ResolveProtoName(c.TurnInItem)));
+            }
+
             return c.HuntCompletionMode switch
             {
                 NcHuntCompletionMode.BodyTurnIn => Loc.GetString(

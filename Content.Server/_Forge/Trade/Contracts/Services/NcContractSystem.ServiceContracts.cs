@@ -7,6 +7,7 @@ internal interface IContractObjectiveRuntimeStore
     HashSet<(EntityUid Store, string ContractId)> ActiveRetrievalRouteDeliveries { get; }
     HashSet<(EntityUid Store, string ContractId)> ActiveTrackedDeliveryDropoffObjectives { get; }
     Dictionary<EntityUid, (EntityUid Store, string ContractId)> ByGuard { get; }
+    Dictionary<EntityUid, (EntityUid Store, string ContractId)> ByDroneCore { get; }
     Dictionary<EntityUid, (EntityUid Store, string ContractId)> ByPinpointer { get; }
     Dictionary<EntityUid, (EntityUid Store, string ContractId)> ByProof { get; }
     Dictionary<EntityUid, (EntityUid Store, string ContractId)> ByRetrievalCargo { get; }

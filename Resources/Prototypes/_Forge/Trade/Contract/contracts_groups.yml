@@ -104,6 +104,29 @@
   - MobRogueSiliconCatcher
 
 - type: ncHuntGroup
+  id: ForgeDroneHuntGroupCores
+  name: "AI-ядро дрон-шаттла"
+  description: "Любое контрактное ядро вражеского дрон-шаттла, пригодное как доказательство перехвата."
+  icon: NpcStationAiRammer
+  prototypes:
+  - NpcStationAiRammer
+  - NpcStationAiApproacher
+  - NpcStationAiApproacherDodger
+  - NpcStationAiRammerSmart
+  - NpcStationAiRammerSmartDodging
+  - NpcStationAiRammerStraight
+  - NpcStationAiAttacker
+  - NpcStationAiShooter
+  - NpcStationAiAttackerSmart
+  - NpcStationAiAttackerStaticSmart
+  - NpcStationAiAttackerBroadside
+  - NpcDroneAiMedusa
+  - NpcDroneAiAssembly
+  - NpcDroneAiMPulsar
+  - NpcDroneAiLance
+  - NpcDroneAiQuake
+
+- type: ncHuntGroup
   id: ForgeHuntGroupSyndicatePatrol
   name: "синдикатский патруль"
   description: "Вооружённые агенты Синдиката, удерживающие дрейфующий объект."

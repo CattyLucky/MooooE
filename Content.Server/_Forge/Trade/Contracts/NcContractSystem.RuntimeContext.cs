@@ -29,6 +29,7 @@ public sealed partial class NcContractSystem : EntitySystem
         NormalizeHuntDungeonExteriorTileConfig(config.HuntDungeonExteriorTiles);
         NormalizeHuntDungeonExteriorRockConfig(config.HuntDungeonExteriorRocks);
         NormalizeHuntDebrisPlacementConfig(config);
+        NormalizeDroneHuntConfig(config);
 
         NormalizeRetrievalSpawnConfig(config);
         config.RetrievalDestinationRadius = Math.Max(0.25f, config.RetrievalDestinationRadius);
@@ -115,6 +116,50 @@ public sealed partial class NcContractSystem : EntitySystem
             NcContractTuning.HuntDebrisSpawnSafetyRadius);
         config.HuntDebrisPlacementAttempts = NormalizePositiveOrDefault(
             config.HuntDebrisPlacementAttempts,
+            NcContractTuning.HuntDebrisSpawnPlacementAttempts);
+    }
+
+    private static void NormalizeDroneHuntConfig(ContractObjectiveConfigData config)
+    {
+        if (!config.DroneHuntEnabled)
+        {
+            config.DroneHuntGrids.Clear();
+            config.DroneHuntCorePrototypes.Clear();
+            config.DroneHuntMinDistance = 0f;
+            config.DroneHuntMaxDistance = 0f;
+            config.DroneHuntSafetyRadius = 0f;
+            config.DroneHuntPlacementAttempts = 0;
+            return;
+        }
+
+        for (var i = config.DroneHuntGrids.Count - 1; i >= 0; i--)
+        {
+            var entry = config.DroneHuntGrids[i];
+            if (entry == null ||
+                string.IsNullOrWhiteSpace(entry.Path.ToString()) ||
+                entry.Weight <= 0)
+            {
+                config.DroneHuntGrids.RemoveAt(i);
+            }
+        }
+
+        RemoveBlankStrings(config.DroneHuntCorePrototypes);
+
+        config.DroneHuntMinDistance = NormalizePositiveOrDefault(
+            config.DroneHuntMinDistance,
+            NcContractTuning.HuntDebrisMinSpawnDistance);
+        config.DroneHuntMaxDistance = NormalizePositiveOrDefault(
+            config.DroneHuntMaxDistance,
+            config.DroneHuntMinDistance);
+
+        if (config.DroneHuntMaxDistance < config.DroneHuntMinDistance)
+            config.DroneHuntMaxDistance = config.DroneHuntMinDistance;
+
+        config.DroneHuntSafetyRadius = NormalizePositiveOrDefault(
+            config.DroneHuntSafetyRadius,
+            NcContractTuning.HuntDebrisSpawnSafetyRadius);
+        config.DroneHuntPlacementAttempts = NormalizePositiveOrDefault(
+            config.DroneHuntPlacementAttempts,
             NcContractTuning.HuntDebrisSpawnPlacementAttempts);
     }
 

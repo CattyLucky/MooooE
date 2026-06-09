@@ -1,7 +1,7 @@
 - type: storeContractsPreset
   id: ForgeExpeditionContractsPreset
   contractOffers:
-    maxVisible: 13
+    maxVisible: 15
     groups:
     - pool: ForgeExpeditionFoodOrders
       minVisible: 1
@@ -18,6 +18,10 @@
     - pool: ForgeExpeditionFieldOrders
       minVisible: 2
       maxVisible: 3
+      fillWeight: 2
+    - pool: ForgeExpeditionDroneHuntOrders
+      minVisible: 1
+      maxVisible: 2
       fillWeight: 2
     - pool: ForgeExpeditionArtifactStudyOrders
       minVisible: 3
@@ -176,4 +180,20 @@
     weight: 1
   - type: ArtifactStudy
     id: ForgeArtifactStudyHard
+    weight: 1
+
+- type: ncContractOfferPool
+  id: ForgeExpeditionDroneHuntOrders
+  name: "Перехват"
+  order: 22
+  color: "#C66868"
+  entries:
+  - type: DroneHunt
+    id: ForgeDroneHuntLight
+    weight: 4
+  - type: DroneHunt
+    id: ForgeDroneHuntMedium
+    weight: 2
+  - type: DroneHunt
+    id: ForgeDroneHuntHeavy
     weight: 1

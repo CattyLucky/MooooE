@@ -170,6 +170,17 @@ nc-store-contract-hunt-body-action-progress = Targets: { $progress }/{ $required
 nc-store-contract-hunt-body-action-ready = Drag the body to the trader.
 nc-store-contract-hunt-target-lost = The hunt target was lost before all stages were completed. The contract has failed.
 nc-store-contract-hunt-next-target-spawn-failed = Could not spawn the next hunt target stage. The contract has failed.
+nc-store-contract-drone-hunt-mode = Drone intercept
+nc-store-contract-drone-hunt-mode-tooltip = An enemy drone shuttle appears after acceptance. Destroy its AI core and bring back the proof core.
+nc-store-contract-drone-hunt-turn-in-header = Turn in core:
+nc-store-contract-drone-hunt-turn-in-note = A proof item appears after the AI core is destroyed: { $item }. Take it and bring it to the trader.
+nc-store-contract-drone-hunt-status-available = The contract drone shuttle appears after acceptance.
+nc-store-contract-drone-hunt-status-progress = Destroy the drone shuttle AI core: { $progress }/{ $required }.
+nc-store-contract-drone-hunt-status-ready = Proof core acquired. Bring it to the trader and complete the order.
+nc-store-contract-drone-hunt-action-available = Accept the intercept.
+nc-store-contract-drone-hunt-action-progress = AI core: { $progress }/{ $required }. Proof appears after destruction.
+nc-store-contract-drone-hunt-action-ready = Turn in the proof core to the trader.
+nc-store-contract-drone-hunt-target-lost = The contract drone shuttle was lost before its AI core was destroyed. The contract has failed.
 
 nc-store-contract-artifact-study-status-available = A contract artifact will appear after acceptance.
 nc-store-contract-artifact-study-status-active = Fully study the contract artifact.

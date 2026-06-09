@@ -44,21 +44,31 @@ public sealed partial class NcContractCard
             _ => string.Empty
         };
 
-    private static string BuildHuntModeName(ContractClientData data) =>
-        data.HuntCompletionMode switch
+    private static string BuildHuntModeName(ContractClientData data)
+    {
+        if (data.ExecutionKind == ContractExecutionKind.DroneHuntObjective)
+            return Loc.GetString("nc-store-contract-drone-hunt-mode");
+
+        return data.HuntCompletionMode switch
         {
             NcHuntCompletionMode.BodyTurnIn => Loc.GetString("nc-store-contract-hunt-mode-body"),
             NcHuntCompletionMode.TrophyTurnIn => Loc.GetString("nc-store-contract-hunt-mode-trophy"),
             _ => Loc.GetString("nc-store-contract-hunt-mode-unknown")
         };
+    }
 
-    private static string BuildHuntModeHint(ContractClientData data) =>
-        data.HuntCompletionMode switch
+    private static string BuildHuntModeHint(ContractClientData data)
+    {
+        if (data.ExecutionKind == ContractExecutionKind.DroneHuntObjective)
+            return Loc.GetString("nc-store-contract-drone-hunt-mode-tooltip");
+
+        return data.HuntCompletionMode switch
         {
             NcHuntCompletionMode.BodyTurnIn => Loc.GetString("nc-store-contract-hunt-mode-body-tooltip"),
             NcHuntCompletionMode.TrophyTurnIn => Loc.GetString("nc-store-contract-hunt-mode-trophy-tooltip"),
             _ => string.Empty
         };
+    }
 
     private static string BuildGhostRoleStatusText(ContractClientData data)
     {
@@ -133,6 +143,20 @@ public sealed partial class NcContractCard
 
         var max = CalculateRouteRequiredTotal(data);
         var progress = Math.Clamp(data.Progress, 0, max);
+
+        if (data.ExecutionKind == ContractExecutionKind.DroneHuntObjective)
+        {
+            return data.FlowStatus switch
+            {
+                ContractFlowStatus.Available => Loc.GetString("nc-store-contract-drone-hunt-status-available"),
+                ContractFlowStatus.InProgress => Loc.GetString(
+                    "nc-store-contract-drone-hunt-status-progress",
+                    ("progress", progress),
+                    ("required", max)),
+                ContractFlowStatus.ReadyToTurnIn => Loc.GetString("nc-store-contract-drone-hunt-status-ready"),
+                _ => string.Empty
+            };
+        }
 
         return data.HuntCompletionMode switch
         {
@@ -214,6 +238,20 @@ public sealed partial class NcContractCard
     {
         var max = CalculateRouteRequiredTotal(data);
         var progress = Math.Clamp(data.Progress, 0, max);
+
+        if (data.ExecutionKind == ContractExecutionKind.DroneHuntObjective)
+        {
+            return data.FlowStatus switch
+            {
+                ContractFlowStatus.Available => Loc.GetString("nc-store-contract-drone-hunt-action-available"),
+                ContractFlowStatus.InProgress => Loc.GetString(
+                    "nc-store-contract-drone-hunt-action-progress",
+                    ("progress", progress),
+                    ("required", max)),
+                ContractFlowStatus.ReadyToTurnIn => Loc.GetString("nc-store-contract-drone-hunt-action-ready"),
+                _ => string.Empty
+            };
+        }
 
         return data.HuntCompletionMode switch
         {

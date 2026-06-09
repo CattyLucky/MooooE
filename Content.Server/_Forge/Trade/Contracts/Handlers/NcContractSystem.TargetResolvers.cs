@@ -13,6 +13,7 @@ public sealed partial class NcContractSystem : EntitySystem
         RegisterTargetResolver(new TrackedDeliveryTargetResolver());
         RegisterTargetResolver(new RetrievalRouteDeliveryTargetResolver());
         RegisterTargetResolver(new HuntTargetResolver());
+        RegisterTargetResolver(new DroneHuntTargetResolver());
         RegisterTargetResolver(new GhostRoleTargetResolver());
         RegisterTargetResolver(new ArtifactStudyTargetResolver());
         RegisterAdditionalTargetResolvers();
@@ -219,6 +220,33 @@ public sealed partial class NcContractSystem : EntitySystem
     private sealed class HuntTargetResolver : ContractTargetResolverBase
     {
         public override ContractExecutionKind Kind => ContractExecutionKind.HuntObjective;
+    }
+
+    private sealed class DroneHuntTargetResolver : ContractTargetResolverBase
+    {
+        public override ContractExecutionKind Kind => ContractExecutionKind.DroneHuntObjective;
+
+        public override bool TryRefreshPinpointerState(
+            NcContractSystem system,
+            EntityUid store,
+            string contractId,
+            ContractServerData contract
+        )
+        {
+            system.SyncDroneHuntObjectiveProgress(store, contractId, contract);
+            return true;
+        }
+
+        protected override bool TryResolveActiveObjectiveTarget(
+            NcContractSystem system,
+            EntityUid store,
+            ContractServerData contract,
+            ObjectiveRuntimeState state,
+            out EntityUid target
+        )
+        {
+            return system.TryResolveDroneHuntPinpointerTarget(store, state, out target);
+        }
     }
 
     private sealed class GhostRoleTargetResolver : ContractTargetResolverBase

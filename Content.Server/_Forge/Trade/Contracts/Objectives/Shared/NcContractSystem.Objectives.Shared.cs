@@ -15,6 +15,8 @@ public sealed partial class NcContractSystem : EntitySystem
         if (_objectiveRuntime.ByGuard.Remove(args.Entity, out var guardKey) &&
             _objectiveRuntime.ByContract.TryGetValue(guardKey, out var guardState))
             guardState.GuardEntities.Remove(args.Entity);
+        if (_objectiveRuntime.ByDroneCore.Remove(args.Entity, out var droneCoreKey))
+            OnContractDroneCoreLost(droneCoreKey, args.Entity);
         if (_objectiveRuntime.ByProof.Remove(args.Entity, out var proofKey))
             OnObjectiveTrackedProofDestroyed(proofKey, args.Entity);
 
