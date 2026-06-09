@@ -27,7 +27,7 @@ public sealed partial class StoreStructuredSystem : EntitySystem
     private const int MaxDynamicUpdatesPerTick = 8;
     private const int MaxRealtimeDynamicUpdatesPerTick = 8;
     private static readonly TimeSpan InvalidContractWarningInterval = TimeSpan.FromSeconds(5);
-    private static readonly ISawmill Sawmill = Logger.GetSawmill("ncstore-structured");
+    private static ISawmill Sawmill => Logger.GetSawmill("ncstore-structured");
     private static readonly TimeSpan RealtimeOpenStoreUpdateInterval = TimeSpan.FromSeconds(0.25);
     private static readonly TimeSpan OpenStoreValidityCheckInterval = TimeSpan.FromSeconds(0.5);
     private readonly HashSet<StoreUserKey> _affectedStoreUsersScratch = new();

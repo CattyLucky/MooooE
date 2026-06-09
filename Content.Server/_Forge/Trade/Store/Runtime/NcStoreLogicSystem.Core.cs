@@ -12,7 +12,7 @@ namespace Content.Server._Forge.Trade;
 
 public sealed partial class NcStoreLogicSystem : EntitySystem, IStoreRewardExecutionService, IStoreCurrencyDebitService
 {
-    private static readonly ISawmill Sawmill = Logger.GetSawmill("ncstore-logic");
+    private static ISawmill Sawmill => Logger.GetSawmill("ncstore-logic");
     private static readonly IComparer<string> OrdinalIds = new OrdinalIdComparer();
 
     [Dependency] private readonly IComponentFactory _compFactory = default!;

@@ -10,7 +10,7 @@ namespace Content.Server._Forge.Trade;
 /// </summary>
 public sealed partial class StackCurrencyHandler : ICurrencyHandler
 {
-    private static readonly ISawmill Sawmill = Logger.GetSawmill("ncstore-logic");
+    private static ISawmill Sawmill => Logger.GetSawmill("ncstore-logic");
     private readonly IEntityManager _ents;
     private readonly SharedHandsSystem _hands;
     private readonly NcStoreInventorySystem _inventory;

@@ -6,7 +6,7 @@ namespace Content.Server._Forge.Trade;
 public sealed partial class StoreSystemStructuredLoader : EntitySystem
 {
     private const int MaxRewardPoolTraversalDepth = 6;
-    private static readonly ISawmill Sawmill = Logger.GetSawmill("ncstore-loader");
+    private static ISawmill Sawmill => Logger.GetSawmill("ncstore-loader");
 
     [Dependency] private readonly NcContractSystem _contracts = default!;
     [Dependency] private readonly NcStoreCurrencySystem _currency = default!;

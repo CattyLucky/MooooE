@@ -12,7 +12,7 @@ public sealed class BankCurrencyHandler : ICurrencyHandler
 {
     public const string CurrencyId = "BankCredit";
 
-    private static readonly ISawmill Sawmill = Logger.GetSawmill("ncstore-logic");
+    private static ISawmill Sawmill => Logger.GetSawmill("ncstore-logic");
     private readonly BankSystem _bank;
     private readonly IConfigurationManager _cfg;
     private readonly IEntityManager _ents;

@@ -18,7 +18,7 @@ public sealed class NcStoreSystem : EntitySystem
     private const float MaxCrateDistance = 4f;
     private const int MaxTransactionCount = 1000;
     private static readonly TimeSpan InvalidMessageWarningInterval = TimeSpan.FromSeconds(5);
-    private static readonly ISawmill Sawmill = Logger.GetSawmill("ncstore");
+    private static ISawmill Sawmill => Logger.GetSawmill("ncstore");
 
     private static readonly SoundSpecifier TransactionSuccessSound =
         new SoundPathSpecifier("/Audio/Effects/Cargo/ping.ogg");

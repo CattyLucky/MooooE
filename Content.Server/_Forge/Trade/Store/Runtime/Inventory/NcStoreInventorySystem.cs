@@ -8,7 +8,7 @@ namespace Content.Server._Forge.Trade;
 public sealed partial class NcStoreInventorySystem : EntitySystem
 {
     private const int UncachedRevision = int.MinValue;
-    private static readonly ISawmill Sawmill = Logger.GetSawmill("ncstore-inventory");
+    private static ISawmill Sawmill => Logger.GetSawmill("ncstore-inventory");
 
     [Dependency] private readonly IComponentFactory _compFactory = default!;
     [Dependency] private readonly IEntityManager _ents = default!;
