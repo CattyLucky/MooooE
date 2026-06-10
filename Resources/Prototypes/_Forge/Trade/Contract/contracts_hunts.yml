@@ -52,10 +52,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 20000
+    count: 70000
   - type: Pool
     pool: ForgeExpeditionRewardAdvanced
-    count: { min: 1, max: 3 }
+    count: { min: 3, max: 5 }
 
 - type: ncHuntContract
   id: ForgeHuntEasyArgocyteScouts
@@ -111,10 +111,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 20000
+    count: 70000
   - type: Pool
     pool: ForgeExpeditionRewardBasic
-    count: { min: 1, max: 3 }
+    count: { min: 3, max: 5 }
 
 - type: ncHuntContract
   id: ForgeHuntEasyDinosaurNest
@@ -170,10 +170,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 20000
+    count: 70000
   - type: Pool
     pool: ForgeExpeditionRewardBasic
-    count: { min: 1, max: 3 }
+    count: { min: 3, max: 5 }
 
 - type: ncHuntContract
   id: ForgeHuntEasyRogueScrap
@@ -229,10 +229,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 20000
+    count: 70000
   - type: Pool
     pool: ForgeExpeditionRewardBasic
-    count: { min: 1, max: 3 }
+    count: { min: 3, max: 5 }
 
 - type: ncHuntContract
   id: ForgeHuntEasyFleshGrowths
@@ -288,10 +288,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 20000
+    count: 70000
   - type: Pool
     pool: ForgeExpeditionRewardBasic
-    count: { min: 1, max: 3 }
+    count: { min: 3, max: 5 }
 
 - type: ncHuntContract
   id: ForgeHuntMediumArgocyteBrood
@@ -347,10 +347,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 50000
+    count: 130000
   - type: Pool
     pool: ForgeExpeditionRewardAdvanced
-    count: { min: 1, max: 3 }
+    count: { min: 4, max: 6 }
 
 - type: ncHuntContract
   id: ForgeHuntMediumRoguePatrol
@@ -406,10 +406,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 50000
+    count: 130000
   - type: Pool
     pool: ForgeExpeditionRewardAdvanced
-    count: { min: 1, max: 3 }
+    count: { min: 4, max: 6 }
 
 - type: ncHuntContract
   id: ForgeHuntMediumDinosaurPack
@@ -465,10 +465,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 50000
+    count: 130000
   - type: Pool
     pool: ForgeExpeditionRewardAdvanced
-    count: { min: 1, max: 3 }
+    count: { min: 4, max: 6 }
 
 - type: ncHuntContract
   id: ForgeHuntMediumSyndicatePatrol
@@ -524,10 +524,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 50000
+    count: 130000
   - type: Pool
     pool: ForgeExpeditionRewardAdvanced
-    count: { min: 1, max: 3 }
+    count: { min: 4, max: 6 }
 
 - type: ncHuntContract
   id: ForgeHuntHardFleshHorror
@@ -585,10 +585,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 70000
+    count: 200000
   - type: Pool
     pool: ForgeExpeditionRewardElite
-    count: { min: 1, max: 3 }
+    count: { min: 5, max: 7 }
 
 - type: ncHuntContract
   id: ForgeHuntHardArgocyteLeviathan
@@ -646,10 +646,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 70000
+    count: 200000
   - type: Pool
     pool: ForgeExpeditionRewardElite
-    count: { min: 1, max: 3 }
+    count: { min: 5, max: 7 }
 
 - type: ncHuntContract
   id: ForgeHuntHardRogueAiCore
@@ -707,10 +707,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 70000
+    count: 200000
   - type: Pool
     pool: ForgeExpeditionRewardElite
-    count: { min: 1, max: 3 }
+    count: { min: 5, max: 7 }
 
 - type: ncHuntContract
   id: ForgeHuntHardSyndicateCommander
@@ -768,7 +768,7 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 70000
+    count: 200000
   - type: Pool
     pool: ForgeExpeditionRewardElite
-    count: { min: 1, max: 3 }
+    count: { min: 5, max: 7 }

@@ -21,10 +21,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 35000
+    count: 100000
   - type: Pool
     pool: ForgeExpeditionRewardBasic
-    count: { min: 1, max: 3 }
+    count: { min: 3, max: 5 }
 
 - type: ncDroneHuntContract
   id: ForgeDroneHuntMedium
@@ -49,10 +49,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 60000
+    count: 175000
   - type: Pool
     pool: ForgeExpeditionRewardAdvanced
-    count: { min: 1, max: 3 }
+    count: { min: 4, max: 6 }
 
 - type: ncDroneHuntContract
   id: ForgeDroneHuntHeavy
@@ -77,7 +77,7 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 90000
+    count: 275000
   - type: Pool
     pool: ForgeExpeditionRewardElite
-    count: { min: 1, max: 3 }
+    count: { min: 5, max: 8 }

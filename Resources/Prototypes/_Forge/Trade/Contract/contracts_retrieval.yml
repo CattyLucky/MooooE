@@ -10,10 +10,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 10000
+    count: 40000
   - type: Pool
     pool: ForgeExpeditionRewardBasic
-    count: { min: 1, max: 3 }
+    count: { min: 2, max: 4 }
 
 - type: ncRetrievalContract
   id: ForgeRetrievalMediumMedicalCrate
@@ -27,10 +27,10 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 30000
+    count: 85000
   - type: Pool
     pool: ForgeExpeditionRewardAdvanced
-    count: { min: 1, max: 3 }
+    count: { min: 3, max: 5 }
 
 - type: ncRetrievalContract
   id: ForgeRetrievalHardSecureCrate
@@ -44,7 +44,7 @@
   reward:
   - type: Currency
     currency: BankCredit
-    count: 45000
+    count: 140000
   - type: Pool
     pool: ForgeExpeditionRewardElite
-    count: { min: 1, max: 3 }
+    count: { min: 4, max: 6 }
