@@ -1,4 +1,5 @@
 using Content.Shared.Mind;
+using Content.Shared.Movement.Pulling.Components;
 using Robust.Shared.Player;
 
 namespace Content.Server._Forge.Trade;
@@ -65,8 +66,12 @@ public sealed partial class NcContractSystem : EntitySystem
         {
             _objectiveRuntime.ByProof.Remove(proof);
 
-            if (!TerminatingOrDeleted(proof))
+            if (!state.DroneHuntActive &&
+                deleteTrackedEntities &&
+                !TerminatingOrDeleted(proof))
+            {
                 Del(proof);
+            }
         }
 
         state.ProofEntity = null;
@@ -113,9 +118,6 @@ public sealed partial class NcContractSystem : EntitySystem
             {
                 var core = state.DroneHuntCoreTargets[i];
                 _objectiveRuntime.ByDroneCore.Remove(core);
-
-                if (deleteTrackedEntities && core != EntityUid.Invalid && !TerminatingOrDeleted(core))
-                    Del(core);
             }
 
             state.DroneHuntCoreTargets.Clear();
@@ -252,13 +254,13 @@ public sealed partial class NcContractSystem : EntitySystem
         if (!deleteDebris || debris == EntityUid.Invalid || TerminatingOrDeleted(debris))
             return;
 
-        if (HuntDebrisHasAttachedPlayer(debris))
+        if (HuntDebrisHasAttachedPlayerOrPulledEntity(debris))
         {
             QueueHuntDebrisDeletion(debris);
             return;
         }
 
-        Del(debris);
+        DeleteHuntDebrisEntity(debris);
     }
 
     private void QueueHuntDebrisDeletion(EntityUid debris)
@@ -283,10 +285,10 @@ public sealed partial class NcContractSystem : EntitySystem
                 continue;
             }
 
-            if (HuntDebrisHasAttachedPlayer(debris))
+            if (HuntDebrisHasAttachedPlayerOrPulledEntity(debris))
                 continue;
 
-            Del(debris);
+            DeleteHuntDebrisEntity(debris);
             _huntDebrisPendingDeletionScratch.Add(debris);
         }
 
@@ -304,7 +306,12 @@ public sealed partial class NcContractSystem : EntitySystem
         _huntDebrisPendingDeletionScratch.Clear();
     }
 
-    private bool HuntDebrisHasAttachedPlayer(EntityUid debris)
+    private void DeleteHuntDebrisEntity(EntityUid debris)
+    {
+        _linkedLifecycleGrid.UnparentPlayersFromGrid(debris, true);
+    }
+
+    private bool HuntDebrisHasAttachedPlayerOrPulledEntity(EntityUid debris)
     {
         var query = EntityQueryEnumerator<ActorComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out _, out var xform))
@@ -315,8 +322,27 @@ public sealed partial class NcContractSystem : EntitySystem
             {
                 return true;
             }
+
+            if (TryComp(uid, out PullerComponent? puller) &&
+                IsPulledEntityOnHuntDebris(puller.Pulling, debris))
+            {
+                return true;
+            }
         }
 
         return false;
+    }
+
+    private bool IsPulledEntityOnHuntDebris(EntityUid? pulled, EntityUid debris)
+    {
+        if (pulled is not { } pulledUid ||
+            pulledUid == EntityUid.Invalid ||
+            TerminatingOrDeleted(pulledUid) ||
+            !TryComp(pulledUid, out TransformComponent? pulledXform))
+        {
+            return false;
+        }
+
+        return pulledXform.GridUid == debris;
     }
 }

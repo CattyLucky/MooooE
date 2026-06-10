@@ -234,6 +234,7 @@ public sealed partial class NcStoreLogicSystem
         }
 
         var currencyTransactionActive = false;
+        var currencyDebitTransactionActive = false;
 
         try
         {
@@ -297,9 +298,21 @@ public sealed partial class NcStoreLogicSystem
 
             if (preCommit != null)
             {
+                if (!BeginCurrencyDebitTransaction())
+                {
+                    _spawnService.RollbackRewardTransaction();
+                    RollbackCurrencyIssueTransactionIfNeeded(receiver, ref currencyTransactionActive);
+                    reason = $"{context}: currency debit transaction is already in progress.";
+                    Sawmill.Error($"[NcStore] {reason}");
+                    return false;
+                }
+
+                currencyDebitTransactionActive = true;
+
                 var preCommitFailure = preCommit();
                 if (!string.IsNullOrWhiteSpace(preCommitFailure))
                 {
+                    RollbackCurrencyDebitTransactionIfNeeded(receiver, ref currencyDebitTransactionActive);
                     _spawnService.RollbackRewardTransaction();
                     RollbackCurrencyIssueTransactionIfNeeded(receiver, ref currencyTransactionActive);
                     InvalidateInventoryCache(receiver);
@@ -307,6 +320,19 @@ public sealed partial class NcStoreLogicSystem
                     Sawmill.Warning($"[NcStore] {reason}");
                     return false;
                 }
+
+                if (!CommitCurrencyDebitTransaction(receiver))
+                {
+                    RollbackCurrencyDebitTransactionIfNeeded(receiver, ref currencyDebitTransactionActive);
+                    _spawnService.RollbackRewardTransaction();
+                    RollbackCurrencyIssueTransactionIfNeeded(receiver, ref currencyTransactionActive);
+                    InvalidateInventoryCache(receiver);
+                    reason = $"{context}: failed to commit currency debit transaction.";
+                    Sawmill.Error($"[NcStore] {reason}");
+                    return false;
+                }
+
+                currencyDebitTransactionActive = false;
             }
 
             // From here on the reward/currency commits are finalization-only and must be
@@ -326,6 +352,7 @@ public sealed partial class NcStoreLogicSystem
         catch (Exception e)
         {
             _spawnService.RollbackRewardTransaction();
+            RollbackCurrencyDebitTransactionIfNeeded(receiver, ref currencyDebitTransactionActive);
             RollbackCurrencyIssueTransactionIfNeeded(receiver, ref currencyTransactionActive);
             InvalidateInventoryCache(receiver);
             reason = $"{context}: unexpected reward execution exception: {e.Message}";
@@ -353,6 +380,15 @@ public sealed partial class NcStoreLogicSystem
 
         RollbackCurrencyIssueTransaction(receiver);
         currencyTransactionActive = false;
+    }
+
+    private void RollbackCurrencyDebitTransactionIfNeeded(EntityUid receiver, ref bool currencyDebitTransactionActive)
+    {
+        if (!currencyDebitTransactionActive)
+            return;
+
+        RollbackCurrencyDebitTransaction(receiver);
+        currencyDebitTransactionActive = false;
     }
 
     private sealed class NcRewardExecutionPlan

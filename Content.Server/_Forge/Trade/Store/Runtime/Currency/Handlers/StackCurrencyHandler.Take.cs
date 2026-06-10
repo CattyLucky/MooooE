@@ -39,8 +39,15 @@ public sealed partial class StackCurrencyHandler : ICurrencyHandler
 
         _scratchCandidates.Sort((a, b) => a.Count.CompareTo(b.Count));
 
-        _takePendingDeletesScratch.Clear();
-        _takeStackRestoreScratch.Clear();
+        if (!_currencyDebitTransactionActive)
+        {
+            _takePendingDeletesScratch.Clear();
+            _takeStackRestoreScratch.Clear();
+        }
+
+        var pendingDeletes = _currencyDebitTransactionActive
+            ? _transactionTakePendingDeletesScratch
+            : _takePendingDeletesScratch;
 
         try
         {
@@ -65,14 +72,21 @@ public sealed partial class StackCurrencyHandler : ICurrencyHandler
                 _stacks.SetCount(ent, have - take, st);
                 left -= take;
 
-                if (st.Count <= 0)
-                    _takePendingDeletesScratch.Add(ent);
+                if (st.Count <= 0 && !pendingDeletes.Contains(ent))
+                    pendingDeletes.Add(ent);
             }
 
             if (left > 0)
             {
                 RollbackTakeJournal(user);
                 return false;
+            }
+
+            if (_currencyDebitTransactionActive)
+            {
+                ClearTakeJournal();
+                _inventory.InvalidateInventoryCache(user);
+                return true;
             }
 
             for (var i = 0; i < _takePendingDeletesScratch.Count; i++)

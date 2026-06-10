@@ -180,6 +180,59 @@ public sealed class NcStoreCurrencySystem : EntitySystem, IStoreCurrencyService
         }
     }
 
+    public bool BeginCurrencyDebitTransaction()
+    {
+        EnsureHandlersInitialized();
+
+        foreach (var h in _handlers)
+        {
+            if (h.BeginCurrencyDebitTransaction())
+                continue;
+
+            foreach (var rollback in _handlers)
+            {
+                rollback.RollbackCurrencyDebitTransaction(EntityUid.Invalid);
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public bool CommitCurrencyDebitTransaction(EntityUid user)
+    {
+        EnsureHandlersInitialized();
+
+        foreach (var h in _handlers)
+        {
+            if (h.PrepareCurrencyDebitTransaction(user))
+                continue;
+
+            return false;
+        }
+
+        foreach (var h in _handlers)
+        {
+            if (h.CommitCurrencyDebitTransaction(user))
+                continue;
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public void RollbackCurrencyDebitTransaction(EntityUid user)
+    {
+        EnsureHandlersInitialized();
+
+        foreach (var h in _handlers)
+        {
+            h.RollbackCurrencyDebitTransaction(user);
+        }
+    }
+
     public override void Initialize()
     {
         base.Initialize();

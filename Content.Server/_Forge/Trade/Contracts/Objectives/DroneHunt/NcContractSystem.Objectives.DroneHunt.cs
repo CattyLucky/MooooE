@@ -50,13 +50,6 @@ public sealed partial class NcContractSystem : EntitySystem
         var previousProgress = contract.Progress;
         var previousStatus = contract.FlowStatus;
 
-        if (!state.ProofSpawned)
-        {
-            var completionCoords = OffsetDroneHuntProofCoordinates(ResolveDroneHuntCompletionCoordinates(key.Store, state));
-            if (!TrySpawnRequiredObjectiveProofOrFail(key, comp, contract, completionCoords))
-                return;
-        }
-
         if (TryGetLiveObjectiveProof(state, out var proof))
             RetargetObjectivePinpointers(key, state, proof);
 
@@ -243,18 +236,19 @@ public sealed partial class NcContractSystem : EntitySystem
         if (string.IsNullOrWhiteSpace(state.ProofToken))
             return false;
 
-        if (ContainsMatchingDroneHuntProof(userItems, key, state, proofPrototype))
+        if (ContainsMatchingDroneHuntProof(userItems, key, contract, state, proofPrototype))
             return true;
 
-        if (ContainsMatchingDroneHuntProof(crateItems, key, state, proofPrototype))
+        if (ContainsMatchingDroneHuntProof(crateItems, key, contract, state, proofPrototype))
             return true;
 
-        return TryFindNearbyStoreObjectiveProof(store, key, state, proofPrototype, out _);
+        return TryFindNearbyStoreObjectiveProof(store, key, contract, state, proofPrototype, out _);
     }
 
     private bool ContainsMatchingDroneHuntProof(
         IReadOnlyList<EntityUid>? items,
         (EntityUid Store, string ContractId) key,
+        ContractServerData contract,
         ObjectiveRuntimeState state,
         string proofPrototype
     )
@@ -264,7 +258,7 @@ public sealed partial class NcContractSystem : EntitySystem
 
         for (var i = 0; i < items.Count; i++)
         {
-            if (IsMatchingObjectiveProof(items[i], key, state, proofPrototype, out _))
+            if (IsMatchingObjectiveProof(items[i], key, contract, state, proofPrototype, out _))
                 return true;
         }
 

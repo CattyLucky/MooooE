@@ -355,6 +355,7 @@ public sealed partial class NcContractSystem : EntitySystem
         }
 
         var found = 0;
+        var proofAssigned = false;
         var query = EntityQueryEnumerator<TransformComponent>();
         while (query.MoveNext(out var uid, out var xform))
         {
@@ -373,25 +374,39 @@ public sealed partial class NcContractSystem : EntitySystem
             state.DroneHuntCoreTargets.Add(uid);
             found++;
 
+            if (!proofAssigned)
+            {
+                AssignDroneHuntProofCore(key, state, uid);
+                proofAssigned = true;
+            }
+
             if (state.LastKnownTargetCoordinates == null && TryComp(uid, out TransformComponent? coreXform))
                 state.LastKnownTargetCoordinates = coreXform.Coordinates;
         }
 
         _droneHuntCorePrototypeScratch.Clear();
 
-        if (found > 0)
-        {
-            var proofCoords = OffsetDroneHuntProofCoordinates(ResolveDroneHuntCompletionCoordinates(key.Store, state));
-            if (TrySpawnObjectiveProof(key, contract, proofCoords))
-                return true;
-
-            Sawmill.Warning(
-                $"[Contracts] Drone hunt runtime init failed for '{key.ContractId}': proof core could not be spawned.");
-            return false;
-        }
+        if (found > 0 && proofAssigned)
+            return true;
 
         Sawmill.Warning(
             $"[Contracts] Drone hunt runtime init failed for '{key.ContractId}': loaded grid has no configured AI cores.");
         return false;
+    }
+
+    private void AssignDroneHuntProofCore(
+        (EntityUid Store, string ContractId) key,
+        ObjectiveRuntimeState state,
+        EntityUid core
+    )
+    {
+        var proof = EnsureComp<NcContractProofComponent>(core);
+        proof.Store = key.Store;
+        proof.ContractId = key.ContractId;
+        proof.ProofToken = GetOrCreateObjectiveProofToken(state);
+
+        state.ProofEntity = core;
+        state.ProofSpawned = true;
+        _objectiveRuntime.ByProof[core] = key;
     }
 }

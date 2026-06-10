@@ -32,7 +32,9 @@ public sealed partial class StackCurrencyHandler : ICurrencyHandler
             TryPickupIssuedCurrencyBestEffort(user, ent);
         }
 
-        _inventory.InvalidateInventoryCache(user);
+        if (user != EntityUid.Invalid)
+            _inventory.InvalidateInventoryCache(user);
+
         _currencyIssueTransactionActive = false;
         _transactionIssueSpawnedScratch.Clear();
         _transactionIssueStackRestoreScratch.Clear();
@@ -59,11 +61,59 @@ public sealed partial class StackCurrencyHandler : ICurrencyHandler
             DeleteFinalEntityBestEffort(ent, "CurrencyIssueRollback");
         }
 
-        _inventory.InvalidateInventoryCache(user);
+        if (user != EntityUid.Invalid)
+            _inventory.InvalidateInventoryCache(user);
+
         _currencyIssueTransactionActive = false;
         _transactionIssueSpawnedScratch.Clear();
         _transactionIssueStackRestoreScratch.Clear();
         ClearIssueJournal();
+    }
+
+    public bool BeginCurrencyDebitTransaction()
+    {
+        if (_currencyDebitTransactionActive)
+            return false;
+
+        ClearTakeJournal();
+        _transactionTakePendingDeletesScratch.Clear();
+        _transactionTakeStackRestoreScratch.Clear();
+        _currencyDebitTransactionActive = true;
+        return true;
+    }
+
+    public bool CommitCurrencyDebitTransaction(EntityUid user)
+    {
+        if (!_currencyDebitTransactionActive)
+            return true;
+
+        for (var i = 0; i < _transactionTakePendingDeletesScratch.Count; i++)
+        {
+            var ent = _transactionTakePendingDeletesScratch[i];
+            DeleteFinalEntityBestEffort(ent, "CurrencyTake");
+        }
+
+        if (user != EntityUid.Invalid)
+            _inventory.InvalidateInventoryCache(user);
+
+        _currencyDebitTransactionActive = false;
+        _transactionTakePendingDeletesScratch.Clear();
+        _transactionTakeStackRestoreScratch.Clear();
+        ClearTakeJournal();
+        return true;
+    }
+
+    public bool PrepareCurrencyDebitTransaction(EntityUid user)
+    {
+        return true;
+    }
+
+    public void RollbackCurrencyDebitTransaction(EntityUid user)
+    {
+        if (!_currencyDebitTransactionActive)
+            return;
+
+        RollbackTakeJournal(user);
     }
 
     private void HandleSuccessfulIssueJournal(EntityUid user)
@@ -128,7 +178,9 @@ public sealed partial class StackCurrencyHandler : ICurrencyHandler
             DeleteFinalEntityBestEffort(ent, "CurrencyIssueRollback");
         }
 
-        _inventory.InvalidateInventoryCache(user);
+        if (user != EntityUid.Invalid)
+            _inventory.InvalidateInventoryCache(user);
+
         ClearIssueJournal();
     }
 
@@ -167,25 +219,42 @@ public sealed partial class StackCurrencyHandler : ICurrencyHandler
 
     private void TrackTakeStackRestore(EntityUid ent, int previousCount)
     {
-        for (var i = 0; i < _takeStackRestoreScratch.Count; i++)
+        var target = _currencyDebitTransactionActive
+            ? _transactionTakeStackRestoreScratch
+            : _takeStackRestoreScratch;
+
+        for (var i = 0; i < target.Count; i++)
         {
-            if (_takeStackRestoreScratch[i].Ent == ent)
+            if (target[i].Ent == ent)
                 return;
         }
 
-        _takeStackRestoreScratch.Add((ent, previousCount));
+        target.Add((ent, previousCount));
     }
 
     private void RollbackTakeJournal(EntityUid user)
     {
-        for (var i = _takeStackRestoreScratch.Count - 1; i >= 0; i--)
+        var target = _currencyDebitTransactionActive
+            ? _transactionTakeStackRestoreScratch
+            : _takeStackRestoreScratch;
+
+        for (var i = target.Count - 1; i >= 0; i--)
         {
-            var (ent, previousCount) = _takeStackRestoreScratch[i];
+            var (ent, previousCount) = target[i];
             if (_ents.TryGetComponent(ent, out StackComponent? stack))
                 _stacks.SetCount(ent, previousCount, stack);
         }
 
-        _inventory.InvalidateInventoryCache(user);
+        if (user != EntityUid.Invalid)
+            _inventory.InvalidateInventoryCache(user);
+
+        if (_currencyDebitTransactionActive)
+        {
+            _currencyDebitTransactionActive = false;
+            _transactionTakePendingDeletesScratch.Clear();
+            _transactionTakeStackRestoreScratch.Clear();
+        }
+
         ClearTakeJournal();
     }
 

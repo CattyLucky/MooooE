@@ -32,6 +32,9 @@ internal interface IStoreCurrencyService
     bool BeginCurrencyIssueTransaction();
     void CommitCurrencyIssueTransaction(EntityUid user);
     void RollbackCurrencyIssueTransaction(EntityUid user);
+    bool BeginCurrencyDebitTransaction();
+    bool CommitCurrencyDebitTransaction(EntityUid user);
+    void RollbackCurrencyDebitTransaction(EntityUid user);
 }
 
 internal interface IStoreCurrencyDebitService
@@ -84,5 +87,5 @@ internal interface IStoreTransactionCoordinator
 {
     List<ContractRewardData> BuildSingleReward(StoreRewardType type, string id, int amount);
     List<ContractRewardData> BuildCurrencyRewards(IReadOnlyDictionary<string, int> incomeByCurrency);
-    string? TryCommitInventoryTake(string context, Func<string?> takeAction);
+    string? TryCommitInventoryTake(string context, EntityUid root, Func<string?> takeAction);
 }

@@ -1,3 +1,4 @@
+using Content.Server.StationEvents.Events;
 using Content.Shared._Forge.Trade;
 using Content.Shared.Chemistry.EntitySystems;
 using Robust.Shared.ContentPack;
@@ -17,6 +18,7 @@ public sealed partial class NcContractSystem : EntitySystem
     [Dependency] private readonly IComponentFactory _compFactory = default!;
     private readonly Dictionary<string, int> _depthCache = new(StringComparer.Ordinal);
     [Dependency] private readonly NcStoreInventorySystem _inventory = default!;
+    [Dependency] private readonly LinkedLifecycleGridSystem _linkedLifecycleGrid = default!;
     [Dependency] private readonly NcStoreLogicSystem _logic = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutions = default!;

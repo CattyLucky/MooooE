@@ -35,7 +35,7 @@ public sealed partial class NcStoreLogicSystem
             return rewards;
         }
 
-        public string? TryCommitInventoryTake(string context, Func<string?> takeAction)
+        public string? TryCommitInventoryTake(string context, EntityUid root, Func<string?> takeAction)
         {
             if (!_sys._inventory.BeginTakeTransaction())
                 return $"{context}: inventory take transaction is already active.";
@@ -45,8 +45,16 @@ public sealed partial class NcStoreLogicSystem
                 var failure = takeAction();
                 if (!string.IsNullOrWhiteSpace(failure))
                 {
+                    _sys.RollbackCurrencyDebitTransaction(root);
                     _sys._inventory.RollbackTakeTransaction();
                     return failure;
+                }
+
+                if (!_sys.CommitCurrencyDebitTransaction(root))
+                {
+                    _sys.RollbackCurrencyDebitTransaction(root);
+                    _sys._inventory.RollbackTakeTransaction();
+                    return $"{context}: failed to commit currency debit transaction.";
                 }
 
                 _sys._inventory.CommitTakeTransaction();
@@ -54,6 +62,7 @@ public sealed partial class NcStoreLogicSystem
             }
             catch (Exception e)
             {
+                _sys.RollbackCurrencyDebitTransaction(root);
                 _sys._inventory.RollbackTakeTransaction();
                 return $"{context}: inventory take transaction threw {e.GetType().Name}: {e.Message}";
             }

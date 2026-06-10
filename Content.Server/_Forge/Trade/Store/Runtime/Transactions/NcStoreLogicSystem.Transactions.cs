@@ -313,6 +313,7 @@ public sealed partial class NcStoreLogicSystem
     {
         return _transactionCoordinator.TryCommitInventoryTake(
             "Sell",
+            root,
             () =>
             {
                 if (TryValidateListingRemainingForCommit(listing, amount, "sell") is { } remainingFail)

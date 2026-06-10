@@ -16,7 +16,9 @@ public sealed class BankCurrencyHandler : ICurrencyHandler
     private readonly BankSystem _bank;
     private readonly IConfigurationManager _cfg;
     private readonly IEntityManager _ents;
+    private readonly Dictionary<EntityUid, int> _pendingDebit = new();
     private readonly Dictionary<EntityUid, int> _pendingIssue = new();
+    private bool _currencyDebitTransactionActive;
     private bool _currencyIssueTransactionActive;
 
     public BankCurrencyHandler(BankSystem bank, IEntityManager ents, IConfigurationManager cfg)
@@ -42,7 +44,13 @@ public sealed class BankCurrencyHandler : ICurrencyHandler
         if (!CanHandle(currencyId))
             return false;
 
-        return _bank.TryGetBalance(user, out balance);
+        if (!_bank.TryGetBalance(user, out balance))
+            return false;
+
+        if (_currencyDebitTransactionActive)
+            balance = Math.Max(0, balance - GetPendingDebit(user));
+
+        return true;
     }
 
     public bool TryTake(EntityUid user, string currencyId, int amount)
@@ -52,7 +60,19 @@ public sealed class BankCurrencyHandler : ICurrencyHandler
         if (!CanHandle(currencyId))
             return false;
 
-        return _bank.TryBankWithdraw(user, amount);
+        if (!_currencyDebitTransactionActive)
+            return _bank.TryBankWithdraw(user, amount);
+
+        if (!_bank.TryGetBalance(user, out var balance))
+            return false;
+
+        var pending = GetPendingDebit(user);
+        var total = (long)pending + amount;
+        if (total <= 0 || total > int.MaxValue || balance < total)
+            return false;
+
+        _pendingDebit[user] = (int)total;
+        return true;
     }
 
     public bool TryGiveCurrency(EntityUid user, string currencyId, int amount)
@@ -114,6 +134,74 @@ public sealed class BankCurrencyHandler : ICurrencyHandler
         _currencyIssueTransactionActive = false;
     }
 
+    public bool BeginCurrencyDebitTransaction()
+    {
+        if (_currencyDebitTransactionActive)
+            return false;
+
+        _pendingDebit.Clear();
+        _currencyDebitTransactionActive = true;
+        return true;
+    }
+
+    public bool CommitCurrencyDebitTransaction(EntityUid user)
+    {
+        if (!_currencyDebitTransactionActive)
+            return true;
+
+        if (!PrepareCurrencyDebitTransaction(user))
+            return false;
+
+        foreach (var (target, amount) in _pendingDebit)
+        {
+            if (amount <= 0)
+                continue;
+
+            if (_bank.TryBankWithdraw(target, amount))
+                continue;
+
+            Sawmill.Error(
+                $"[NcStore] Failed to commit bank currency debit '{CurrencyId}' x{amount} from {target}.");
+            _pendingDebit.Clear();
+            _currencyDebitTransactionActive = false;
+            return false;
+        }
+
+        _pendingDebit.Clear();
+        _currencyDebitTransactionActive = false;
+        return true;
+    }
+
+    public bool PrepareCurrencyDebitTransaction(EntityUid user)
+    {
+        if (!_currencyDebitTransactionActive)
+            return true;
+
+        foreach (var (target, amount) in _pendingDebit)
+        {
+            if (amount <= 0)
+                continue;
+
+            if (_bank.TryGetBalance(target, out var balance) && balance >= amount)
+                continue;
+
+            Sawmill.Error(
+                $"[NcStore] Failed to prepare bank currency debit '{CurrencyId}' x{amount} from {target}.");
+            return false;
+        }
+
+        return true;
+    }
+
+    public void RollbackCurrencyDebitTransaction(EntityUid user)
+    {
+        if (!_currencyDebitTransactionActive)
+            return;
+
+        _pendingDebit.Clear();
+        _currencyDebitTransactionActive = false;
+    }
+
     public bool CanGiveCurrency(EntityUid user, string currencyId, int amount)
     {
         if (amount <= 0)
@@ -139,5 +227,13 @@ public sealed class BankCurrencyHandler : ICurrencyHandler
             return 0;
 
         return _pendingIssue.GetValueOrDefault(user);
+    }
+
+    private int GetPendingDebit(EntityUid user)
+    {
+        if (!_currencyDebitTransactionActive)
+            return 0;
+
+        return _pendingDebit.GetValueOrDefault(user);
     }
 }

@@ -85,6 +85,21 @@ public sealed partial class NcStoreLogicSystem
         Currency.RollbackCurrencyIssueTransaction(user);
     }
 
+    private bool BeginCurrencyDebitTransaction()
+    {
+        return Currency.BeginCurrencyDebitTransaction();
+    }
+
+    private bool CommitCurrencyDebitTransaction(EntityUid user)
+    {
+        return Currency.CommitCurrencyDebitTransaction(user);
+    }
+
+    private void RollbackCurrencyDebitTransaction(EntityUid user)
+    {
+        Currency.RollbackCurrencyDebitTransaction(user);
+    }
+
 
     private sealed partial class StoreSpawnService : IStoreRewardSpawner
     {

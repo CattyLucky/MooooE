@@ -51,6 +51,27 @@ public interface ICurrencyHandler
     void RollbackCurrencyIssueTransaction(EntityUid user);
 
     /// <summary>
+    ///     Opens a short-lived debit transaction. While active, implementations should stage
+    ///     destructive currency takes until commit when possible.
+    /// </summary>
+    bool BeginCurrencyDebitTransaction();
+
+    /// <summary>
+    ///     Checks that all staged currency debits can still be finalized.
+    /// </summary>
+    bool PrepareCurrencyDebitTransaction(EntityUid user);
+
+    /// <summary>
+    ///     Finalizes staged currency debit side effects after every handler prepared successfully.
+    /// </summary>
+    bool CommitCurrencyDebitTransaction(EntityUid user);
+
+    /// <summary>
+    ///     Rolls back staged currency debit side effects for the payer.
+    /// </summary>
+    void RollbackCurrencyDebitTransaction(EntityUid user);
+
+    /// <summary>
     ///     Returns true when a later <see cref="TryGiveCurrency" /> call is expected to be able to pay this receiver.
     ///     This is used before destructive sell/claim operations so unsupported currencies fail before items are removed.
     /// </summary>

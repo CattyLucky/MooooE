@@ -24,7 +24,10 @@ public sealed partial class StackCurrencyHandler : ICurrencyHandler
     private readonly List<(EntityUid Ent, int PreviousCount)> _takeStackRestoreScratch = new();
     private readonly List<EntityUid> _transactionIssueSpawnedScratch = new();
     private readonly List<(EntityUid Ent, int PreviousCount)> _transactionIssueStackRestoreScratch = new();
+    private readonly List<EntityUid> _transactionTakePendingDeletesScratch = new();
+    private readonly List<(EntityUid Ent, int PreviousCount)> _transactionTakeStackRestoreScratch = new();
     private readonly SharedTransformSystem _xform;
+    private bool _currencyDebitTransactionActive;
     private bool _currencyIssueTransactionActive;
 
     public StackCurrencyHandler(

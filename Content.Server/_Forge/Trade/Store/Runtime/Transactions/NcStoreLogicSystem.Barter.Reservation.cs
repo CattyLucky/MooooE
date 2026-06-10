@@ -11,6 +11,7 @@ public sealed partial class NcStoreLogicSystem
 
         return _transactionCoordinator.TryCommitInventoryTake(
             "BarterCost",
+            root,
             () =>
             {
                 for (var i = 0; i < plan.Reservations.Count; i++)

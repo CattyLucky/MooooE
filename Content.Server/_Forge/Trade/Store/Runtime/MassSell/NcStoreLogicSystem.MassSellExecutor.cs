@@ -46,6 +46,7 @@ public sealed partial class NcStoreLogicSystem
     {
         return _transactionCoordinator.TryCommitInventoryTake(
             "MassSell",
+            container,
             () =>
             {
                 for (var i = 0; i < plan.Steps.Count; i++)

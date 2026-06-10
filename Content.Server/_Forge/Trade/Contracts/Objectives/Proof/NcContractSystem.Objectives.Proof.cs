@@ -148,7 +148,7 @@ public sealed partial class NcContractSystem : EntitySystem
     {
         var userItems = new List<EntityUid>(32);
         _logic.ScanInventoryItems(user, userItems);
-        if (TryFindObjectiveProofInSource(user, userItems, key, state, proofPrototype, out proof))
+        if (TryFindObjectiveProofInSource(user, userItems, key, contract, state, proofPrototype, out proof))
             return true;
 
         var crateUid = _logic.GetPulledClosedCrate(user);
@@ -156,7 +156,7 @@ public sealed partial class NcContractSystem : EntitySystem
         {
             var crateItems = new List<EntityUid>(32);
             _logic.ScanInventoryItems(pulledCrate, crateItems);
-            if (TryFindObjectiveProofInSource(pulledCrate, crateItems, key, state, proofPrototype, out proof))
+            if (TryFindObjectiveProofInSource(pulledCrate, crateItems, key, contract, state, proofPrototype, out proof))
                 return true;
         }
 
@@ -166,13 +166,14 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
         }
 
-        return TryFindNearbyStoreObjectiveProof(store, key, state, proofPrototype, out proof);
+        return TryFindNearbyStoreObjectiveProof(store, key, contract, state, proofPrototype, out proof);
     }
 
     private bool TryFindObjectiveProofInSource(
         EntityUid root,
         IReadOnlyList<EntityUid> items,
         (EntityUid Store, string ContractId) key,
+        ContractServerData contract,
         ObjectiveRuntimeState state,
         string proofPrototype,
         out EntityUid proof
@@ -184,7 +185,7 @@ public sealed partial class NcContractSystem : EntitySystem
             if (!CanUseContractPlanningEntity(root, ent, false))
                 continue;
 
-            if (IsMatchingObjectiveProof(ent, key, state, proofPrototype, out _))
+            if (IsMatchingObjectiveProof(ent, key, contract, state, proofPrototype, out _))
             {
                 proof = ent;
                 return true;
@@ -198,6 +199,7 @@ public sealed partial class NcContractSystem : EntitySystem
     private bool TryFindNearbyStoreObjectiveProof(
         EntityUid store,
         (EntityUid Store, string ContractId) key,
+        ContractServerData contract,
         ObjectiveRuntimeState state,
         string proofPrototype,
         out EntityUid proof
@@ -211,7 +213,7 @@ public sealed partial class NcContractSystem : EntitySystem
             if (!CanUseNearbyStoreObjectiveProofEntity(store, ent))
                 continue;
 
-            if (IsMatchingObjectiveProof(ent, key, state, proofPrototype, out _))
+            if (IsMatchingObjectiveProof(ent, key, contract, state, proofPrototype, out _))
             {
                 proof = ent;
                 return true;
@@ -233,6 +235,7 @@ public sealed partial class NcContractSystem : EntitySystem
     private bool IsMatchingObjectiveProof(
         EntityUid ent,
         (EntityUid Store, string ContractId) key,
+        ContractServerData contract,
         ObjectiveRuntimeState state,
         string proofPrototype,
         out string rejectReason
@@ -244,9 +247,7 @@ public sealed partial class NcContractSystem : EntitySystem
             return false;
         }
 
-        if (!string.IsNullOrWhiteSpace(proofPrototype) &&
-            (!TryGetPlanningEntityPrototypeId(ent, out var candidatePrototype) ||
-             !string.Equals(candidatePrototype, proofPrototype, StringComparison.Ordinal)))
+        if (!IsAllowedObjectiveProofPrototype(ent, contract, proofPrototype))
         {
             rejectReason = "wrong prototype";
             return false;
@@ -281,6 +282,34 @@ public sealed partial class NcContractSystem : EntitySystem
         return false;
     }
 
+    private bool IsAllowedObjectiveProofPrototype(
+        EntityUid ent,
+        ContractServerData contract,
+        string proofPrototype
+    )
+    {
+        if (string.IsNullOrWhiteSpace(proofPrototype) && !contract.Config.DroneHuntEnabled)
+            return true;
+
+        if (!TryGetPlanningEntityPrototypeId(ent, out var candidatePrototype))
+            return false;
+
+        if (!string.IsNullOrWhiteSpace(proofPrototype) &&
+            string.Equals(candidatePrototype, proofPrototype, StringComparison.Ordinal))
+            return true;
+
+        if (!contract.Config.DroneHuntEnabled)
+            return false;
+
+        for (var i = 0; i < contract.Config.DroneHuntCorePrototypes.Count; i++)
+        {
+            if (string.Equals(candidatePrototype, contract.Config.DroneHuntCorePrototypes[i], StringComparison.Ordinal))
+                return true;
+        }
+
+        return false;
+    }
+
     private static bool CanUseTrackedProofEntityFallback(
         ContractServerData contract,
         ObjectiveRuntimeState state
@@ -311,6 +340,7 @@ public sealed partial class NcContractSystem : EntitySystem
     {
         var scanned = new List<EntityUid>(32);
         _logic.ScanInventoryItems(user, scanned);
+        var hasContract = TryGetObjectiveContract(key, out _, out var contract);
 
         var candidates = 0;
         for (var i = 0; i < scanned.Count; i++)
@@ -320,7 +350,10 @@ public sealed partial class NcContractSystem : EntitySystem
                 continue;
 
             candidates++;
-            IsMatchingObjectiveProof(ent, key, state, proofPrototype, out var reason);
+            if (!hasContract)
+                continue;
+
+            IsMatchingObjectiveProof(ent, key, contract, state, proofPrototype, out var reason);
             Sawmill.Info(
                 $"[Contracts] Proof candidate rejected for '{key.ContractId}' in user inventory: " +
                 $"{ToPrettyString(ent)}, reason='{reason}', expectedProto='{proofPrototype}'.");
