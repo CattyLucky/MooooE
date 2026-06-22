@@ -4,6 +4,7 @@ using Content.Server.Ghost.Roles.Components;
 using Content.Server.Mind;
 using Content.Server.Pinpointer;
 using Content.Server.Procedural;
+using Content.Server.Shuttles.Systems; // Forge-Change: hide hunt sites from IFF.
 using Content.Shared._Forge.Trade;
 using Content.Shared.Damage;
 using Content.Shared.GameTicking;
@@ -23,6 +24,7 @@ namespace Content.Server._Forge.Trade;
 public sealed partial class NcContractSystem : EntitySystem
 {
     [Dependency] private readonly MetaDataSystem _contractMeta = default!;
+    [Dependency] private readonly ShuttleSystem _contractShuttle = default!; // Forge-Change
     [Dependency] private readonly DungeonSystem _dungeon = default!;
     [Dependency] private readonly MindSystem _contractMind = default!;
     [Dependency] private readonly GhostRoleSystem _ghostRoles = default!;

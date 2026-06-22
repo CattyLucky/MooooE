@@ -14,15 +14,12 @@ public sealed partial class NcStoreLogicSystem
                 user,
                 count,
                 out var listing,
-                out var effectiveProtoId,
-                out _,
                 out var plan))
             return false;
 
-        var rewards = _transactionCoordinator.BuildSingleReward(
-            StoreRewardType.Item,
-            effectiveProtoId,
-            plan.TotalUnits);
+        if (!TryBuildBuyRewards(listing, plan, out var rewards)) // Forge-Change
+            return false;
+
         if (!TryExecuteRewardListWithPreCommit(
                 user,
                 rewards,
@@ -49,14 +46,10 @@ public sealed partial class NcStoreLogicSystem
         EntityUid user,
         int count,
         out NcStoreListingDef listing,
-        out string effectiveProtoId,
-        out EntityPrototype proto,
         out BuyExecutionPlan plan
     )
     {
         listing = default!;
-        effectiveProtoId = string.Empty;
-        proto = default!;
         plan = default;
 
         if (store == null || store.Listings.Count == 0 || count <= 0)
@@ -67,15 +60,7 @@ public sealed partial class NcStoreLogicSystem
                 out var foundListing))
             return false;
 
-        // Phase M2: for Matcher listings, ProductEntity is an NcMatcherPrototype id. Resolve
-        // it to a random concrete prototype from matcher.Items. For Exact listings, use the
-        // ProductEntity directly as the prototype ID.
-        if (!TryResolveBuyEffectiveProto(foundListing, out effectiveProtoId, out var foundProto) ||
-            foundProto == null)
-            return false;
-
         listing = foundListing;
-        proto = foundProto;
 
         _inventory.InvalidateInventoryCache(user);
         var snapshot = _inventory.BuildInventorySnapshot(user);
@@ -135,6 +120,36 @@ public sealed partial class NcStoreLogicSystem
 
         return true;
     }
+
+    // Forge-Change-start: resolve matcher listings per purchase so bulk buys can roll different items.
+    private bool TryBuildBuyRewards(
+        NcStoreListingDef listing,
+        BuyExecutionPlan plan,
+        out List<ContractRewardData> rewards
+    )
+    {
+        rewards = new List<ContractRewardData>();
+
+        if (listing.MatchMode != PrototypeMatchMode.Matcher)
+        {
+            if (!TryResolveBuyEffectiveProto(listing, out var effectiveProtoId, out _))
+                return false;
+
+            rewards.Add(new ContractRewardData(StoreRewardType.Item, effectiveProtoId, plan.TotalUnits));
+            return true;
+        }
+
+        for (var i = 0; i < plan.Purchases; i++)
+        {
+            if (!TryResolveBuyEffectiveProto(listing, out var effectiveProtoId, out _))
+                return false;
+
+            rewards.Add(new ContractRewardData(StoreRewardType.Item, effectiveProtoId, plan.UnitsPerPurchase));
+        }
+
+        return rewards.Count > 0;
+    }
+    // Forge-Change-end
 
     private static bool TryBuildBuyPlan(
         string currency,

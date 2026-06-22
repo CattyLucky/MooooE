@@ -7,6 +7,7 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Physics;
+using Content.Shared.Shuttles.Components; // Forge-Change: hide hunt sites from IFF.
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Map;
@@ -17,7 +18,19 @@ namespace Content.Server._Forge.Trade;
 
 public sealed partial class NcContractSystem : EntitySystem
 {
+    // Forge-Change-start: random fallback names for hidden hunt-site grids.
+    private static readonly string[] HuntSiteNameLocIds =
+    {
+        "nc-contract-hunt-site-name-drifting-object",
+        "nc-contract-hunt-site-name-derelict-ruins",
+        "nc-contract-hunt-site-name-anomalous-signature",
+        "nc-contract-hunt-site-name-abandoned-site",
+        "nc-contract-hunt-site-name-silent-wreck",
+    };
+    // Forge-Change-end
+
     private List<Entity<MapGridComponent>> _huntDebrisPlacementGridScratch = new();
+    private readonly List<DungeonRoom> _huntDungeonRoomScratch = new(); // Forge-Change
 
     private bool TrySpawnHuntTargets(
         EntityUid store,
@@ -118,6 +131,7 @@ public sealed partial class NcContractSystem : EntitySystem
             {
                 grid = _mapManager.CreateGridEntity(spawnMapCoords.MapId);
                 _xform.SetMapCoordinates(grid, spawnMapCoords);
+                ConfigureHuntSiteGrid(grid.Owner); // Forge-Change
             }
             catch (Exception e)
             {
@@ -225,6 +239,7 @@ public sealed partial class NcContractSystem : EntitySystem
 
             state.HuntDebrisEntity = debris;
             ForceLoadHuntDebris(debris);
+            ConfigureHuntSiteGrid(debris); // Forge-Change
 
             if (!TryComp(debris, out MapGridComponent? grid))
             {
@@ -256,6 +271,14 @@ public sealed partial class NcContractSystem : EntitySystem
             $"[Contracts] Hunt runtime init failed for '{contractId}': cannot find a free debris placement after {attempts} attempts.");
         return false;
     }
+
+    // Forge-Change-start: keep spawned hunt sites off radar and avoid default grid names if exposed.
+    private void ConfigureHuntSiteGrid(EntityUid site)
+    {
+        _contractMeta.SetEntityName(site, Loc.GetString(_random.Pick(HuntSiteNameLocIds)));
+        _contractShuttle.AddIFFFlag(site, IFFFlags.Hide);
+    }
+    // Forge-Change-end
 
     private bool TryGetHuntStoreFallbackCoordinates(EntityUid store, out EntityCoordinates coordinates)
     {
@@ -486,7 +509,7 @@ public sealed partial class NcContractSystem : EntitySystem
         }
 
         var spawnCoordinates = new List<EntityCoordinates>();
-        CollectHuntDebrisSpawnCoordinates(site, grid, spawnCoordinates);
+        CollectHuntDungeonSpawnCoordinates(site, grid, dungeons, spawnCoordinates); // Forge-Change
         if (spawnCoordinates.Count == 0)
         {
             FinalizeObjectiveTerminalOutcome(
@@ -560,6 +583,78 @@ public sealed partial class NcContractSystem : EntitySystem
             output.Add(_map.GridTileToLocal(debris, grid, tileRef.GridIndices));
         }
     }
+
+    // Forge-Change-start: prefer real dungeon rooms and leave the nearest room as an entry buffer.
+    private void CollectHuntDungeonSpawnCoordinates(
+        EntityUid site,
+        MapGridComponent grid,
+        IReadOnlyList<Dungeon> dungeons,
+        List<EntityCoordinates> output
+    )
+    {
+        output.Clear();
+        _huntDungeonRoomScratch.Clear();
+
+        for (var dungeonIndex = 0; dungeonIndex < dungeons.Count; dungeonIndex++)
+        {
+            var rooms = dungeons[dungeonIndex].Rooms;
+            for (var roomIndex = 0; roomIndex < rooms.Count; roomIndex++)
+            {
+                if (rooms[roomIndex].Tiles.Count > 0)
+                    _huntDungeonRoomScratch.Add(rooms[roomIndex]);
+            }
+        }
+
+        if (_huntDungeonRoomScratch.Count == 0)
+        {
+            CollectHuntDebrisSpawnCoordinates(site, grid, output);
+            return;
+        }
+
+        _huntDungeonRoomScratch.Sort(static (a, b) => a.Center.LengthSquared().CompareTo(b.Center.LengthSquared()));
+
+        var skippedEntryRooms = _huntDungeonRoomScratch.Count > 2 ? 1 : 0;
+        for (var i = skippedEntryRooms; i < _huntDungeonRoomScratch.Count; i++)
+            CollectHuntRoomSpawnCoordinates(site, grid, _huntDungeonRoomScratch[i], output);
+
+        if (output.Count == 0 && skippedEntryRooms > 0)
+        {
+            for (var i = 0; i < skippedEntryRooms; i++)
+                CollectHuntRoomSpawnCoordinates(site, grid, _huntDungeonRoomScratch[i], output);
+        }
+
+        _huntDungeonRoomScratch.Clear();
+    }
+
+    private void CollectHuntRoomSpawnCoordinates(
+        EntityUid site,
+        MapGridComponent grid,
+        DungeonRoom room,
+        List<EntityCoordinates> output
+    )
+    {
+        foreach (var tile in room.Tiles)
+            TryAddHuntTileSpawnCoordinate(site, grid, tile, output);
+    }
+
+    private bool TryAddHuntTileSpawnCoordinate(
+        EntityUid site,
+        MapGridComponent grid,
+        Vector2i tile,
+        List<EntityCoordinates> output
+    )
+    {
+        if (!_map.TryGetTileRef(site, grid, tile, out var tileRef) ||
+            tileRef.Tile.IsEmpty ||
+            _turf.IsTileBlocked(tileRef, CollisionGroup.MobMask))
+        {
+            return false;
+        }
+
+        output.Add(_map.GridTileToLocal(site, grid, tileRef.GridIndices));
+        return true;
+    }
+    // Forge-Change-end
 
     private bool TryAdvanceSpawnedHuntTargetProgress(
         EntityUid killedTarget,

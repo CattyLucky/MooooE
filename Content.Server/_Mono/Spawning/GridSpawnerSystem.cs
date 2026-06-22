@@ -1,3 +1,4 @@
+using Content.Server.RandomMetadata; // Forge-Change: apply late-added random metadata to spawned grids.
 using Content.Shared.Random.Helpers;
 using Robust.Shared.EntitySerialization.Systems;
 using Robust.Shared.Map;
@@ -13,6 +14,7 @@ public sealed partial class GridSpawnerSystem : EntitySystem
     [Dependency] private IRobustRandom _random = default!;
     [Dependency] private MapLoaderSystem _loader = default!;
     [Dependency] private MetaDataSystem _metadata = default!;
+    [Dependency] private RandomMetadataSystem _randomMetadata = default!; // Forge-Change
     [Dependency] private SharedTransformSystem _transform = default!;
 
     public override void Initialize()
@@ -42,6 +44,11 @@ public sealed partial class GridSpawnerSystem : EntitySystem
             }
 
             EntityManager.AddComponents(grid.Value, ent.Comp.AddComponents);
+
+            // Forge-Change-start: RandomMetadata is added after MapInit for spawned grids, so apply it manually.
+            if (TryComp<RandomMetadataComponent>(grid.Value, out var randomMetadata))
+                _randomMetadata.ApplyRandomMetadata(grid.Value, randomMetadata);
+            // Forge-Change-end
         }
     }
 }

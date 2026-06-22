@@ -14,27 +14,9 @@
       type: Store
     dungeons:
     - prototype: ForgeHuntDungeonMineshaft
-      weight: 1
+      weight: 6
     - prototype: ForgeHuntDungeonHaunted
-      weight: 1
-    - prototype: ForgeHuntDungeonSalvageOutpost
-      weight: 1
-    - prototype: ForgeHuntDungeonCaveFactory
-      weight: 1
-    - prototype: ForgeHuntDungeonMedSci
-      weight: 1
-    - prototype: ForgeHuntDungeonSnowyLabs
-      weight: 1
-    - prototype: ForgeHuntDungeonFactoryDorms
-      weight: 1
-    - prototype: ForgeHuntDungeonExperiment
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaMercenary
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaBrig
-      weight: 1
-    - prototype: ForgeHuntDungeonVirologyLab
-      weight: 1
+      weight: 4
   reward:
   - type: Currency
     currency: Credit
@@ -59,27 +41,9 @@
       type: Store
     dungeons:
     - prototype: ForgeHuntDungeonMineshaft
-      weight: 1
+      weight: 7
     - prototype: ForgeHuntDungeonHaunted
-      weight: 1
-    - prototype: ForgeHuntDungeonSalvageOutpost
-      weight: 1
-    - prototype: ForgeHuntDungeonCaveFactory
-      weight: 1
-    - prototype: ForgeHuntDungeonMedSci
-      weight: 1
-    - prototype: ForgeHuntDungeonSnowyLabs
-      weight: 1
-    - prototype: ForgeHuntDungeonFactoryDorms
-      weight: 1
-    - prototype: ForgeHuntDungeonExperiment
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaMercenary
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaBrig
-      weight: 1
-    - prototype: ForgeHuntDungeonVirologyLab
-      weight: 1
+      weight: 3
   reward:
   - type: Currency
     currency: Credit
@@ -104,27 +68,9 @@
       type: Store
     dungeons:
     - prototype: ForgeHuntDungeonHaunted
-      weight: 1
+      weight: 6
     - prototype: ForgeHuntDungeonMineshaft
-      weight: 1
-    - prototype: ForgeHuntDungeonSalvageOutpost
-      weight: 1
-    - prototype: ForgeHuntDungeonCaveFactory
-      weight: 1
-    - prototype: ForgeHuntDungeonMedSci
-      weight: 1
-    - prototype: ForgeHuntDungeonSnowyLabs
-      weight: 1
-    - prototype: ForgeHuntDungeonFactoryDorms
-      weight: 1
-    - prototype: ForgeHuntDungeonExperiment
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaMercenary
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaBrig
-      weight: 1
-    - prototype: ForgeHuntDungeonVirologyLab
-      weight: 1
+      weight: 4
   reward:
   - type: Currency
     currency: Credit
@@ -148,28 +94,12 @@
     point:
       type: Store
     dungeons:
-    - prototype: ForgeHuntDungeonMineshaft
-      weight: 1
-    - prototype: ForgeHuntDungeonHaunted
-      weight: 1
-    - prototype: ForgeHuntDungeonSalvageOutpost
-      weight: 1
     - prototype: ForgeHuntDungeonCaveFactory
-      weight: 1
-    - prototype: ForgeHuntDungeonMedSci
-      weight: 1
-    - prototype: ForgeHuntDungeonSnowyLabs
-      weight: 1
+      weight: 5
     - prototype: ForgeHuntDungeonFactoryDorms
-      weight: 1
-    - prototype: ForgeHuntDungeonExperiment
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaMercenary
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaBrig
-      weight: 1
-    - prototype: ForgeHuntDungeonVirologyLab
-      weight: 1
+      weight: 4
+    - prototype: ForgeHuntDungeonSalvageOutpost
+      weight: 2
   reward:
   - type: Currency
     currency: Credit
@@ -193,28 +123,10 @@
     point:
       type: Store
     dungeons:
-    - prototype: ForgeHuntDungeonHaunted
-      weight: 1
-    - prototype: ForgeHuntDungeonMineshaft
-      weight: 1
-    - prototype: ForgeHuntDungeonSalvageOutpost
-      weight: 1
-    - prototype: ForgeHuntDungeonCaveFactory
-      weight: 1
-    - prototype: ForgeHuntDungeonMedSci
-      weight: 1
-    - prototype: ForgeHuntDungeonSnowyLabs
-      weight: 1
-    - prototype: ForgeHuntDungeonFactoryDorms
-      weight: 1
     - prototype: ForgeHuntDungeonExperiment
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaMercenary
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaBrig
-      weight: 1
+      weight: 4
     - prototype: ForgeHuntDungeonVirologyLab
-      weight: 1
+      weight: 6
   reward:
   - type: Currency
     currency: Credit
@@ -239,27 +151,9 @@
       type: Store
     dungeons:
     - prototype: ForgeHuntDungeonMineshaft
-      weight: 1
+      weight: 7
     - prototype: ForgeHuntDungeonHaunted
-      weight: 1
-    - prototype: ForgeHuntDungeonSalvageOutpost
-      weight: 1
-    - prototype: ForgeHuntDungeonCaveFactory
-      weight: 1
-    - prototype: ForgeHuntDungeonMedSci
-      weight: 1
-    - prototype: ForgeHuntDungeonSnowyLabs
-      weight: 1
-    - prototype: ForgeHuntDungeonFactoryDorms
-      weight: 1
-    - prototype: ForgeHuntDungeonExperiment
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaMercenary
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaBrig
-      weight: 1
-    - prototype: ForgeHuntDungeonVirologyLab
-      weight: 1
+      weight: 3
   reward:
   - type: Currency
     currency: Credit
@@ -283,28 +177,12 @@
     point:
       type: Store
     dungeons:
-    - prototype: ForgeHuntDungeonMineshaft
-      weight: 1
-    - prototype: ForgeHuntDungeonHaunted
-      weight: 1
-    - prototype: ForgeHuntDungeonSalvageOutpost
-      weight: 1
     - prototype: ForgeHuntDungeonCaveFactory
-      weight: 1
-    - prototype: ForgeHuntDungeonMedSci
-      weight: 1
-    - prototype: ForgeHuntDungeonSnowyLabs
-      weight: 1
+      weight: 5
     - prototype: ForgeHuntDungeonFactoryDorms
-      weight: 1
-    - prototype: ForgeHuntDungeonExperiment
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaMercenary
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaBrig
-      weight: 1
-    - prototype: ForgeHuntDungeonVirologyLab
-      weight: 1
+      weight: 4
+    - prototype: ForgeHuntDungeonSalvageOutpost
+      weight: 2
   reward:
   - type: Currency
     currency: Credit
@@ -329,27 +207,9 @@
       type: Store
     dungeons:
     - prototype: ForgeHuntDungeonHaunted
-      weight: 1
+      weight: 6
     - prototype: ForgeHuntDungeonMineshaft
-      weight: 1
-    - prototype: ForgeHuntDungeonSalvageOutpost
-      weight: 1
-    - prototype: ForgeHuntDungeonCaveFactory
-      weight: 1
-    - prototype: ForgeHuntDungeonMedSci
-      weight: 1
-    - prototype: ForgeHuntDungeonSnowyLabs
-      weight: 1
-    - prototype: ForgeHuntDungeonFactoryDorms
-      weight: 1
-    - prototype: ForgeHuntDungeonExperiment
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaMercenary
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaBrig
-      weight: 1
-    - prototype: ForgeHuntDungeonVirologyLab
-      weight: 1
+      weight: 4
   reward:
   - type: Currency
     currency: Credit
@@ -373,28 +233,10 @@
     point:
       type: Store
     dungeons:
-    - prototype: ForgeHuntDungeonMineshaft
-      weight: 1
-    - prototype: ForgeHuntDungeonHaunted
-      weight: 1
-    - prototype: ForgeHuntDungeonSalvageOutpost
-      weight: 1
-    - prototype: ForgeHuntDungeonCaveFactory
-      weight: 1
-    - prototype: ForgeHuntDungeonMedSci
-      weight: 1
-    - prototype: ForgeHuntDungeonSnowyLabs
-      weight: 1
-    - prototype: ForgeHuntDungeonFactoryDorms
-      weight: 1
-    - prototype: ForgeHuntDungeonExperiment
-      weight: 1
     - prototype: ForgeHuntDungeonLavaMercenary
-      weight: 1
+      weight: 6
     - prototype: ForgeHuntDungeonLavaBrig
-      weight: 1
-    - prototype: ForgeHuntDungeonVirologyLab
-      weight: 1
+      weight: 4
   reward:
   - type: Currency
     currency: Credit
@@ -420,28 +262,10 @@
     point:
       type: Store
     dungeons:
-    - prototype: ForgeHuntDungeonMineshaft
-      weight: 1
-    - prototype: ForgeHuntDungeonHaunted
-      weight: 1
-    - prototype: ForgeHuntDungeonSalvageOutpost
-      weight: 1
-    - prototype: ForgeHuntDungeonCaveFactory
-      weight: 1
-    - prototype: ForgeHuntDungeonMedSci
-      weight: 1
-    - prototype: ForgeHuntDungeonSnowyLabs
-      weight: 1
-    - prototype: ForgeHuntDungeonFactoryDorms
-      weight: 1
     - prototype: ForgeHuntDungeonExperiment
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaMercenary
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaBrig
-      weight: 1
+      weight: 4
     - prototype: ForgeHuntDungeonVirologyLab
-      weight: 1
+      weight: 6
   reward:
   - type: Currency
     currency: Credit
@@ -468,27 +292,9 @@
       type: Store
     dungeons:
     - prototype: ForgeHuntDungeonMineshaft
-      weight: 1
+      weight: 7
     - prototype: ForgeHuntDungeonHaunted
-      weight: 1
-    - prototype: ForgeHuntDungeonSalvageOutpost
-      weight: 1
-    - prototype: ForgeHuntDungeonCaveFactory
-      weight: 1
-    - prototype: ForgeHuntDungeonMedSci
-      weight: 1
-    - prototype: ForgeHuntDungeonSnowyLabs
-      weight: 1
-    - prototype: ForgeHuntDungeonFactoryDorms
-      weight: 1
-    - prototype: ForgeHuntDungeonExperiment
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaMercenary
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaBrig
-      weight: 1
-    - prototype: ForgeHuntDungeonVirologyLab
-      weight: 1
+      weight: 3
   reward:
   - type: Currency
     currency: Credit
@@ -514,27 +320,11 @@
     point:
       type: Store
     dungeons:
-    - prototype: ForgeHuntDungeonMineshaft
-      weight: 1
-    - prototype: ForgeHuntDungeonHaunted
-      weight: 1
-    - prototype: ForgeHuntDungeonSalvageOutpost
-      weight: 1
     - prototype: ForgeHuntDungeonCaveFactory
-      weight: 1
-    - prototype: ForgeHuntDungeonMedSci
-      weight: 1
-    - prototype: ForgeHuntDungeonSnowyLabs
-      weight: 1
+      weight: 5
     - prototype: ForgeHuntDungeonFactoryDorms
-      weight: 1
-    - prototype: ForgeHuntDungeonExperiment
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaMercenary
-      weight: 1
-    - prototype: ForgeHuntDungeonLavaBrig
-      weight: 1
-    - prototype: ForgeHuntDungeonVirologyLab
+      weight: 4
+    - prototype: ForgeHuntDungeonSalvageOutpost
       weight: 1
   reward:
   - type: Currency
@@ -561,28 +351,10 @@
     point:
       type: Store
     dungeons:
-    - prototype: ForgeHuntDungeonMineshaft
-      weight: 1
-    - prototype: ForgeHuntDungeonHaunted
-      weight: 1
-    - prototype: ForgeHuntDungeonSalvageOutpost
-      weight: 1
-    - prototype: ForgeHuntDungeonCaveFactory
-      weight: 1
-    - prototype: ForgeHuntDungeonMedSci
-      weight: 1
-    - prototype: ForgeHuntDungeonSnowyLabs
-      weight: 1
-    - prototype: ForgeHuntDungeonFactoryDorms
-      weight: 1
-    - prototype: ForgeHuntDungeonExperiment
-      weight: 1
     - prototype: ForgeHuntDungeonLavaMercenary
-      weight: 1
+      weight: 6
     - prototype: ForgeHuntDungeonLavaBrig
-      weight: 1
-    - prototype: ForgeHuntDungeonVirologyLab
-      weight: 1
+      weight: 4
   reward:
   - type: Currency
     currency: Credit

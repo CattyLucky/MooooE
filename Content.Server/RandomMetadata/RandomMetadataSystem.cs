@@ -20,7 +20,14 @@ public sealed partial class RandomMetadataSystem : EntitySystem
     }
 
     // This is done on map init so that map-placed entities have it randomized each time the map loads, for fun.
+    // Forge-Change-start: allow late-added RandomMetadata components to be applied by grid spawners.
     private void OnMapInit(EntityUid uid, RandomMetadataComponent component, MapInitEvent args)
+    {
+        ApplyRandomMetadata(uid, component);
+    }
+
+    [PublicAPI]
+    public void ApplyRandomMetadata(EntityUid uid, RandomMetadataComponent component)
     {
         var meta = MetaData(uid);
 
@@ -35,6 +42,7 @@ public sealed partial class RandomMetadataSystem : EntitySystem
                 GetRandomFromSegments(component.DescriptionSegments, component.DescriptionSeparator), meta);
         }
     }
+    // Forge-Change-end
 
     /// <summary>
     /// Generates a random string from segments and a separator.
