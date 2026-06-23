@@ -43,6 +43,7 @@ public sealed partial class NcContractSystem : EntitySystem
     [Dependency] private readonly SharedTransformSystem _xform = default!;
 
     private TimeSpan _nextGhostRoleTimeoutCheck = TimeSpan.Zero;
+    private TimeSpan _nextActiveContractDeadlineCheck = TimeSpan.Zero;
     private TimeSpan _nextHuntPinpointerCheck = TimeSpan.Zero;
     private TimeSpan _nextRetrievalRouteDeliveryCheck = TimeSpan.Zero;
     private TimeSpan _nextTrackedDeliveryDropoffCheck = TimeSpan.Zero;
@@ -195,6 +196,12 @@ public sealed partial class NcContractSystem : EntitySystem
 
         if (_objectiveRuntime.ByContract.Count == 0)
             return;
+
+        if (_timing.CurTime >= _nextActiveContractDeadlineCheck)
+        {
+            _nextActiveContractDeadlineCheck = _timing.CurTime + NcContractTuning.ActiveContractDeadlineCheckInterval;
+            UpdateActiveContractDeadlines();
+        }
 
         if (_objectiveRuntime.ActiveTrackedDeliveryDropoffObjectives.Count > 0 &&
             _timing.CurTime >= _nextTrackedDeliveryDropoffCheck)
