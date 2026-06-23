@@ -29,6 +29,10 @@
     - RoundstartShipgunAmmo
     - MonoAttachmentsStatic
     dynamicPacks:
+    # Empire start
+    - HardsuitEmpirePack
+    - WeaponEmpirePack
+    - EmpireVoucherRecipePack
     # rogue start
     - MonoRogueWeaponsDynamicMelee
     - MonoRogueWeaponsDynamicRanged
@@ -102,6 +106,7 @@
     - MonoCentrifugeProcessingStatic
     dynamicPacks:
     - MonoUraniumProcessing
+    - MonoIriditeProcessing # Forge-Change
   - type: MaterialStorage
     whitelist:
       tags:
