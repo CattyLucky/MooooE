@@ -267,7 +267,10 @@ public sealed partial class NcContractSystem : EntitySystem
             ConfigureHuntSiteRadarContact(debris, contract);
             CollectHuntDebrisSpawnCoordinates(debris, grid, spawnCoordinates);
             if (spawnCoordinates.Count > 0)
+            {
+                ActivateContractNpcsOnGrid(debris);
                 return true;
+            }
 
             Sawmill.Warning(
                 $"[Contracts] Hunt runtime init failed for '{contractId}': debris '{debrisPrototype}' has no valid spawn tiles.");
@@ -590,6 +593,8 @@ public sealed partial class NcContractSystem : EntitySystem
             return;
         }
 
+        ActivateContractNpcsOnGrid(placedGrid.Owner);
+
         if (state.PinpointerEntities.Count > 0 &&
             TryResolveSpawnedHuntPinpointerTarget(key.Store, contract, state, out var pinpointerTarget))
         {
@@ -743,9 +748,11 @@ public sealed partial class NcContractSystem : EntitySystem
 
     private void ConfigureHuntSiteRadarContact(EntityUid grid, ContractServerData contract)
     {
-        _contractMeta.SetEntityName(grid, ResolveRuntimeGridName(contract, "опасный объект"));
-        _shuttle.SetIFFColor(grid, Color.FromHex("#d67e27"));
-        _shuttle.RemoveIFFFlag(grid, IFFFlags.Hide | IFFFlags.HideLabel | IFFFlags.HideLabelAlways);
+        TryConfigureContractRadarContact(
+            grid,
+            contract,
+            "опасный объект",
+            Color.FromHex("#d67e27"));
     }
 
     private static bool IsSelfContainedHuntDungeonPrototype(string prototypeId)

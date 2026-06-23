@@ -2,6 +2,7 @@ using Content.Server.GameTicking;
 using Content.Server.Ghost.Roles;
 using Content.Server.Ghost.Roles.Components;
 using Content.Server.Mind;
+using Content.Server.NPC.Systems;
 using Content.Server.Pinpointer;
 using Content.Server.Procedural;
 using Content.Shared._Forge.Trade;
@@ -30,6 +31,7 @@ public sealed partial class NcContractSystem : EntitySystem
     [Dependency] private readonly MetaDataSystem _contractMeta = default!;
     [Dependency] private readonly DungeonSystem _dungeon = default!;
     [Dependency] private readonly MindSystem _contractMind = default!;
+    [Dependency] private readonly NPCSystem _contractNpc = default!;
     [Dependency] private readonly GridFixtureSystem _gridFixture = default!;
     [Dependency] private readonly GhostRoleSystem _ghostRoles = default!;
     [Dependency] private readonly SharedMapSystem _map = default!;

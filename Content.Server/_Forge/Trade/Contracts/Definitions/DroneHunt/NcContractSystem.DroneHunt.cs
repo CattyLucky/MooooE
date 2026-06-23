@@ -335,10 +335,13 @@ public sealed partial class NcContractSystem : EntitySystem
 
     private void PrepareDroneHuntGrid(EntityUid grid, ContractServerData contract, NcDroneHuntGridEntry gridEntry)
     {
-        _contractMeta.SetEntityName(grid, ResolveRuntimeGridName(contract, "боевой дрон", gridEntry.GridNames));
-        _shuttle.SetIFFColor(grid, Color.FromHex("#9a2020"));
-        _shuttle.AddIFFFlag(grid, IFFFlags.AlwaysShowColor);
-        _shuttle.RemoveIFFFlag(grid, IFFFlags.Hide | IFFFlags.HideLabel | IFFFlags.HideLabelAlways);
+        TryConfigureContractRadarContact(
+            grid,
+            contract,
+            "боевой дрон",
+            Color.FromHex("#9a2020"),
+            alwaysShowColor: true,
+            localNames: gridEntry.GridNames);
     }
 
     private bool TryRegisterDroneHuntCores(
