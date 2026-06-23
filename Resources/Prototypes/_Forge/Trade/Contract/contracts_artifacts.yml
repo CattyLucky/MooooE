@@ -24,8 +24,11 @@
     prototype: SpawnDungeonLootMaterialsValuableFull
     count: { min: 2, max: 4 }
   - type: Pool
-    pool: ForgeArtifactStudyRewardBasic
+    pool: ForgeExpeditionRewardBasic
     count: { min: 1, max: 3 }
+  - type: Pool
+    pool: ForgeArtifactStudyResearchGeneratorChance
+    count: 1
 
 - type: ncArtifactStudyContract
   id: ForgeArtifactStudyMedium
@@ -53,8 +56,11 @@
     prototype: SpawnDungeonLootMaterialsValuableFull
     count: { min: 4, max: 7 }
   - type: Pool
-    pool: ForgeArtifactStudyRewardAdvanced
+    pool: ForgeExpeditionRewardAdvanced
     count: { min: 1, max: 3 }
+  - type: Pool
+    pool: ForgeArtifactStudyResearchGeneratorChance
+    count: 1
 
 - type: ncArtifactStudyContract
   id: ForgeArtifactStudyHard
@@ -82,8 +88,11 @@
     prototype: SpawnDungeonLootMaterialsValuableFull
     count: { min: 6, max: 10 }
   - type: Pool
-    pool: ForgeArtifactStudyRewardElite
+    pool: ForgeExpeditionRewardElite
     count: { min: 1, max: 3 }
   - type: Pool
     pool: ForgeExpeditionRewardEliteTechDisks
     count: { min: 1, max: 3 }
+  - type: Pool
+    pool: ForgeArtifactStudyResearchGeneratorChance
+    count: 1
