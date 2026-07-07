@@ -13,6 +13,7 @@
   canBeAntag: false
   icon: JobIconStationAi
   supervisors: job-supervisors-hire # Frontier: rd<hire
+  salary: 20000 # Frontier
   jobEntity: StationAiBrain
   jobPreviewEntity: PlayerStationAiPreview
   applyTraits: false
@@ -30,5 +31,6 @@
   canBeAntag: false
   icon: JobIconBorg
   supervisors: job-supervisors-hire # Frontier
+  salary: 20000 # Frontier
   jobEntity: PlayerBorgBattery
   applyTraits: false

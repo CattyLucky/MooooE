@@ -8,6 +8,7 @@
     - !type:OverallPlaytimeRequirement
       time: 144000 #40 hrs
   weight: 10
+  salary: 20000 # Frontier
   startingGear: ChiefEngineerGear
   icon: "JobIconChiefEngineer"
   supervisors: job-supervisors-captain

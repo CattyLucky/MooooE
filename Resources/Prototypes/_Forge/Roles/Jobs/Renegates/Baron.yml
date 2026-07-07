@@ -22,6 +22,7 @@
   supervisors: job-supervisors-nobody
   weight: 50
   displayWeight: 60
+  salary: 60000
   assignedCompany: Renegates
   assignedNationality: FreeColonies
   canBeAntag: false

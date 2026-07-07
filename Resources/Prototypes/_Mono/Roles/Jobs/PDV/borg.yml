@@ -11,5 +11,6 @@
   canBeAntag: false
   icon: JobIconBorg
   supervisors: job-supervisors-hire
+  salary: 20000 # Frontier
   jobEntity: PlayerBorgPDV
   applyTraits: false

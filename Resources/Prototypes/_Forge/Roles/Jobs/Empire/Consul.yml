@@ -33,6 +33,7 @@
   supervisors: job-supervisors-nobody
   weight: 30
   displayWeight: 30
+  salary: 40000
   canBeAntag: false
   setPreference: true
   access:

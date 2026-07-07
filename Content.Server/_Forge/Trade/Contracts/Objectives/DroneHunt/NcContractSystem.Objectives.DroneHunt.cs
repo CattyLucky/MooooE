@@ -66,10 +66,18 @@ public sealed partial class NcContractSystem : EntitySystem
     )
     {
         EnsureObjectiveRuntimeDefaults(contract);
-        SyncDroneHuntObjectiveProgress(store, contractId, contract);
+        ScanTrackedDeliveryTransferSources(user, out var userItems, out _, out var crateItems);
+        RefreshDroneHuntObjectiveProgressFromProofScan(store, contractId, contract, userItems, crateItems);
 
         if (contract.Runtime.Failed)
             return ClaimAttemptResult.Fail(ClaimFailureReason.ObjectiveFailed, contract.Runtime.FailureReason);
+
+        if (!contract.Completed)
+        {
+            return ClaimAttemptResult.Fail(
+                ClaimFailureReason.ObjectiveNotCompleted,
+                $"Drone hunt proof progress {contract.Progress}/{contract.Required} for '{contractId}'.");
+        }
 
         if (!TryValidateDroneHuntProofClaim(store, user, contractId, contract, out var proofFail))
             return proofFail;

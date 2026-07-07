@@ -6,6 +6,7 @@
   icon: "JobIconContractor"
   supervisors: job-supervisors-hire
   displayWeight: 40 # Top
+  salary: 0 # Frontier
   accessGroups: # Frontier
   - GeneralAccess # Frontier
   special:

@@ -14,6 +14,7 @@
   supervisors: job-supervisors-sr
   weight: 100
   displayWeight: 40
+  salary: 20000 # Frontier
   assignedCompany: Colonial
   canBeAntag: false
   access:

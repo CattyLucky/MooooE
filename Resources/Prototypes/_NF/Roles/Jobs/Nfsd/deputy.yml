@@ -12,6 +12,7 @@
   supervisors: job-supervisors-sergeant
   weight: 130
   displayWeight: 40
+  salary: 20000 # Frontier
   hideConsoleVisibility: true #Forge Change
   canBeAntag: false
  # guides: [ BasicLore, TransSolarFederation ] # Forge-Change-delete

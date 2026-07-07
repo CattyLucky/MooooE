@@ -23,6 +23,7 @@
   startingGear: AuxiliaGear
   weight: 15
   displayWeight: 15
+  salary: 30000
   canBeAntag: false
   setPreference: true
   assignedCompany: Imperial

@@ -31,6 +31,7 @@
   supervisors: job-supervisors-inquisitor-grand
   weight: 30
   displayWeight: 30
+  salary: 55000
   canBeAntag: false
   setPreference: true
   access:

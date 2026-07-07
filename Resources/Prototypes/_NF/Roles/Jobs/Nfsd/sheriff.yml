@@ -21,6 +21,7 @@
   supervisors: job-supervisors-centcom
   weight: 180
   displayWeight: 70
+  salary: 20000 # Frontier
   hideConsoleVisibility: true #Forge Change
   canBeAntag: false
  # guides: [ BasicLore, TransSolarFederation ] # Forge-Change-delete

@@ -26,6 +26,7 @@
   supervisors: job-supervisors-centcom
   weight: 170
   displayWeight: 60 # Forge
+  salary: 60000 # Frontier
   canBeAntag: false
   access:
   - NtSecApartment

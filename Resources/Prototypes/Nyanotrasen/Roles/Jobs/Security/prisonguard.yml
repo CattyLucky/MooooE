@@ -13,6 +13,7 @@
   startingGear: PrisonGuardGear
   icon: "JobIconWarden"
   supervisors: job-supervisors-bailiff # Frontier
+  salary: 20000 # Frontier
   canBeAntag: false
   access:
   - Security

@@ -11,6 +11,7 @@
   supervisors: job-supervisors-tsf-rangers
   weight: 70
   displayWeight: 25
+  salary: 20000
   assignedCompany: TSF
   assignedNationality: TransSolarFederation
   canBeAntag: false

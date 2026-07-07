@@ -16,6 +16,7 @@
   supervisors: job-supervisors-Draftsman
   weight: 50
   displayWeight: 20
+  salary: 50000
   assignedCompany: Renegates
   assignedNationality: FreeColonies
   canBeAntag: false

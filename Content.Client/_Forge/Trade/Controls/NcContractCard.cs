@@ -548,8 +548,32 @@ public sealed partial class NcContractCard : PanelContainer
             return;
         }
 
-        if (canClaim || canPartialTurnIn)
-            OnClaim?.Invoke(_data.Id);
+        if (canClaim)
+        {
+            var contractId = _data.Id;
+            ShowContractConfirmation(
+                Loc.GetString("nc-store-contract-confirm-claim-title"),
+                Loc.GetString("nc-store-contract-confirm-claim", ("contract", BuildPrettyTitle(_data))),
+                Loc.GetString("nc-store-contract-confirm-claim-action"),
+                Color.FromHex("#243729"),
+                Color.FromHex("#7DA260"),
+                PrimaryActionButton,
+                () => OnClaim?.Invoke(contractId));
+            return;
+        }
+
+        if (canPartialTurnIn)
+        {
+            var contractId = _data.Id;
+            ShowContractConfirmation(
+                Loc.GetString("nc-store-contract-confirm-partial-title"),
+                Loc.GetString("nc-store-contract-confirm-partial", ("contract", BuildPrettyTitle(_data))),
+                Loc.GetString("nc-store-contract-confirm-partial-action"),
+                Color.FromHex("#243729"),
+                Color.FromHex("#7DA260"),
+                PrimaryActionButton,
+                () => OnClaim?.Invoke(contractId));
+        }
     }
 
     private void ShowContractConfirmation(

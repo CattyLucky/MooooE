@@ -18,6 +18,7 @@
   supervisors: job-supervisors-sheriff
   weight: 150
   displayWeight: 60
+  salary: 20000 # Frontier
   hideConsoleVisibility: true #Forge-Change
  # guides: [ BasicLore, TransSolarFederation ] # Forge-Change-delete
   assignedCompany: TSF # Forge-Change

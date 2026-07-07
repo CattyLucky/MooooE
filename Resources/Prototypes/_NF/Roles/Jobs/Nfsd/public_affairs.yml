@@ -20,6 +20,7 @@
  # guides: [ BasicLore, TransSolarFederation ] # Forge-Change-delete
   weight: 105
   displayWeight: 16
+  salary: 20000 # Frontier
   assignedCompany: TSF # Forge-Change
   assignedNationality: TransSolarFederation
   setPreference: false # mono

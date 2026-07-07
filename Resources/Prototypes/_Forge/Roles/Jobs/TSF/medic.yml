@@ -16,6 +16,7 @@
   supervisors: job-supervisors-tsf-officers
   weight: 130
   displayWeight: 40
+  salary: 30000
   assignedCompany: TSF
   assignedNationality: TransSolarFederation
   canBeAntag: false

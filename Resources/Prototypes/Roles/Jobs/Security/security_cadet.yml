@@ -13,6 +13,7 @@
   startingGear: SecurityCadetGear
   icon: "JobIconSecurityCadet"
   supervisors: job-supervisors-security
+  salary: 20000 # Frontier
   canBeAntag: false
   ## Frontier: commented out stuff below
   # access:

@@ -10,6 +10,7 @@
   startingGear: ServiceWorkerGear
   icon: "JobIconServiceWorker"
   supervisors: job-supervisors-service
+  salary: 20000 # Frontier
   accessGroups: # Frontier
   - GeneralAccess # Frontier
   # access: # Frontier

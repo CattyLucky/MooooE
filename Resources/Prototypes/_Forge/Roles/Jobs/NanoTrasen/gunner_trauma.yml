@@ -14,6 +14,7 @@
   supervisors: job-supervisors-doc
   weight: 170
   displayWeight: 38
+  salary: 30000
   assignedCompany: MD
   canBeAntag: false
   accessGroups:

@@ -15,6 +15,7 @@
   supervisors: job-supervisors-doc
   weight: 170
   displayWeight: 39 # Forge
+  salary: 30000 # Frontier
   assignedCompany: MD
   canBeAntag: false
   accessGroups:

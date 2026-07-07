@@ -16,6 +16,7 @@
   supervisors: job-supervisors-overseer
   weight: 50
   displayWeight: 30
+  salary: 30000
   assignedCompany: Renegates
   assignedNationality: FreeColonies
   canBeAntag: false

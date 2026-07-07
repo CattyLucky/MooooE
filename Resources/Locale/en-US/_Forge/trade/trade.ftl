@@ -78,10 +78,16 @@ nc-store-contract-action-pinpointer-tooltip = Issue a new pinpointer for the cur
 
 nc-store-contract-confirm-take-title = Accept Contract
 nc-store-contract-confirm-skip-title = Skip Contract
+nc-store-contract-confirm-claim-title = Complete Contract
+nc-store-contract-confirm-partial-title = Turn In Cargo
 nc-store-contract-confirm-take = Accept contract "{ $contract }"?
 nc-store-contract-confirm-skip = Skip contract "{ $contract }" and replace it with a new one?
+nc-store-contract-confirm-claim = Complete contract "{ $contract }" and receive the reward?
+nc-store-contract-confirm-partial = Turn in available cargo for "{ $contract }"?
 nc-store-contract-confirm-take-action = Accept
 nc-store-contract-confirm-skip-action = Skip
+nc-store-contract-confirm-claim-action = Complete
+nc-store-contract-confirm-partial-action = Turn in
 nc-store-contract-confirm-no = No
 
 nc-store-contract-claim-tooltip-single = Complete this one-time contract and receive the full reward.

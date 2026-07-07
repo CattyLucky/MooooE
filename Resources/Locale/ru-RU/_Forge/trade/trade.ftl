@@ -78,10 +78,16 @@ nc-store-contract-action-pinpointer-tooltip = Выдать новый пелен
 
 nc-store-contract-confirm-take-title = Взятие контракта
 nc-store-contract-confirm-skip-title = Пропуск контракта
+nc-store-contract-confirm-claim-title = Завершение контракта
+nc-store-contract-confirm-partial-title = Сдача груза
 nc-store-contract-confirm-take = Взять контракт «{ $contract }»?
 nc-store-contract-confirm-skip = Пропустить контракт «{ $contract }» и заменить его новым?
+nc-store-contract-confirm-claim = Завершить контракт «{ $contract }» и получить награду?
+nc-store-contract-confirm-partial = Сдать доступный груз для контракта «{ $contract }»?
 nc-store-contract-confirm-take-action = Взять
 nc-store-contract-confirm-skip-action = Пропустить
+nc-store-contract-confirm-claim-action = Завершить
+nc-store-contract-confirm-partial-action = Сдать
 nc-store-contract-confirm-no = Нет
 
 nc-store-contract-claim-tooltip-single = Завершить разовый контракт и получить полную награду.

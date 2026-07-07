@@ -20,6 +20,7 @@
   alwaysUseSpawner: true
   weight: 170
   displayWeight: 38
+  salary: 50000
   canBeAntag: false
   assignedCompany: Imperial
   assignedNationality: Imperial

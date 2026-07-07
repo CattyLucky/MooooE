@@ -10,6 +10,7 @@
   startingGear: SecurityOfficerGear
   icon: "JobIconSecurityOfficer"
   supervisors: job-supervisors-hos
+  salary: 20000 # Frontier
   canBeAntag: false
   ## Frontier: commented out stuff below
   # access:

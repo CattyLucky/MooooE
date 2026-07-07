@@ -18,6 +18,7 @@
       department: Command
       time: 54000 # 15 hours
   weight: 20
+  salary: 20000 # Frontier
   startingGear: CaptainGear
   icon: "JobIconCaptain"
 # Frontier: commented out below, separate access

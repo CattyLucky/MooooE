@@ -18,6 +18,7 @@
   supervisors: job-supervisors-bailiff
   weight: 110
   displayWeight: 20
+  salary: 20000 # Frontier
   assignedCompany: TSF # Forge-Change
   assignedNationality: TransSolarFederation
   canBeAntag: false

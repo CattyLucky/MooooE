@@ -19,6 +19,7 @@
   supervisors: job-supervisors-bailiff
   weight: 125
   displayWeight: 35
+  salary: 20000 # Frontier
   hideConsoleVisibility: true #Forge Change
   canBeAntag: false
  # guides: [ BasicLore, TransSolarFederation ] # Forge-Change-delete

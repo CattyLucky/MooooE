@@ -9,6 +9,7 @@
   startingGear: MarsocFTLGear
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-ws
+  salary: 20000 # Frontier
   canBeAntag: false
   setPreference: false
   accessGroups:
@@ -41,6 +42,7 @@
   startingGear: MarsocOperativeGear
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-ws
+  salary: 20000 # Frontier
   canBeAntag: false
   setPreference: false
   accessGroups:

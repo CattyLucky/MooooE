@@ -10,6 +10,7 @@
   startingGear: MimeGear
   icon: "JobIconMime"
   supervisors: job-supervisors-hire # Frontier
+  salary: 20000 # Frontier
   accessGroups: # Frontier
   - GeneralAccess # Frontier
   special:

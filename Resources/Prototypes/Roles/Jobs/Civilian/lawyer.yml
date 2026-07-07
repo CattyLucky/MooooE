@@ -10,6 +10,7 @@
   startingGear: LawyerGear
   icon: "JobIconLawyer"
   supervisors: job-supervisors-hire
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups: # Frontier
   - GeneralAccess # Frontier

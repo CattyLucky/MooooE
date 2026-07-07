@@ -70,6 +70,8 @@
     - TsfCrew
     - TsfRanger
     - TsfRecruit
+    - Contractor
+    - Mercenary
   - type: Sprite
     sprite: Structures/Machines/computers.rsi
     layers:
@@ -105,6 +107,8 @@
     - Nt_Botanist
     - NFJanitor
     - CCServiceWorker
+    - Contractor
+    - Mercenary
   - type: Sprite
     sprite: Structures/Machines/computers.rsi
     layers:
@@ -135,6 +139,8 @@
     - NtMedicGunner
     - NtMedicPilot
     - NtMedic
+    - Contractor
+    - Mercenary
   - type: Sprite
     sprite: Structures/Machines/computers.rsi
     layers:
@@ -165,6 +171,8 @@
     - USSPMedic
     - USSPCorporal
     - USSPRifleman
+    - Contractor
+    - Mercenary
   - type: Sprite
     sprite: Structures/Machines/computers.rsi
     layers:
@@ -198,6 +206,8 @@
     - Foreman
     - Flunky
     - Militia
+    - Contractor
+    - Mercenary
   - type: Sprite
     sprite: Structures/Machines/computers.rsi
     layers:
@@ -238,6 +248,8 @@
     - EmpireApotek
     - Auxilia
     - Neophyte
+    - Contractor
+    - Mercenary
   - type: Sprite
     sprite: Structures/Machines/computers.rsi
     layers:

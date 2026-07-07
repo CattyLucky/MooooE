@@ -10,6 +10,7 @@
   startingGear: BoxerGear
   icon: "JobIconBoxer"
   supervisors: job-supervisors-hire # Frontier
+  salary: 20000 # Frontier
   accessGroups: # Frontier
   - GeneralAccess # Frontier
   special:

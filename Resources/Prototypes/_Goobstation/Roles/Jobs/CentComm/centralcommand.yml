@@ -11,6 +11,7 @@
   startingGear: NavyOfficerGear
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-commander
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups:
   - AllAccess
@@ -49,6 +50,7 @@
   startingGear: NavyCaptainGear
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-null
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups:
     - AllAccess
@@ -87,6 +89,7 @@
   startingGear: NavyOfficerUndercoverGear
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-commander
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups:
     - AllAccess
@@ -124,6 +127,7 @@
   startingGear: SpecialOperationsOfficerGear
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-commander
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups:
     - AllAccess
@@ -164,6 +168,7 @@
   startingGear: DiplomatGear
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-commander
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups:
   - AllAccess
@@ -200,6 +205,7 @@
   startingGear: GovernmentManGear
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-null
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups:
   - AllAccess

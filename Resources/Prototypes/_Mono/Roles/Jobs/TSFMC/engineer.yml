@@ -13,6 +13,7 @@
   supervisors: job-supervisors-sergeant
   weight: 130
   displayWeight: 20
+  salary: 30000 # Frontier
   assignedCompany: TSF # Forge-Change
   assignedNationality: TransSolarFederation
   canBeAntag: false

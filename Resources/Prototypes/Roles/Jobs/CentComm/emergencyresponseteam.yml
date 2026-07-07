@@ -8,6 +8,7 @@
   startingGear: ERTLeaderGearEVA
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups:
   - AllAccess
@@ -98,6 +99,7 @@
   startingGear: ERTChaplainGear
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups:
   - AllAccess
@@ -180,6 +182,7 @@
   startingGear: ERTEngineerGearEVA
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups:
   - AllAccess
@@ -252,6 +255,7 @@
   startingGear: ERTEngineerGearEVA
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups:
   - AllAccess
@@ -341,6 +345,7 @@
   startingGear: ERTMedicalGearEVA
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups:
   - AllAccess
@@ -405,6 +410,7 @@
   startingGear: ERTJanitorGearEVA
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups:
   - AllAccess

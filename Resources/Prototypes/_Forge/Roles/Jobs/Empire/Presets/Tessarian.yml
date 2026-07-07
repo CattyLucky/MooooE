@@ -34,6 +34,7 @@
   assignedNationality: Imperial
   weight: 20
   displayWeight: 20
+  salary: 50000
   canBeAntag: false
   setPreference: false
   overrideConsoleVisibility: true

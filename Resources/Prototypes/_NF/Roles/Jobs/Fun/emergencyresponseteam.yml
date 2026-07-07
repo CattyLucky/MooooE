@@ -8,6 +8,7 @@
   startingGear: ERTMailCarrierGearEVA
   icon: "JobIconNanotrasen"
   supervisors: job-supervisors-centcom
+  salary: 20000 # Frontier
   canBeAntag: false
   accessGroups:
   - AllAccess

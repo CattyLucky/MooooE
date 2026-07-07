@@ -6,6 +6,7 @@
   setPreference: false # Frontier
   startingGear: PassengerGear
   icon: "JobIconPassenger"
+  salary: 20000 # Frontier
 #  supervisors: job-supervisors-everyone
   accessGroups: # Frontier
   - GeneralAccess # Frontier

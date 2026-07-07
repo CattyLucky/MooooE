@@ -15,6 +15,7 @@
   supervisors: job-supervisors-Baron
   weight: 50
   displayWeight: 10
+  salary: 30000
   assignedCompany: Renegates
   canBeAntag: false
   access:

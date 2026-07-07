@@ -5,6 +5,7 @@
   playTimeTracker: JobVisitor
   canBeAntag: false
   icon: JobIconVisitor
+  salary: 20000 # Frontier
   setPreference: false
 #  overrideConsoleVisibility: true # Frontier
   accessGroups: # Frontier

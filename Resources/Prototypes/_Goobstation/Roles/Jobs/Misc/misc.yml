@@ -1,4 +1,5 @@
 - type: job
   id: Overall
+  salary: 20000 # Frontier
   name: job-name-overall
   playTimeTracker: Overall

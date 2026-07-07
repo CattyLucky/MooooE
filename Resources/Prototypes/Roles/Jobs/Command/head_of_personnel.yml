@@ -17,6 +17,7 @@
       department: Command
       time: 36000 # 10 hours
   weight: 20
+  salary: 20000 # Frontier
   startingGear: HoPGear
   icon: "JobIconHeadOfPersonnel"
   supervisors: job-supervisors-captain

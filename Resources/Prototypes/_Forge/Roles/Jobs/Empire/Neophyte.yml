@@ -15,6 +15,7 @@
   startingGear: NeophyteGear
   weight: 10
   displayWeight: 10
+  salary: 20000
   canBeAntag: false
   setPreference: true
   assignedCompany: Imperial

@@ -13,5 +13,6 @@
   hideConsoleVisibility: true #Forge Change
   icon: JobIconBorg
   supervisors: job-supervisors-hire
+  salary: 20000 # Frontier
   jobEntity: PlayerBorgTSF
   applyTraits: false
