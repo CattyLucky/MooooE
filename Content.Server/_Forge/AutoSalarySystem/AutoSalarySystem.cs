@@ -7,7 +7,6 @@ using Content.Server.Roles.Jobs;
 using Content.Shared._NF.Bank.Components;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
-using Content.Server.Popups;
 using Content.Shared.SSDIndicator;
 using Robust.Shared.Enums;
 using Robust.Shared.Prototypes;
@@ -26,7 +25,6 @@ public sealed class AutoSalarySystem : EntitySystem
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly MindSystem _mindSystem = default!;
-    [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly BankSystem _bank = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IAfkManager _afkManager = default!;
@@ -139,8 +137,6 @@ public sealed class AutoSalarySystem : EntitySystem
         var message = Loc.GetString("auto-salary-popup",
             ("salary", salary),
             ("balance", bank.Balance));
-
-        _popup.PopupEntity(message, body, body);
 
         if (_playerManager.TryGetSessionByEntity(body, out var session))
             _chat.DispatchServerMessage(session, message, suppressLog: true);
